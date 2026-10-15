@@ -2,14 +2,11 @@
   "name": "photobooth-monorepo",
   "private": true,
   "version": "0.1.0",
-  "workspaces": [
-    "frontend",
-    "backend",
-    "apps/*"
-  ],
   "type": "module",
   "scripts": {
-    "dev": "vite --port=3000 --host=0.0.0.0",
+    "dev": "vite --port=3001 --host=0.0.0.0",
+    "dev:frontend": "npm run --prefix frontend dev",
+    "dev:backend": "cd backend && go run main.go",
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
@@ -32,7 +29,6 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "autoprefixer": "^10.4.21",
-    "esbuild": "^0.25.0",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.21.0",
     "typescript": "^7.0.2",

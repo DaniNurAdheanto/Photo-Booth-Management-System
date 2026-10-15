@@ -12,6 +12,8 @@ bin/
 
 # Go compiled binaries
 apps/api/bin/
+backend/bin/
+backend/server
 *.exe
 *.exe~
 *.dll
@@ -19,6 +21,7 @@ apps/api/bin/
 *.dylib
 *.test
 apps/api/tmp/
+backend/tmp/
 
 # Environment files
 .env

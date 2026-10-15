@@ -1,7 +1,8 @@
 import React from 'react';
-import { Store, Film, Cpu, Database, CheckCircle2, Terminal } from 'lucide-react';
+import { Store, Film, Cpu, Database, CheckCircle2, Terminal, Plus, TrendingUp, Filter, DownloadCloud, Sparkles } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { BoothCard } from '@/features/booths/components/BoothCard';
 import { LiveSessionStatus } from '@/features/sessions/components/LiveSessionStatus';
 import { Booth } from '@/features/booths/types/booth.types';
@@ -64,93 +65,153 @@ const liveSession: PhotoSession = {
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
-      {/* Top Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+    <div className="space-y-8 max-w-7xl mx-auto">
+      {/* Page Header - Untitled UI Style */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-6">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-white">
-            Photo Booth Operations Hub
-          </h2>
-          <p className="text-sm text-slate-400 mt-1">
-            Next.js App Router (Frontend) • Go Gin (Backend) • PostgreSQL (Database) • TypeORM
+          <div className="flex items-center gap-2">
+            <h2 className="text-2xl font-bold tracking-tight text-gray-900 font-sans">
+              Photo Booth Operations Hub
+            </h2>
+            <Badge variant="brand" size="sm" withDot={false}>
+              Live
+            </Badge>
+          </div>
+          <p className="text-sm text-gray-500 mt-1">
+            Pantau unit photo booth, telemetri hardware, dan live photo session secara real-time.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="secondary" size="sm" className="gap-2">
-            <Terminal className="h-4 w-4" /> Docker Compose
+        <div className="flex items-center gap-3">
+          <Button variant="secondary" size="md" className="gap-2">
+            <DownloadCloud className="h-4 w-4 text-gray-500" /> Export Laporan
           </Button>
-          <Button variant="primary" size="sm">
-            + Tambah Unit Booth
+          <Button variant="primary" size="md" className="gap-2">
+            <Plus className="h-4 w-4" /> Tambah Booth
           </Button>
         </div>
       </div>
 
-      {/* Metrics Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <span className="text-xs text-slate-400 font-medium">Total Unit Booth</span>
-            <Store className="h-4 w-4 text-cyan-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">3 Unit</div>
-            <p className="text-[11px] text-emerald-400 mt-1 flex items-center gap-1">
-              <CheckCircle2 className="h-3 w-3" /> 2 Unit Siap Beroperasi
-            </p>
-          </CardContent>
+      {/* Metrics Row - Untitled UI Signature Stat Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {/* Metric 1 */}
+        <Card className="p-5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-gray-500">Total Unit Booth</span>
+            <div className="p-2 rounded-lg bg-brand-50 text-brand-600 border border-brand-100">
+              <Store className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-4">
+            <div className="text-2xl font-bold text-gray-900 tracking-tight">3 Unit</div>
+            <div className="mt-2 flex items-center gap-2 text-xs">
+              <span className="inline-flex items-center text-success-700 font-semibold gap-0.5">
+                <TrendingUp className="h-3.5 w-3.5 text-success-600" /> 2 Online
+              </span>
+              <span className="text-gray-400">• Siap beroperasi</span>
+            </div>
+          </div>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <span className="text-xs text-slate-400 font-medium">Sesi Aktif Saat Ini</span>
-            <Film className="h-4 w-4 text-amber-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">1 Sesi</div>
-            <p className="text-[11px] text-amber-400 mt-1">Central Park • Sedang Foto</p>
-          </CardContent>
+        {/* Metric 2 */}
+        <Card className="p-5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-gray-500">Sesi Aktif Live</span>
+            <div className="p-2 rounded-lg bg-warning-50 text-warning-600 border border-warning-100">
+              <Film className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-4">
+            <div className="text-2xl font-bold text-gray-900 tracking-tight">1 Sesi</div>
+            <div className="mt-2 flex items-center gap-2 text-xs">
+              <span className="inline-flex items-center text-warning-700 font-semibold gap-1">
+                Central Park
+              </span>
+              <span className="text-gray-400">• Sedang foto</span>
+            </div>
+          </div>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <span className="text-xs text-slate-400 font-medium">Database Status</span>
-            <Database className="h-4 w-4 text-cyan-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-cyan-400">PostgreSQL 16</div>
-            <p className="text-[11px] text-slate-400 mt-1">TypeORM Entity Synchronization OK</p>
-          </CardContent>
+        {/* Metric 3 */}
+        <Card className="p-5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-gray-500">PostgreSQL 16</span>
+            <div className="p-2 rounded-lg bg-brand-50 text-brand-600 border border-brand-100">
+              <Database className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-4">
+            <div className="text-2xl font-bold text-gray-900 tracking-tight">Port 5432</div>
+            <div className="mt-2 flex items-center gap-2 text-xs">
+              <span className="inline-flex items-center text-success-700 font-semibold gap-1">
+                <CheckCircle2 className="h-3.5 w-3.5 text-success-600" /> Terkoneksi
+              </span>
+              <span className="text-gray-400">• TypeORM Sync OK</span>
+            </div>
+          </div>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <span className="text-xs text-slate-400 font-medium">Go Backend API</span>
-            <Cpu className="h-4 w-4 text-emerald-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-emerald-400">Gin v1.9</div>
-            <p className="text-[11px] text-slate-400 mt-1">Handler, Service & Repo Layer OK</p>
-          </CardContent>
+        {/* Metric 4 */}
+        <Card className="p-5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-gray-500">Go Backend API</span>
+            <div className="p-2 rounded-lg bg-success-50 text-success-600 border border-success-100">
+              <Cpu className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-4">
+            <div className="text-2xl font-bold text-gray-900 tracking-tight">Gin v1.9</div>
+            <div className="mt-2 flex items-center gap-2 text-xs">
+              <span className="inline-flex items-center text-success-700 font-semibold gap-1">
+                :8080 Active
+              </span>
+              <span className="text-gray-400">• Layered Arch OK</span>
+            </div>
+          </div>
         </Card>
       </div>
 
-      {/* Live Session Telemetry */}
-      <div>
-        <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">
-          Live Session Telemetry
-        </h3>
+      {/* Live Session Telemetry Banner */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+            Live Session Telemetry
+          </h3>
+          <span className="text-xs text-gray-400">Sinkronisasi otomatis</span>
+        </div>
         <LiveSessionStatus session={liveSession} />
       </div>
 
-      {/* Booth Grid */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">
-            Unit Booth Terdaftar ({initialBooths.length})
-          </h3>
-          <span className="text-xs text-slate-400">Real-time status dari Go API</span>
+      {/* Booth Grid Section */}
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 className="text-base font-semibold text-gray-900">
+              Unit Photo Booth Terdaftar
+            </h3>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Menampilkan {initialBooths.length} booth yang dikelola sistem
+            </p>
+          </div>
+
+          {/* Untitled UI Filter Pills */}
+          <div className="flex items-center gap-2 bg-gray-100/80 p-1 rounded-lg border border-gray-200 text-xs">
+            <button className="px-3 py-1 font-semibold rounded-md bg-white text-gray-900 shadow-xs">
+              Semua ({initialBooths.length})
+            </button>
+            <button className="px-3 py-1 font-medium rounded-md text-gray-600 hover:text-gray-900 transition-colors">
+              Online (1)
+            </button>
+            <button className="px-3 py-1 font-medium rounded-md text-gray-600 hover:text-gray-900 transition-colors">
+              In Session (1)
+            </button>
+            <button className="px-3 py-1 font-medium rounded-md text-gray-600 hover:text-gray-900 transition-colors">
+              Offline (1)
+            </button>
+          </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+        {/* Booth Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {initialBooths.map((booth) => (
             <BoothCard key={booth.id} booth={booth} />
           ))}

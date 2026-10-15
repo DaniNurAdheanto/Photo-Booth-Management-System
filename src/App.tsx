@@ -90,9 +90,12 @@ export default function App() {
                 <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800/60">
                   Frontend & Backend Terpisah
                 </span>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-800/60 flex items-center gap-1">
+                  <Sparkles className="h-3 w-3 text-purple-400" /> Untitled UI & Poppins
+                </span>
               </div>
               <p className="text-[11px] sm:text-xs text-slate-400 truncate">
-                Folder <code className="text-cyan-400 font-mono">frontend/</code> & <code className="text-emerald-400 font-mono">backend/</code> Terisolasi
+                Folder <code className="text-cyan-400 font-mono">frontend/</code> & <code className="text-emerald-400 font-mono">backend/</code> • Design System: Untitled UI • Font: Poppins
               </p>
             </div>
           </div>

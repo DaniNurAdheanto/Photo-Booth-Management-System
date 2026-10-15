@@ -39,7 +39,7 @@ export const MONOREPO_FILES: {
     path: 'package.json',
     name: 'package.json (Root)',
     category: 'root',
-    description: 'Root package.json configuring workspaces: ["frontend", "backend", "apps/*"]',
+    description: 'Root package.json configuring workspaces: ["frontend"]',
     language: 'json',
     badge: 'Workspace',
   },
