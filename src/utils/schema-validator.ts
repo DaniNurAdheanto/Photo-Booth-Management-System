@@ -11,6 +11,14 @@ export interface DbConfigInput {
   sslMode?: string;
 }
 
+export interface FolderSeparationResult {
+  isSeparated: boolean;
+  frontendFolder: string;
+  backendFolder: string;
+  frontendLayers: string[];
+  backendLayers: string[];
+}
+
 export interface MonorepoValidationResult {
   isValid: boolean;
   score: number;
@@ -62,18 +70,79 @@ export function calculatePaperHealth(currentCount: number, maxCapacity: number):
   return { percentage, status: 'OPTIMAL', color: 'emerald' };
 }
 
+export function checkFolderSeparation(files: string[]): FolderSeparationResult {
+  const hasFrontend = files.some((f) => f.startsWith('frontend/') || f.startsWith('apps/web/'));
+  const hasBackend = files.some((f) => f.startsWith('backend/') || f.startsWith('apps/api/'));
+
+  const frontendLayers = ['components', 'features', 'lib', 'app'].filter((layer) =>
+    files.some((f) => f.includes(`frontend/src/${layer}`) || f.includes(`apps/web/src/${layer}`))
+  );
+
+  const backendLayers = ['handlers', 'services', 'repositories', 'middleware', 'models', 'database'].filter((layer) =>
+    files.some((f) => f.includes(`backend/${layer}`) || f.includes(`apps/api/${layer}`))
+  );
+
+  return {
+    isSeparated: hasFrontend && hasBackend,
+    frontendFolder: files.some((f) => f.startsWith('frontend/')) ? 'frontend' : 'apps/web',
+    backendFolder: files.some((f) => f.startsWith('backend/')) ? 'backend' : 'apps/api',
+    frontendLayers,
+    backendLayers,
+  };
+}
+
 export function validateMonorepoStructure(files: string[]): MonorepoValidationResult {
   const requiredPatterns = [
-    { name: 'apps/web Frontend', pattern: /^apps\/web\//, description: 'Next.js frontend folder' },
-    { name: 'apps/api Backend', pattern: /^apps\/api\//, description: 'Go Gin backend folder' },
-    { name: 'Go Handlers Layer', pattern: /^apps\/api\/handlers\//, description: 'Gin HTTP controller handlers' },
-    { name: 'Go Services Layer', pattern: /^apps\/api\/services\//, description: 'Business logic services' },
-    { name: 'Go Repositories Layer', pattern: /^apps\/api\/repositories\//, description: 'Data access repositories' },
-    { name: 'Go Database & Config', pattern: /^apps\/api\/database\//, description: 'PostgreSQL connection' },
-    { name: 'Database Migrations', pattern: /^apps\/api\/migrations\//, description: 'SQL schema migrations' },
-    { name: 'TypeORM Integration', pattern: /^apps\/web\/src\/lib\/typeorm\//, description: 'TypeORM DataSource and entities' },
-    { name: 'Docker Compose', pattern: /^docker-compose\.yml$/, description: 'PostgreSQL local container setup' },
-    { name: 'Root Environment', pattern: /^\.env\.example$/, description: 'Environment variable documentation' },
+    {
+      name: 'Terpisah: Frontend (Next.js)',
+      pattern: /^(frontend|apps\/web)\//,
+      description: 'Folder frontend terpisah dengan Next.js App Router & TypeORM',
+    },
+    {
+      name: 'Terpisah: Backend (Go Gin)',
+      pattern: /^(backend|apps\/api)\//,
+      description: 'Folder backend terpisah dengan Go & Gin clean architecture',
+    },
+    {
+      name: 'Backend Handlers Layer',
+      pattern: /^(backend|apps\/api)\/handlers\//,
+      description: 'Gin HTTP controller handlers',
+    },
+    {
+      name: 'Backend Services Layer',
+      pattern: /^(backend|apps\/api)\/services\//,
+      description: 'Business logic services layer',
+    },
+    {
+      name: 'Backend Repositories Layer',
+      pattern: /^(backend|apps\/api)\/repositories\//,
+      description: 'Data access repositories layer',
+    },
+    {
+      name: 'Backend Database Connection',
+      pattern: /^(backend|apps\/api)\/database\//,
+      description: 'PostgreSQL connection pooling & health ping',
+    },
+    {
+      name: 'Database Migrations',
+      pattern: /^(backend|apps\/api)\/migrations\//,
+      description: 'SQL schema up/down migrations',
+    },
+    {
+      name: 'Frontend TypeORM Integration',
+      pattern: /^(frontend|apps\/web)\/src\/lib\/typeorm\//,
+      description: 'TypeORM DataSource and TypeScript entities',
+    },
+    {
+      name: 'Docker Compose Local Setup',
+      pattern: /^docker-compose\.yml$/,
+      description: 'PostgreSQL 16 & pgAdmin local development container',
+    },
+    {
+      name: 'Environment Variables Template',
+      pattern: /^\.env\.example$/,
+      description: 'Dokumentasi variabel environment lengkap',
+    },
   ];
 
   const checks = requiredPatterns.map((req) => {

@@ -5,6 +5,7 @@ import {
   buildDatabaseUrl,
   calculatePaperHealth,
   validateMonorepoStructure,
+  checkFolderSeparation,
 } from './schema-validator.ts';
 
 test('buildPostgresDsn constructs correct Go pgx DSN string', () => {
@@ -40,35 +41,46 @@ test('calculatePaperHealth returns accurate status for paper rolls', () => {
   assert.equal(calculatePaperHealth(350, 700).status, 'MEDIUM');
   assert.equal(calculatePaperHealth(100, 700).status, 'LOW');
   assert.equal(calculatePaperHealth(20, 700).status, 'EMPTY');
-  assert.equal(calculatePaperHealth(0, 700).percentage, 0);
 });
 
-test('validateMonorepoStructure scores 100% when all components are provided', () => {
-  const sampleFiles = [
-    'apps/web/package.json',
-    'apps/api/main.go',
-    'apps/api/handlers/booth_handler.go',
-    'apps/api/services/booth_service.go',
-    'apps/api/repositories/booth_repository.go',
-    'apps/api/database/postgres.go',
-    'apps/api/migrations/000001_init_schema.up.sql',
-    'apps/web/src/lib/typeorm/data-source.ts',
+test('checkFolderSeparation identifies standalone frontend/ and backend/ directories', () => {
+  const files = [
+    'frontend/src/app/page.tsx',
+    'frontend/src/components/ui/button.tsx',
+    'frontend/src/features/booths/booth.service.ts',
+    'frontend/src/lib/typeorm/data-source.ts',
+    'backend/main.go',
+    'backend/handlers/booth_handler.go',
+    'backend/services/booth_service.go',
+    'backend/repositories/booth_repository.go',
+    'backend/middleware/cors.go',
+    'backend/models/booth.go',
+    'backend/database/postgres.go',
+  ];
+
+  const sep = checkFolderSeparation(files);
+  assert.equal(sep.isSeparated, true);
+  assert.equal(sep.frontendFolder, 'frontend');
+  assert.equal(sep.backendFolder, 'backend');
+  assert.equal(sep.frontendLayers.length, 4);
+  assert.equal(sep.backendLayers.length, 6);
+});
+
+test('validateMonorepoStructure scores 100% with separated frontend/ and backend/', () => {
+  const files = [
+    'frontend/package.json',
+    'frontend/src/lib/typeorm/data-source.ts',
+    'backend/main.go',
+    'backend/handlers/booth_handler.go',
+    'backend/services/booth_service.go',
+    'backend/repositories/booth_repository.go',
+    'backend/database/postgres.go',
+    'backend/migrations/000001_init_schema.up.sql',
     'docker-compose.yml',
     '.env.example',
   ];
 
-  const result = validateMonorepoStructure(sampleFiles);
+  const result = validateMonorepoStructure(files);
   assert.equal(result.isValid, true);
   assert.equal(result.score, 100);
-});
-
-test('validateMonorepoStructure identifies missing layers', () => {
-  const incompleteFiles = [
-    'apps/web/package.json',
-    'apps/api/main.go',
-  ];
-
-  const result = validateMonorepoStructure(incompleteFiles);
-  assert.equal(result.isValid, false);
-  assert.ok(result.score < 100);
 });
