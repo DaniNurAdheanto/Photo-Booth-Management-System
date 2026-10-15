@@ -7,16 +7,16 @@ import { PhotoSession } from '../types/session.types';
 
 export function LiveSessionStatus({ session }: { session: PhotoSession }) {
   return (
-    <div className="rounded-xl border border-brand-200 bg-gradient-to-r from-brand-50/80 via-white to-white p-5 shadow-xs">
+    <div className="rounded-xl border border-[#a8d7bc] bg-gradient-to-r from-[#C1E3D0]/30 via-white to-white p-5 shadow-xs font-poppins">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Left: Session Code & Customer */}
         <div className="flex items-start sm:items-center gap-3.5">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-600 text-white shadow-xs shrink-0">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#C1E3D0] text-[#133825] border border-[#a8d7bc] shadow-xs shrink-0">
             <Film className="h-5 w-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-sm font-bold text-brand-900">{session.sessionCode}</span>
+              <span className="font-mono text-sm font-bold text-[#133825]">{session.sessionCode}</span>
               <Badge variant="warning" size="sm">
                 Live Capturing
               </Badge>

@@ -90,12 +90,12 @@ export default function App() {
                 <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800/60">
                   Frontend & Backend Terpisah
                 </span>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-800/60 flex items-center gap-1">
-                  <Sparkles className="h-3 w-3 text-purple-400" /> Untitled UI & Poppins
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#133825] text-[#C1E3D0] border border-[#a8d7bc]/50 flex items-center gap-1 font-poppins">
+                  <Sparkles className="h-3 w-3 text-[#C1E3D0]" /> Untitled UI & Poppins (#C1E3D0)
                 </span>
               </div>
               <p className="text-[11px] sm:text-xs text-slate-400 truncate">
-                Folder <code className="text-cyan-400 font-mono">frontend/</code> & <code className="text-emerald-400 font-mono">backend/</code> • Design System: Untitled UI • Font: Poppins
+                Folder <code className="text-[#C1E3D0] font-mono">frontend/</code> & <code className="text-emerald-400 font-mono">backend/</code> • Design System: Untitled UI • Primary: <code className="text-[#C1E3D0] font-mono">#C1E3D0</code> • Font: Poppins
               </p>
             </div>
           </div>
@@ -107,7 +107,7 @@ export default function App() {
             </span>
             <button
               onClick={() => setActiveTab('quickstart')}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#C1E3D0] hover:bg-[#aedbbe] text-[#133825] border border-[#a8d7bc] shadow-xs transition"
             >
               <Terminal className="h-3.5 w-3.5" />
               Quick Start

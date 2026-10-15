@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,20 +7,26 @@
 @layer base {
   :root {
     --font-poppins: 'Poppins', sans-serif;
+    --color-primary: #C1E3D0;
+    --color-primary-dark: #133825;
   }
 
   * {
     border-color: #EAECF0;
   }
 
-  body {
-    font-family: var(--font-poppins), 'Poppins', sans-serif;
+  html, body {
+    font-family: 'Poppins', var(--font-poppins), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  h1, h2, h3, h4, h5, h6, button, input, select, textarea {
+    font-family: 'Poppins', var(--font-poppins), sans-serif;
+  }
 }
 
-/* Untitled UI custom scrollbars */
+/* Custom scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -37,8 +45,8 @@
   background: #98A2B3;
 }
 
-/* Selection */
+/* Selection using #C1E3D0 */
 ::selection {
-  background-color: #F4EBFF;
-  color: #6941C6;
+  background-color: #C1E3D0;
+  color: #133825;
 }

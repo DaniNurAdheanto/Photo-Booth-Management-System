@@ -1,5 +1,5 @@
 import React from 'react';
-import { Camera, Printer, Wifi, MapPin, ArrowUpRight, RefreshCw, MoreVertical } from 'lucide-react';
+import { Camera, Printer, Wifi, MapPin, ArrowUpRight, RefreshCw } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -18,21 +18,21 @@ export function BoothCard({ booth }: { booth: Booth }) {
   const getProgressColor = (pct: number) => {
     if (pct <= 20) return 'bg-error-500';
     if (pct <= 50) return 'bg-warning-500';
-    return 'bg-brand-600';
+    return 'bg-[#5BA87E]';
   };
 
   return (
-    <Card className="flex flex-col justify-between group">
+    <Card className="flex flex-col justify-between group font-poppins">
       <div>
         <CardHeader className="flex flex-row items-start justify-between pb-3">
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-[11px] font-semibold text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200">
+              <span className="font-mono text-[11px] font-bold text-[#133825] bg-[#C1E3D0]/50 px-2 py-0.5 rounded border border-[#a8d7bc]">
                 {booth.code}
               </span>
               <span className="text-[11px] text-gray-400">Unit ID</span>
             </div>
-            <CardTitle className="mt-2 text-sm font-semibold text-gray-900 group-hover:text-brand-600 transition-colors">
+            <CardTitle className="mt-2 text-sm font-semibold text-gray-900 group-hover:text-[#2C6D4C] transition-colors">
               {booth.name}
             </CardTitle>
           </div>
@@ -66,7 +66,7 @@ export function BoothCard({ booth }: { booth: Booth }) {
             </div>
             <div className="flex justify-between text-[11px] text-gray-500">
               <span>Kapasitas</span>
-              <span className="font-medium text-gray-700">{paperPercentage}%</span>
+              <span className="font-semibold text-gray-800">{paperPercentage}%</span>
             </div>
           </div>
 

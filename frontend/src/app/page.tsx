@@ -1,6 +1,6 @@
 import React from 'react';
-import { Store, Film, Cpu, Database, CheckCircle2, Terminal, Plus, TrendingUp, Filter, DownloadCloud, Sparkles } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Store, Film, Cpu, Database, CheckCircle2, Plus, TrendingUp, DownloadCloud } from 'lucide-react';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BoothCard } from '@/features/booths/components/BoothCard';
@@ -65,12 +65,12 @@ const liveSession: PhotoSession = {
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
+    <div className="space-y-8 max-w-7xl mx-auto font-poppins">
       {/* Page Header - Untitled UI Style */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-6">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-2xl font-bold tracking-tight text-gray-900 font-sans">
+            <h2 className="text-2xl font-bold tracking-tight text-gray-900 font-poppins">
               Photo Booth Operations Hub
             </h2>
             <Badge variant="brand" size="sm" withDot={false}>
@@ -97,7 +97,7 @@ export default function DashboardPage() {
         <Card className="p-5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-gray-500">Total Unit Booth</span>
-            <div className="p-2 rounded-lg bg-brand-50 text-brand-600 border border-brand-100">
+            <div className="p-2 rounded-lg bg-[#C1E3D0]/40 text-[#133825] border border-[#a8d7bc]">
               <Store className="h-4 w-4" />
             </div>
           </div>
@@ -135,7 +135,7 @@ export default function DashboardPage() {
         <Card className="p-5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-gray-500">PostgreSQL 16</span>
-            <div className="p-2 rounded-lg bg-brand-50 text-brand-600 border border-brand-100">
+            <div className="p-2 rounded-lg bg-[#C1E3D0]/40 text-[#133825] border border-[#a8d7bc]">
               <Database className="h-4 w-4" />
             </div>
           </div>
@@ -193,9 +193,9 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          {/* Untitled UI Filter Pills */}
-          <div className="flex items-center gap-2 bg-gray-100/80 p-1 rounded-lg border border-gray-200 text-xs">
-            <button className="px-3 py-1 font-semibold rounded-md bg-white text-gray-900 shadow-xs">
+          {/* Untitled UI Filter Pills with #C1E3D0 Active State */}
+          <div className="flex items-center gap-1.5 bg-gray-100/80 p-1 rounded-lg border border-gray-200 text-xs">
+            <button className="px-3 py-1 font-bold rounded-md bg-[#C1E3D0] text-[#133825] border border-[#a8d7bc] shadow-xs">
               Semua ({initialBooths.length})
             </button>
             <button className="px-3 py-1 font-medium rounded-md text-gray-600 hover:text-gray-900 transition-colors">

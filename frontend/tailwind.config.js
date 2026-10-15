@@ -14,20 +14,36 @@ module.exports = {
         poppins: ['var(--font-poppins)', 'Poppins', 'sans-serif'],
       },
       colors: {
-        // Untitled UI signature Brand / Violet scale
+        // Primary brand palette built around user requested #C1E3D0
+        primary: {
+          DEFAULT: '#C1E3D0',
+          25: '#FAFCFA',
+          50: '#F2F9F5',
+          100: '#E4F3EB',
+          200: '#D2ECDE',
+          300: '#C1E3D0', // Exact Primary Color
+          400: '#A3D4B8',
+          500: '#7EC29B',
+          600: '#5BA87E',
+          700: '#418B63',
+          800: '#2C6D4C',
+          900: '#1B4E35',
+          950: '#0E2E1E',
+        },
         brand: {
-          25: '#FCFAFF',
-          50: '#F9F5FF',
-          100: '#F4EBFF',
-          200: '#E9D7FE',
-          300: '#D6BBFB',
-          400: '#B692F6',
-          500: '#9E77ED',
-          600: '#7F56D9',
-          700: '#6941C6',
-          800: '#53389E',
-          900: '#42307D',
-          950: '#2C1C5F',
+          DEFAULT: '#C1E3D0',
+          25: '#FAFCFA',
+          50: '#F2F9F5',
+          100: '#E4F3EB',
+          200: '#D2ECDE',
+          300: '#C1E3D0', // Exact Primary Color
+          400: '#A3D4B8',
+          500: '#7EC29B',
+          600: '#5BA87E',
+          700: '#418B63',
+          800: '#2C6D4C',
+          900: '#1B4E35',
+          950: '#0E2E1E',
         },
         // Untitled UI Neutral Gray scale
         gray: {

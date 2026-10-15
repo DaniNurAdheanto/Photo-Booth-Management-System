@@ -17,7 +17,7 @@ export function Badge({
 }: BadgeProps) {
   const variants = {
     default: 'bg-gray-50 text-gray-700 border-gray-200',
-    brand: 'bg-brand-50 text-brand-700 border-brand-200',
+    brand: 'bg-[#C1E3D0]/45 text-[#133825] border-[#a8d7bc] font-semibold',
     success: 'bg-success-50 text-success-700 border-success-200',
     warning: 'bg-warning-50 text-warning-700 border-warning-200',
     danger: 'bg-error-50 text-error-700 border-error-200',
@@ -26,7 +26,7 @@ export function Badge({
 
   const dots = {
     default: 'bg-gray-500',
-    brand: 'bg-brand-500',
+    brand: 'bg-[#2C6D4C]',
     success: 'bg-success-500',
     warning: 'bg-warning-500',
     danger: 'bg-error-500',
@@ -51,7 +51,7 @@ export function Badge({
       {withDot && (
         <span
           className={cn('h-1.5 w-1.5 rounded-full shrink-0', dots[variant], {
-            'animate-pulse': variant === 'success' || variant === 'warning',
+            'animate-pulse': variant === 'success' || variant === 'warning' || variant === 'brand',
           })}
         />
       )}

@@ -13,7 +13,7 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: 'Photo Booth Management System - Untitled UI',
-  description: 'Scalable Monorepo with Next.js 14, Go Gin, PostgreSQL and TypeORM styled with Untitled UI Design System & Poppins font',
+  description: 'Scalable Monorepo with Next.js 14, Go Gin, PostgreSQL and TypeORM styled with Untitled UI Design System, #C1E3D0 primary color, and Poppins font',
 };
 
 export default function RootLayout({
@@ -22,8 +22,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id" className={`${poppins.variable} font-sans antialiased h-full`}>
-      <body className="min-h-full bg-gray-50 text-gray-900 flex flex-col font-sans selection:bg-brand-100 selection:text-brand-900">
+    <html lang="id" className={`${poppins.variable} ${poppins.className} font-poppins antialiased h-full`}>
+      <body className="min-h-full bg-gray-50 text-gray-900 flex flex-col font-poppins selection:bg-[#C1E3D0] selection:text-[#133825]">
         <Header />
         <div className="flex flex-1 overflow-hidden">
           <Sidebar />
