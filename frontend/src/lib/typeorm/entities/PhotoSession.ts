@@ -5,9 +5,11 @@ export enum SessionStatus {
   PENDING = 'PENDING',
   COUNTDOWN = 'COUNTDOWN',
   CAPTURING = 'CAPTURING',
-  PRINTING = 'PRINTING',
+  REVIEWING = 'REVIEWING',
+  PROCESSING = 'PROCESSING',
   COMPLETED = 'COMPLETED',
   CANCELLED = 'CANCELLED',
+  FAILED = 'FAILED',
 }
 
 @Entity({ name: 'photo_sessions' })
@@ -47,6 +49,30 @@ export class PhotoSession {
 
   @Column({ type: 'varchar', length: 64, name: 'template_id', nullable: true })
   templateId?: string;
+
+  @Column({ type: 'int', name: 'countdown_seconds', default: 5 })
+  countdownSeconds!: number;
+
+  @Column({ type: 'int', name: 'retake_count', default: 0 })
+  retakeCount!: number;
+
+  @Column({ type: 'varchar', length: 50, name: 'filter_preset', default: 'ORIGINAL' })
+  filterPreset!: string;
+
+  @Column({ type: 'varchar', length: 100, name: 'idempotency_key', nullable: true })
+  idempotencyKey?: string;
+
+  @Column({ type: 'text', name: 'captured_photos', default: '[]' })
+  capturedPhotos!: string;
+
+  @Column({ type: 'text', name: 'final_composite_url', default: '' })
+  finalCompositeUrl!: string;
+
+  @Column({ type: 'text', name: 'qr_code_url', default: '' })
+  qrCodeUrl!: string;
+
+  @Column({ type: 'text', name: 'notes', default: '' })
+  notes!: string;
 
   @Column({ type: 'timestamptz', name: 'started_at', nullable: true })
   startedAt?: Date;

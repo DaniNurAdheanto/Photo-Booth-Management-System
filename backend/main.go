@@ -43,22 +43,26 @@ func main() {
 	// 3. Initialize Repositories
 	boothRepo := repositories.NewBoothRepository(pgDB.DB)
 	sessionRepo := repositories.NewSessionRepository(pgDB.DB)
+	templateRepo := repositories.NewTemplateRepository(pgDB.DB)
 
 	// 4. Initialize Services (Business Logic)
 	boothService := services.NewBoothService(boothRepo)
 	sessionService := services.NewSessionService(sessionRepo, boothRepo)
+	templateService := services.NewTemplateService(templateRepo)
 
 	// 5. Initialize HTTP Handlers
 	healthHandler := handlers.NewHealthHandler(pgDB)
 	boothHandler := handlers.NewBoothHandler(boothService)
 	sessionHandler := handlers.NewSessionHandler(sessionService)
+	templateHandler := handlers.NewTemplateHandler(templateService)
 
 	// 6. Setup Router & Middlewares
 	router := routes.SetupRouter(&routes.RouterDependencies{
-		Config:         cfg,
-		HealthHandler:  healthHandler,
-		BoothHandler:   boothHandler,
-		SessionHandler: sessionHandler,
+		Config:          cfg,
+		HealthHandler:   healthHandler,
+		BoothHandler:    boothHandler,
+		SessionHandler:  sessionHandler,
+		TemplateHandler: templateHandler,
 	})
 
 	serverAddr := fmt.Sprintf(":%s", cfg.Port)

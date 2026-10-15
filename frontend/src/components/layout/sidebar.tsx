@@ -1,15 +1,20 @@
+'use client';
+
 import React from 'react';
-import { LayoutDashboard, Store, Film, CalendarDays, Cpu, Layers, LogOut, CheckCircle2, ChevronRight } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { LayoutDashboard, Store, Film, CalendarDays, Cpu, Layers, LogOut, CheckCircle2 } from 'lucide-react';
 
 export function Sidebar() {
+  const pathname = usePathname();
+
   const navItems = [
-    { label: 'Overview', icon: LayoutDashboard, active: true, count: null },
-    { label: 'Booths & Hardware', icon: Store, active: false, count: '3' },
-    { label: 'Live Sessions', icon: Film, active: false, count: '1' },
-    { label: 'Bookings & Events', icon: CalendarDays, active: false, count: '8' },
-    { label: 'Telemetry & Devices', icon: Cpu, active: false, count: null },
-    { label: 'Print Templates', icon: Layers, active: false, count: '12' },
+    { label: 'Overview', href: '/', icon: LayoutDashboard, count: null },
+    { label: 'Session Management', href: '/sessions', icon: Film, count: 'Live' },
+    { label: 'Print Templates', href: '/templates', icon: Layers, count: '5' },
+    { label: 'Booths & Hardware', href: '/#booths', icon: Store, count: '3' },
+    { label: 'Bookings & Events', href: '/#bookings', icon: CalendarDays, count: '8' },
+    { label: 'Telemetry & Devices', href: '/#telemetry', icon: Cpu, count: null },
   ];
 
   return (
@@ -23,31 +28,34 @@ export function Sidebar() {
           <nav className="mt-2.5 space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
+              const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
+
               return (
-                <button
+                <Link
                   key={item.label}
+                  href={item.href}
                   className={`group flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-medium transition-all ${
-                    item.active
+                    isActive
                       ? 'bg-[#C1E3D0]/40 text-[#133825] font-semibold border-r-2 border-[#418B63]'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
                     <Icon className={`h-4 w-4 transition-colors ${
-                      item.active ? 'text-[#2C6D4C]' : 'text-gray-400 group-hover:text-gray-600'
+                      isActive ? 'text-[#2C6D4C]' : 'text-gray-400 group-hover:text-gray-600'
                     }`} />
                     <span>{item.label}</span>
                   </div>
                   {item.count && (
                     <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full ${
-                      item.active
+                      isActive
                         ? 'bg-[#C1E3D0] text-[#133825] border border-[#a8d7bc]'
                         : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
                     }`}>
                       {item.count}
                     </span>
                   )}
-                </button>
+                </Link>
               );
             })}
           </nav>

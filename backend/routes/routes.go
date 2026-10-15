@@ -8,10 +8,11 @@ import (
 )
 
 type RouterDependencies struct {
-	Config         *config.Config
-	HealthHandler  *handlers.HealthHandler
-	BoothHandler   *handlers.BoothHandler
-	SessionHandler *handlers.SessionHandler
+	Config          *config.Config
+	HealthHandler   *handlers.HealthHandler
+	BoothHandler    *handlers.BoothHandler
+	SessionHandler  *handlers.SessionHandler
+	TemplateHandler *handlers.TemplateHandler
 }
 
 func SetupRouter(deps *RouterDependencies) *gin.Engine {
@@ -44,7 +45,27 @@ func SetupRouter(deps *RouterDependencies) *gin.Engine {
 		sessions := v1.Group("/sessions")
 		{
 			sessions.GET("", deps.SessionHandler.ListSessions)
+			sessions.GET("/:id", deps.SessionHandler.GetSession)
+			sessions.GET("/active/:booth_id", deps.SessionHandler.GetActiveSession)
 			sessions.POST("/start", deps.SessionHandler.StartSession)
+			sessions.POST("/:id/capture", deps.SessionHandler.CapturePhoto)
+			sessions.POST("/:id/retake", deps.SessionHandler.RetakePhoto)
+			sessions.POST("/:id/confirm", deps.SessionHandler.ConfirmSession)
+			sessions.POST("/:id/cancel", deps.SessionHandler.CancelSession)
+			sessions.DELETE("/:id", deps.SessionHandler.DeleteSession)
+		}
+
+		// Template & Layout routes
+		templates := v1.Group("/templates")
+		{
+			templates.GET("", deps.TemplateHandler.ListTemplates)
+			templates.GET("/:id", deps.TemplateHandler.GetTemplate)
+			templates.POST("", deps.TemplateHandler.CreateTemplate)
+			templates.PUT("/:id", deps.TemplateHandler.UpdateTemplate)
+			templates.DELETE("/:id", deps.TemplateHandler.DeleteTemplate)
+			templates.PATCH("/:id/toggle", deps.TemplateHandler.ToggleActive)
+			templates.PATCH("/:id/archive", deps.TemplateHandler.ToggleArchive)
+			templates.POST("/:id/duplicate", deps.TemplateHandler.DuplicateTemplate)
 		}
 	}
 
