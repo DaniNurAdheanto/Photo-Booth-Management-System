@@ -1,0 +1,6 @@
+{
+  "name": "Photo Booth Management Monorepo",
+  "description": "Scalable monorepo architecture for Photo Booth Management System with Next.js (App Router), Go Gin API, TypeORM, and PostgreSQL.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
