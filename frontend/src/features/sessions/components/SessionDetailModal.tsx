@@ -44,12 +44,12 @@ export function SessionDetailModal({
   const endedAt = session.ended_at || session.endedAt;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-fade-in font-poppins">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-fade-in font-sora">
       <div className="relative w-full max-w-3xl rounded-2xl bg-white shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[90vh]">
         {/* Modal Header */}
         <div className="px-6 py-4.5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#C1E3D0]/60 border border-[#a8d7bc] flex items-center justify-center text-[#133825]">
+            <div className="h-10 w-10 rounded-xl bg-[#DE5795]/15 border border-[#DE5795]/30 flex items-center justify-center text-[#9D174D]">
               <Camera className="w-5 h-5" />
             </div>
             <div>
@@ -62,7 +62,7 @@ export function SessionDetailModal({
                       : session.status === 'REVIEWING'
                       ? 'bg-amber-50 text-amber-700 border border-amber-200'
                       : session.status === 'CAPTURING' || session.status === 'COUNTDOWN'
-                      ? 'bg-[#C1E3D0] text-[#133825] border border-[#a8d7bc]'
+                      ? 'bg-[#DE5795] text-white border border-[#c93d7e]'
                       : 'bg-gray-100 text-gray-700'
                   }`}
                 >
@@ -144,10 +144,10 @@ export function SessionDetailModal({
 
           {/* Composite and QR Code Preview */}
           {(finalComposite || qrCodeUrl) && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl bg-[#C1E3D0]/20 border border-[#a8d7bc]/60">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl bg-[#DE5795]/10 border border-[#DE5795]/25">
               {finalComposite && (
                 <div>
-                  <span className="text-xs font-semibold text-[#133825] mb-2 block">
+                  <span className="text-xs font-semibold text-[#9D174D] mb-2 block">
                     Hasil Cetak Final (Composite)
                   </span>
                   <div className="rounded-lg overflow-hidden border border-gray-200 bg-white max-h-48 flex items-center justify-center">
@@ -157,7 +157,7 @@ export function SessionDetailModal({
               )}
               {qrCodeUrl && (
                 <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-white border border-gray-200 text-center">
-                  <span className="text-xs font-semibold text-[#133825] mb-2">QR Code Unduhan Digital</span>
+                  <span className="text-xs font-semibold text-[#9D174D] mb-2">QR Code Unduhan Digital</span>
                   <img src={qrCodeUrl} alt="QR Code" className="w-28 h-28 object-contain" />
                   <p className="text-[10px] text-gray-500 mt-2">Pindai dengan kamera ponsel untuk menyimpan foto.</p>
                 </div>

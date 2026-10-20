@@ -33,7 +33,7 @@ const CURATED_LIBRARY_PRESETS = [
     slots_count: 3,
     width: 600,
     height: 1800,
-    background_color: '#C1E3D0',
+    background_color: '#DE5795',
     event_name: 'The Wedding of Sarah & Dani',
     print_size: '2x6 in',
     orientation: 'PORTRAIT',
@@ -300,7 +300,7 @@ export default function TemplatesPage() {
   const layoutCount = new Set(templates.map((t) => t.layout)).size;
 
   return (
-    <div className="space-y-6 font-poppins">
+    <div className="space-y-6 font-sora">
         {/* Toast Notification */}
         {toast && (
           <div className="fixed top-6 right-6 z-50 animate-fade-in">
@@ -321,10 +321,10 @@ export default function TemplatesPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+              <h1 className="text-2xl font-bold tracking-tight text-gray-900 font-sora">
                 Template & Layout Management
               </h1>
-              <span className="px-2.5 py-0.5 rounded-full bg-[#C1E3D0] text-[#133825] text-xs font-bold border border-[#a8d7bc]">
+              <span className="px-2.5 py-0.5 rounded-full bg-[#DE5795] text-white text-xs font-bold border border-[#DE5795]">
                 PRD Verified
               </span>
             </div>
@@ -339,7 +339,7 @@ export default function TemplatesPage() {
               onClick={() => setIsLibraryOpen(true)}
               className="px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2 shadow-xs"
             >
-              <BookOpen className="w-4 h-4 text-[#2C6D4C]" />
+              <BookOpen className="w-4 h-4 text-[#DE5795]" />
               <span>Template Library</span>
             </button>
 
@@ -348,7 +348,7 @@ export default function TemplatesPage() {
                 setEditingTemplate(null);
                 setIsModalOpen(true);
               }}
-              className="px-4.5 py-2.5 rounded-xl bg-[#C1E3D0] text-[#133825] text-xs font-bold hover:bg-[#aee0c2] transition-colors border border-[#418B63]/40 flex items-center gap-2 shadow-sm"
+              className="px-4.5 py-2.5 rounded-xl bg-[#DE5795] text-white text-xs font-bold hover:bg-[#c93d7e] transition-colors border border-[#DE5795] flex items-center gap-2 shadow-sm"
             >
               <Plus className="w-4 h-4" />
               <span>Buat Template Baru</span>
@@ -365,18 +365,18 @@ export default function TemplatesPage() {
             </div>
             <div className="mt-2 flex items-baseline gap-2">
               <span className="text-2xl font-bold text-gray-900">{totalCount}</span>
-              <span className="text-[11px] text-gray-500 font-medium">di PostgreSQL</span>
+              <span className="text-[11px] text-gray-500 font-medium">desain tersimpan</span>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-[#C1E3D0] bg-[#C1E3D0]/20 p-4 shadow-xs">
+          <div className="rounded-2xl border border-[#DE5795]/30 bg-[#DE5795]/10 p-4 shadow-xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-[#133825]">Template Aktif</span>
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-xs font-semibold text-[#9D174D]">Template Aktif</span>
+              <span className="w-2 h-2 rounded-full bg-[#DE5795] animate-pulse" />
             </div>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-[#133825]">{activeCount}</span>
-              <span className="text-[11px] text-[#2C6D4C] font-semibold">tersedia di Kiosk</span>
+              <span className="text-2xl font-bold text-[#9D174D]">{activeCount}</span>
+              <span className="text-[11px] text-[#DE5795] font-semibold">tersedia di Kiosk</span>
             </div>
           </div>
 
@@ -421,7 +421,7 @@ export default function TemplatesPage() {
                   onClick={() => setLayoutFilter(tab.value)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${
                     layoutFilter === tab.value
-                      ? 'bg-[#C1E3D0] text-[#133825] border border-[#a8d7bc]'
+                      ? 'bg-[#DE5795] text-white border border-[#DE5795]'
                       : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
@@ -436,7 +436,7 @@ export default function TemplatesPage() {
               <select
                 value={boothFilter}
                 onChange={(e) => setBoothFilter(e.target.value)}
-                className="px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-700 focus:outline-hidden focus:border-[#418B63]"
+                className="px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-700 focus:outline-hidden focus:border-[#DE5795]"
               >
                 <option value="all">Semua Booth</option>
                 <option value="bth-001">Booth Alpha (GI)</option>
@@ -468,7 +468,7 @@ export default function TemplatesPage() {
               placeholder="Cari template berdasarkan nama, judul acara, atau deskripsi..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#418B63] focus:ring-2 focus:ring-[#C1E3D0]"
+              className="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#DE5795] focus:ring-2 focus:ring-[#DE5795]/20"
             />
           </div>
         </div>
@@ -476,8 +476,8 @@ export default function TemplatesPage() {
         {/* Templates Grid */}
         {isLoading ? (
           <div className="py-20 text-center rounded-2xl border border-gray-200 bg-white">
-            <RefreshCw className="w-8 h-8 text-[#2C6D4C] animate-spin mx-auto mb-3" />
-            <p className="text-xs font-medium text-gray-500">Memuat template dari database PostgreSQL...</p>
+            <RefreshCw className="w-8 h-8 text-[#DE5795] animate-spin mx-auto mb-3" />
+            <p className="text-xs font-medium text-gray-500">Memuat koleksi template desain...</p>
           </div>
         ) : filteredTemplates.length === 0 ? (
           <div className="py-20 text-center rounded-2xl border border-dashed border-gray-300 bg-white p-6 space-y-3">
@@ -490,7 +490,7 @@ export default function TemplatesPage() {
             </div>
             <button
               onClick={() => setIsLibraryOpen(true)}
-              className="px-4 py-2 rounded-xl bg-[#C1E3D0] text-[#133825] text-xs font-bold hover:bg-[#aee0c2] transition-colors border border-[#418B63]/40"
+              className="px-4 py-2 rounded-xl bg-[#DE5795] text-white text-xs font-bold hover:bg-[#c93d7e] transition-colors border border-[#DE5795]"
             >
               Buka Template Library
             </button>
@@ -528,15 +528,15 @@ export default function TemplatesPage() {
 
       {/* Template Library Drawer / Modal */}
       {isLibraryOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/60 backdrop-blur-sm animate-fade-in font-poppins">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/60 backdrop-blur-sm animate-fade-in font-sora">
           <div className="relative w-full max-w-3xl rounded-3xl bg-white shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[88vh]">
             <div className="px-6 py-4.5 border-b border-gray-100 flex items-center justify-between bg-gray-50/70">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-[#C1E3D0] text-[#133825] border border-[#a8d7bc]">
+                <div className="p-2.5 rounded-xl bg-[#DE5795] text-white border border-[#DE5795]">
                   <BookOpen className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-gray-900">Template Library</h3>
+                  <h3 className="text-base font-bold text-gray-900 font-sora">Template Library</h3>
                   <p className="text-xs text-gray-500">
                     Pilih preset profesional siap pakai untuk langsung ditambahkan ke sistem booth Anda.
                   </p>
@@ -555,12 +555,12 @@ export default function TemplatesPage() {
                 {CURATED_LIBRARY_PRESETS.map((preset, idx) => (
                   <div
                     key={idx}
-                    className="p-4 rounded-2xl border border-gray-200 bg-white hover:border-[#418B63] hover:shadow-md transition-all flex flex-col justify-between space-y-3"
+                    className="p-4 rounded-2xl border border-gray-200 bg-white hover:border-[#DE5795] hover:shadow-md transition-all flex flex-col justify-between space-y-3"
                   >
                     <div>
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-gray-900">{preset.name}</span>
-                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#C1E3D0]/60 text-[#133825] border border-[#a8d7bc]">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#DE5795]/15 text-[#9D174D] border border-[#DE5795]/30">
                           {preset.print_size}
                         </span>
                       </div>
@@ -571,7 +571,7 @@ export default function TemplatesPage() {
                       <span className="text-gray-400 text-[11px]">{preset.slots_count} Foto • {preset.category}</span>
                       <button
                         onClick={() => handleInstallPreset(preset)}
-                        className="px-3 py-1.5 rounded-lg bg-[#C1E3D0] text-[#133825] font-bold text-xs hover:bg-[#aee0c2] transition-colors border border-[#418B63]/40"
+                        className="px-3 py-1.5 rounded-lg bg-[#DE5795] text-white font-bold text-xs hover:bg-[#c93d7e] transition-colors border border-[#DE5795]"
                       >
                         Pasang Template
                       </button>
@@ -595,7 +595,7 @@ export default function TemplatesPage() {
 
       {/* Delete Confirmation Modal */}
       {deleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/60 backdrop-blur-sm animate-fade-in font-poppins">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/60 backdrop-blur-sm animate-fade-in font-sora">
           <div className="relative w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl border border-gray-100 text-center space-y-4">
             <div className="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center mx-auto">
               <AlertTriangle className="w-6 h-6" />

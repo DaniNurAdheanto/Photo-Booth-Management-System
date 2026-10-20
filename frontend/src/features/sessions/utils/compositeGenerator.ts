@@ -32,7 +32,7 @@ export async function generateCompositeImage(options: GenerateCompositeOptions):
   if (!ctx) return '';
 
   // 1. Draw Background
-  ctx.fillStyle = backgroundColor || '#C1E3D0';
+  ctx.fillStyle = backgroundColor || '#DE5795';
   ctx.fillRect(0, 0, width, height);
 
   // 2. Add subtle texture or border
@@ -102,18 +102,18 @@ export async function generateCompositeImage(options: GenerateCompositeOptions):
     }
 
     // Footer Branding
-    ctx.fillStyle = '#133825';
-    ctx.font = 'bold 36px Poppins, sans-serif';
+    ctx.fillStyle = '#470F29';
+    ctx.font = 'bold 36px Sora, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('PHOTO BOOTH', width / 2, height - 100);
 
-    ctx.font = '22px Poppins, sans-serif';
-    ctx.fillStyle = '#2C6D4C';
+    ctx.font = '22px Sora, sans-serif';
+    ctx.fillStyle = '#8C2454';
     ctx.fillText(templateName || 'Moments to Remember', width / 2, height - 60);
 
     const dateStr = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' });
-    ctx.font = '16px Poppins, sans-serif';
-    ctx.fillStyle = '#418B63';
+    ctx.font = '16px Sora, sans-serif';
+    ctx.fillStyle = '#A92B66';
     ctx.fillText(dateStr, width / 2, height - 30);
   } else if (layout === '2x2_grid') {
     const pad = 40;
@@ -149,13 +149,13 @@ export async function generateCompositeImage(options: GenerateCompositeOptions):
     }
 
     // Bottom Branding
-    ctx.fillStyle = '#133825';
-    ctx.font = 'bold 44px Poppins, sans-serif';
+    ctx.fillStyle = '#470F29';
+    ctx.font = 'bold 44px Sora, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(templateName || 'PHOTO BOOTH MOMENTS', width / 2, height - 100);
 
-    ctx.font = '22px Poppins, sans-serif';
-    ctx.fillStyle = '#2C6D4C';
+    ctx.font = '22px Sora, sans-serif';
+    ctx.fillStyle = '#8C2454';
     ctx.fillText(new Date().toDateString(), width / 2, height - 50);
   } else {
     // Default / Postcard / Polaroid
@@ -184,8 +184,8 @@ export async function generateCompositeImage(options: GenerateCompositeOptions):
       }
     }
 
-    ctx.fillStyle = '#133825';
-    ctx.font = 'bold 36px Poppins, sans-serif';
+    ctx.fillStyle = '#470F29';
+    ctx.font = 'bold 36px Sora, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('PHOTO BOOTH', width / 2, height - 70);
   }

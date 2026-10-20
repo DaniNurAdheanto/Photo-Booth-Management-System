@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       slotsCount: body.slots_count || body.slotsCount || 4,
       width: body.width || 600,
       height: body.height || 1800,
-      backgroundColor: body.background_color || body.backgroundColor || '#C1E3D0',
+      backgroundColor: body.background_color || body.backgroundColor || '#DE5795',
       backgroundGradient: body.background_gradient || body.backgroundGradient || '',
       backgroundImageUrl: body.background_image_url || body.backgroundImageUrl || '',
       overlayPngUrl: body.overlay_png_url || body.overlayPngUrl || '',

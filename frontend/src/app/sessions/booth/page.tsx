@@ -92,7 +92,7 @@ export default function KioskBoothPage() {
         } else {
           // Fallback templates
           const fallback = [
-            { id: 'tmpl-001', name: 'Classic Strip 2x6', layout: '2x6_strip', slotsCount: 4, backgroundColor: '#C1E3D0' },
+            { id: 'tmpl-001', name: 'Classic Strip 2x6', layout: '2x6_strip', slotsCount: 4, backgroundColor: '#DE5795' },
             { id: 'tmpl-002', name: 'Duo Postcard 4x6', layout: '4x6_postcard', slotsCount: 2, backgroundColor: '#ffffff' },
             { id: 'tmpl-003', name: 'Party Quad 2x2', layout: '2x2_grid', slotsCount: 4, backgroundColor: '#E0F2FE' },
           ];
@@ -420,7 +420,7 @@ export default function KioskBoothPage() {
       const composite = await generateCompositeImage({
         photos: capturedPhotos,
         layout: selectedTemplate?.layout || '2x6_strip',
-        backgroundColor: selectedTemplate?.backgroundColor || selectedTemplate?.background_color || '#C1E3D0',
+        backgroundColor: selectedTemplate?.backgroundColor || selectedTemplate?.background_color || '#DE5795',
         templateName: selectedTemplate?.name || 'Photo Booth Moments',
         filterPreset,
       });
@@ -436,7 +436,7 @@ export default function KioskBoothPage() {
 
       // 3. Confirm to DB with Unique Idempotency Key
       setProcessingProgress(90);
-      setProcessingStatusText('Menyimpan sesi ke database PostgreSQL...');
+      setProcessingStatusText('Menyimpan hasil foto resolusi tinggi...');
 
       const idempotencyKey = `idem-${activeSession.id}-${Date.now()}`;
       const res = await fetch(`/api/sessions/${activeSession.id}/confirm`, {
@@ -509,9 +509,9 @@ export default function KioskBoothPage() {
   const totalSlotsNeeded = selectedTemplate?.slotsCount || selectedTemplate?.slots_count || 4;
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-[#F4FAF6] via-white to-[#E8F5EE] text-gray-900 font-poppins flex flex-col justify-between selection:bg-[#C1E3D0] selection:text-[#133825]">
+    <div className="relative min-h-screen bg-gradient-to-br from-[#FDF7FA] via-white to-[#FCE7F1] text-gray-900 font-sora flex flex-col justify-between selection:bg-[#DE5795] selection:text-white">
       {/* Kiosk Top Bar */}
-      <header className="px-6 py-4 flex items-center justify-between border-b border-[#C1E3D0]/60 bg-white/80 backdrop-blur-md sticky top-0 z-40">
+      <header className="px-6 py-4 flex items-center justify-between border-b border-[#DE5795]/20 bg-white/80 backdrop-blur-md sticky top-0 z-40">
         <div className="flex items-center gap-3">
           <Link
             href="/sessions"
@@ -525,11 +525,11 @@ export default function KioskBoothPage() {
           <div className="h-4 w-px bg-gray-200" />
 
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[#C1E3D0] border border-[#a8d7bc] flex items-center justify-center text-[#133825] font-black text-xs">
+            <div className="w-7 h-7 rounded-lg bg-[#DE5795] border border-[#c93d7e] flex items-center justify-center text-white font-black text-xs shadow-xs">
               PB
             </div>
             <div>
-              <h1 className="text-sm font-bold text-[#133825] leading-tight">Booth Alpha • Kiosk Live</h1>
+              <h1 className="text-sm font-bold text-gray-900 leading-tight">Booth Alpha • Kiosk Live</h1>
               <p className="text-[10px] text-gray-500">Grand Indonesia Level 3A</p>
             </div>
           </div>
@@ -537,10 +537,10 @@ export default function KioskBoothPage() {
 
         {/* Step Indicator Pill */}
         {step !== 'WELCOME' && (
-          <div className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#C1E3D0] text-xs font-medium text-[#133825] shadow-xs">
+          <div className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#DE5795]/30 text-xs font-medium text-[#9D174D] shadow-xs">
             <span
               className={`w-2 h-2 rounded-full ${
-                step === 'COMPLETED' ? 'bg-emerald-500' : 'bg-[#418B63] animate-pulse'
+                step === 'COMPLETED' ? 'bg-emerald-500' : 'bg-[#DE5795] animate-pulse'
               }`}
             />
             <span className="font-semibold">
@@ -558,7 +558,7 @@ export default function KioskBoothPage() {
         {/* Right Controls */}
         <div className="flex items-center gap-3">
           {activeSession && (
-            <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded-md bg-[#C1E3D0]/40 text-[#133825] border border-[#a8d7bc]/60">
+            <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded-md bg-[#DE5795]/15 text-[#9D174D] border border-[#DE5795]/30">
               {activeSession.session_code || activeSession.sessionCode}
             </span>
           )}
@@ -582,16 +582,16 @@ export default function KioskBoothPage() {
         {step === 'WELCOME' && (
           <div className="text-center max-w-2xl w-full py-8 space-y-8 animate-fade-in">
             {/* Hero Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#C1E3D0]/50 border border-[#418B63]/30 text-xs font-semibold text-[#133825] shadow-xs">
-              <Sparkles className="w-4 h-4 text-[#2C6D4C]" />
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#DE5795]/15 border border-[#DE5795]/30 text-xs font-semibold text-[#9D174D] shadow-xs">
+              <Sparkles className="w-4 h-4 text-[#DE5795]" />
               <span>Sentuh Layar atau Klik Mulai untuk Berpose</span>
             </div>
 
             {/* Title */}
             <div className="space-y-3">
-              <h2 className="text-4xl sm:text-6xl font-extrabold text-[#133825] tracking-tight leading-tight">
+              <h2 className="text-4xl sm:text-6xl font-extrabold text-gray-900 tracking-tight leading-tight">
                 Abadikan Momen <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2C6D4C] to-[#418B63]">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#DE5795] to-[#A92B66]">
                   Terbaik Bersama Kami
                 </span>
               </h2>
@@ -601,7 +601,7 @@ export default function KioskBoothPage() {
             </div>
 
             {/* Quick Guest Inputs (Optional) */}
-            <div className="max-w-md mx-auto p-4 rounded-2xl bg-white border border-[#C1E3D0] shadow-sm space-y-3 text-left">
+            <div className="max-w-md mx-auto p-4 rounded-2xl bg-white border border-[#DE5795]/25 shadow-sm space-y-3 text-left">
               <div>
                 <label className="text-xs font-semibold text-gray-700 block mb-1">
                   Nama Anda (Opsional)
@@ -611,7 +611,7 @@ export default function KioskBoothPage() {
                   placeholder="Misal: Rian & Maya"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full px-3.5 py-2 text-sm rounded-lg border border-gray-200 focus:outline-hidden focus:border-[#418B63] focus:ring-2 focus:ring-[#C1E3D0]"
+                  className="w-full px-3.5 py-2 text-sm rounded-lg border border-gray-200 focus:outline-hidden focus:border-[#DE5795] focus:ring-2 focus:ring-[#DE5795]/20"
                 />
               </div>
               <div>
@@ -623,7 +623,7 @@ export default function KioskBoothPage() {
                   placeholder="nama@email.com"
                   value={customerEmail}
                   onChange={(e) => setCustomerEmail(e.target.value)}
-                  className="w-full px-3.5 py-2 text-sm rounded-lg border border-gray-200 focus:outline-hidden focus:border-[#418B63] focus:ring-2 focus:ring-[#C1E3D0]"
+                  className="w-full px-3.5 py-2 text-sm rounded-lg border border-gray-200 focus:outline-hidden focus:border-[#DE5795] focus:ring-2 focus:ring-[#DE5795]/20"
                 />
               </div>
             </div>
@@ -633,7 +633,7 @@ export default function KioskBoothPage() {
               <button
                 onClick={handleStartSession}
                 disabled={loading}
-                className="group relative inline-flex items-center gap-3 px-8 py-4.5 rounded-2xl bg-[#C1E3D0] text-[#133825] font-bold text-lg sm:text-xl shadow-lg hover:shadow-xl hover:bg-[#aee0c2] active:scale-95 transition-all border-2 border-[#418B63]/40"
+                className="group relative inline-flex items-center gap-3 px-8 py-4.5 rounded-2xl bg-[#DE5795] text-white font-bold text-lg sm:text-xl shadow-lg hover:shadow-xl hover:bg-[#c93d7e] active:scale-95 transition-all border-2 border-[#DE5795]"
               >
                 {loading ? (
                   <>
@@ -642,7 +642,7 @@ export default function KioskBoothPage() {
                   </>
                 ) : (
                   <>
-                    <Camera className="w-6 h-6 text-[#133825] group-hover:scale-110 transition-transform" />
+                    <Camera className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
                     <span>Mulai Sesi Foto</span>
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </>
@@ -687,7 +687,7 @@ export default function KioskBoothPage() {
               {templates.map((tmpl) => {
                 const isSelected = selectedTemplate?.id === tmpl.id;
                 const slots = tmpl.slotsCount || tmpl.slots_count || 4;
-                const bgColor = tmpl.backgroundColor || tmpl.background_color || '#C1E3D0';
+                const bgColor = tmpl.backgroundColor || tmpl.background_color || '#DE5795';
 
                 return (
                   <div
@@ -698,7 +698,7 @@ export default function KioskBoothPage() {
                     }}
                     className={`cursor-pointer rounded-2xl p-4 transition-all border-2 flex flex-col justify-between ${
                       isSelected
-                        ? 'border-[#2C6D4C] bg-white ring-4 ring-[#C1E3D0]/60 shadow-lg scale-102'
+                        ? 'border-[#DE5795] bg-white ring-4 ring-[#DE5795]/20 shadow-lg scale-102'
                         : 'border-gray-200 bg-white/70 hover:border-gray-300 hover:bg-white'
                     }`}
                   >
@@ -739,7 +739,7 @@ export default function KioskBoothPage() {
                       <div className="flex items-center justify-between">
                         <h4 className="font-bold text-sm text-gray-900">{tmpl.name}</h4>
                         {isSelected && (
-                          <span className="p-1 rounded-full bg-[#C1E3D0] text-[#133825]">
+                          <span className="p-1 rounded-full bg-[#DE5795] text-white">
                             <Check className="w-3.5 h-3.5" />
                           </span>
                         )}
@@ -751,7 +751,7 @@ export default function KioskBoothPage() {
 
                     <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
                       <span>Warna: {bgColor}</span>
-                      <span className="font-medium text-[#2C6D4C]">{slots} Slot Pose</span>
+                      <span className="font-medium text-[#9D174D]">{slots} Slot Pose</span>
                     </div>
                   </div>
                 );
@@ -770,7 +770,7 @@ export default function KioskBoothPage() {
 
               <button
                 onClick={() => setStep('PREPARE')}
-                className="px-6 py-3 rounded-xl bg-[#C1E3D0] text-[#133825] font-bold text-sm hover:bg-[#aee0c2] transition-colors border border-[#418B63]/40 flex items-center gap-2 shadow-sm"
+                className="px-6 py-3 rounded-xl bg-[#DE5795] text-white font-bold text-sm hover:bg-[#c93d7e] transition-colors border border-[#DE5795] flex items-center gap-2 shadow-sm"
               >
                 <span>Lanjut ke Kamera ({totalSlotsNeeded} Foto)</span>
                 <ArrowRight className="w-4 h-4" />
@@ -811,7 +811,7 @@ export default function KioskBoothPage() {
                     disabled={isCountingDown}
                     className={`px-2.5 py-1 rounded-lg font-bold text-xs transition-colors ${
                       countdownDuration === sec
-                        ? 'bg-[#C1E3D0] text-[#133825] border border-[#a8d7bc]'
+                        ? 'bg-[#DE5795] text-white border border-[#c93d7e]'
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
@@ -856,9 +856,9 @@ export default function KioskBoothPage() {
                           key={idx}
                           className={`relative h-20 rounded-xl overflow-hidden border-2 transition-all flex items-center justify-center ${
                             captured
-                              ? 'border-[#418B63] bg-emerald-50'
+                              ? 'border-emerald-500 bg-emerald-50'
                               : isCurrent
-                              ? 'border-[#2C6D4C] bg-[#C1E3D0]/30 animate-pulse'
+                              ? 'border-[#DE5795] bg-[#DE5795]/15 animate-pulse'
                               : 'border-dashed border-gray-300 bg-gray-50'
                           }`}
                         >
@@ -889,7 +889,7 @@ export default function KioskBoothPage() {
                   <button
                     onClick={handleStartCountdown}
                     disabled={isCountingDown}
-                    className="w-full py-3 rounded-xl bg-[#C1E3D0] text-[#133825] font-bold text-xs hover:bg-[#aee0c2] transition-colors border border-[#418B63]/40 flex items-center justify-center gap-2 shadow-xs disabled:opacity-50"
+                    className="w-full py-3 rounded-xl bg-[#DE5795] text-white font-bold text-xs hover:bg-[#c93d7e] transition-colors border border-[#DE5795] flex items-center justify-center gap-2 shadow-xs disabled:opacity-50"
                   >
                     <Camera className="w-4 h-4" />
                     <span>{isCountingDown ? 'Bersiaplah...' : 'Mulai Hitung Mundur'}</span>
@@ -906,7 +906,7 @@ export default function KioskBoothPage() {
         {step === 'REVIEW' && (
           <div className="w-full max-w-5xl space-y-6 animate-fade-in">
             <div className="text-center space-y-1">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#133825]">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
                 Tinjau Foto & Pilih Filter
               </h2>
               <p className="text-xs sm:text-sm text-gray-600">
@@ -928,7 +928,7 @@ export default function KioskBoothPage() {
                   }}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                     filterPreset === preset
-                      ? 'bg-[#C1E3D0] text-[#133825] border border-[#2C6D4C] shadow-xs'
+                      ? 'bg-[#DE5795] text-white border border-[#c93d7e] shadow-xs'
                       : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
                   }`}
                 >
@@ -1011,7 +1011,7 @@ export default function KioskBoothPage() {
                   className="rounded-xl p-4 flex flex-col items-center justify-center border border-gray-200 min-h-[340px]"
                   style={{
                     backgroundColor:
-                      selectedTemplate?.backgroundColor || selectedTemplate?.background_color || '#C1E3D0',
+                      selectedTemplate?.backgroundColor || selectedTemplate?.background_color || '#DE5795',
                   }}
                 >
                   <div className="w-40 bg-white p-2 rounded-sm shadow-md flex flex-col items-center space-y-2">
@@ -1034,7 +1034,7 @@ export default function KioskBoothPage() {
                       />
                     ))}
                     <div className="text-center pt-1 border-t border-gray-200 w-full">
-                      <p className="text-[10px] font-black tracking-wider text-[#133825]">PHOTO BOOTH</p>
+                      <p className="text-[10px] font-black tracking-wider text-[#9D174D]">PHOTO BOOTH</p>
                       <p className="text-[8px] text-gray-500 font-medium">Grand Indonesia</p>
                     </div>
                   </div>
@@ -1050,7 +1050,7 @@ export default function KioskBoothPage() {
                         onClick={() => setPrintCopies(num)}
                         className={`px-3 py-1 rounded-lg font-bold text-xs transition-colors ${
                           printCopies === num
-                            ? 'bg-[#C1E3D0] text-[#133825] border border-[#2C6D4C]'
+                            ? 'bg-[#DE5795] text-white border border-[#c93d7e]'
                             : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
                         }`}
                       >
@@ -1075,7 +1075,7 @@ export default function KioskBoothPage() {
               <button
                 onClick={handleConfirmSession}
                 disabled={isConfirming}
-                className="px-8 py-3.5 rounded-xl bg-[#C1E3D0] text-[#133825] font-bold text-sm sm:text-base hover:bg-[#aee0c2] transition-all border-2 border-[#418B63]/40 flex items-center gap-2.5 shadow-md active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="px-8 py-3.5 rounded-xl bg-[#DE5795] text-white font-bold text-sm sm:text-base hover:bg-[#c93d7e] transition-all border-2 border-[#DE5795] flex items-center gap-2.5 shadow-md active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isConfirming ? (
                   <>
@@ -1084,7 +1084,7 @@ export default function KioskBoothPage() {
                   </>
                 ) : (
                   <>
-                    <CheckCircle2 className="w-5 h-5 text-[#133825]" />
+                    <CheckCircle2 className="w-5 h-5 text-white" />
                     <span>Konfirmasi & Cetak Foto ({printCopies} Lembar)</span>
                     <ArrowRight className="w-5 h-5" />
                   </>
@@ -1098,13 +1098,13 @@ export default function KioskBoothPage() {
         {/* STEP 6: PROCESSING SCREEN (INDIKATOR PROSES)                 */}
         {/* ============================================================ */}
         {step === 'PROCESSING' && (
-          <div className="max-w-md w-full p-8 rounded-3xl bg-white border border-[#C1E3D0] shadow-2xl text-center space-y-6 animate-fade-in">
-            <div className="w-16 h-16 rounded-2xl bg-[#C1E3D0]/60 border border-[#418B63]/30 flex items-center justify-center mx-auto text-[#133825]">
-              <RefreshCw className="w-8 h-8 animate-spin text-[#2C6D4C]" />
+          <div className="max-w-md w-full p-8 rounded-3xl bg-white border border-[#DE5795]/25 shadow-2xl text-center space-y-6 animate-fade-in">
+            <div className="w-16 h-16 rounded-2xl bg-[#DE5795]/15 border border-[#DE5795]/30 flex items-center justify-center mx-auto text-[#9D174D]">
+              <RefreshCw className="w-8 h-8 animate-spin text-[#DE5795]" />
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-xl font-extrabold text-[#133825]">Memproses Foto Anda</h3>
+              <h3 className="text-xl font-extrabold text-gray-900">Memproses Foto Anda</h3>
               <p className="text-xs text-gray-500">{processingStatusText}</p>
             </div>
 
@@ -1112,7 +1112,7 @@ export default function KioskBoothPage() {
             <div className="space-y-1.5">
               <div className="w-full h-3 rounded-full bg-gray-100 overflow-hidden border border-gray-200">
                 <div
-                  className="h-full bg-gradient-to-r from-[#C1E3D0] to-[#418B63] transition-all duration-300"
+                  className="h-full bg-gradient-to-r from-[#DE5795] to-[#A92B66] transition-all duration-300"
                   style={{ width: `${processingProgress}%` }}
                 />
               </div>
@@ -1153,7 +1153,7 @@ export default function KioskBoothPage() {
                 <CheckCircle2
                   className={`w-4 h-4 shrink-0 ${processingProgress >= 90 ? 'text-emerald-600' : 'text-gray-300'}`}
                 />
-                <span>Penyimpanan aman di database PostgreSQL</span>
+                <span>Foto resolusi tinggi tersimpan aman</span>
               </div>
             </div>
           </div>
@@ -1169,19 +1169,19 @@ export default function KioskBoothPage() {
               <div className="inline-flex p-3 rounded-full bg-emerald-100 text-emerald-700 mb-2">
                 <CheckCircle2 className="w-10 h-10" />
               </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#133825]">Foto Anda Siap! 🎉</h2>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900">Foto Anda Siap! 🎉</h2>
               <p className="text-xs sm:text-sm text-gray-600 max-w-md mx-auto">
                 Silakan ambil hasil cetak Anda pada tray printer dan pindai QR Code di bawah untuk menyimpan file digital.
               </p>
             </div>
 
             {/* Auto Reset Timer Banner */}
-            <div className="p-3 rounded-xl bg-[#C1E3D0]/30 border border-[#a8d7bc] max-w-md mx-auto flex items-center justify-between text-xs text-[#133825]">
+            <div className="p-3 rounded-xl bg-[#DE5795]/15 border border-[#DE5795]/30 max-w-md mx-auto flex items-center justify-between text-xs text-[#9D174D]">
               <span className="flex items-center gap-2 font-medium">
-                <Clock className="w-4 h-4 text-[#2C6D4C]" />
+                <Clock className="w-4 h-4 text-[#DE5795]" />
                 Layar kembali ke menu utama dalam:
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-[#133825] text-white font-mono font-bold text-xs">
+              <span className="px-2.5 py-0.5 rounded-full bg-[#9D174D] text-white font-mono font-bold text-xs">
                 {autoResetSeconds}s
               </span>
             </div>
@@ -1209,7 +1209,7 @@ export default function KioskBoothPage() {
               <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-sm flex flex-col justify-between space-y-4">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <Printer className="w-5 h-5 text-[#2C6D4C]" />
+                    <Printer className="w-5 h-5 text-[#DE5795]" />
                     <h4 className="text-sm font-bold text-gray-900">Status Pencetakan</h4>
                   </div>
                   <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 space-y-1">
@@ -1230,7 +1230,7 @@ export default function KioskBoothPage() {
                 {/* Instant Finish Button */}
                 <button
                   onClick={handleResetToWelcome}
-                  className="w-full py-3.5 rounded-xl bg-[#C1E3D0] text-[#133825] font-bold text-sm hover:bg-[#aee0c2] transition-colors border border-[#418B63]/40 flex items-center justify-center gap-2 shadow-xs"
+                  className="w-full py-3.5 rounded-xl bg-[#DE5795] text-white font-bold text-sm hover:bg-[#c93d7e] transition-colors border border-[#DE5795] flex items-center justify-center gap-2 shadow-xs"
                 >
                   <Home className="w-4 h-4" />
                   <span>Selesai Sekarang (Tamu Berikutnya)</span>
@@ -1245,7 +1245,7 @@ export default function KioskBoothPage() {
       {/* INTERRUPTED SESSION RECOVERY MODAL                           */}
       {/* ============================================================ */}
       {showRecoveryModal && interruptedSession && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/70 backdrop-blur-sm animate-fade-in font-poppins">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/70 backdrop-blur-sm animate-fade-in font-sora">
           <div className="relative w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl border border-gray-200 space-y-5 text-left">
             <div className="flex items-start gap-4">
               <div className="p-3 rounded-2xl bg-amber-100 text-amber-800 shrink-0">
@@ -1280,7 +1280,7 @@ export default function KioskBoothPage() {
               </button>
               <button
                 onClick={() => handleResumeSession(interruptedSession)}
-                className="px-5 py-2.5 rounded-xl bg-[#C1E3D0] text-[#133825] font-bold text-xs hover:bg-[#aee0c2] transition-colors border border-[#418B63]/40 flex items-center gap-1.5 shadow-xs"
+                className="px-5 py-2.5 rounded-xl bg-[#DE5795] text-white font-bold text-xs hover:bg-[#c93d7e] transition-colors border border-[#DE5795] flex items-center gap-1.5 shadow-xs"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Pulihkan Sesi Ini</span>
@@ -1294,7 +1294,7 @@ export default function KioskBoothPage() {
       {/* IDLE WARNING MODAL                                           */}
       {/* ============================================================ */}
       {idleWarning && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/70 backdrop-blur-sm animate-fade-in font-poppins">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/70 backdrop-blur-sm animate-fade-in font-sora">
           <div className="relative w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl border border-gray-200 text-center space-y-4">
             <div className="w-14 h-14 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center mx-auto">
               <Clock className="w-7 h-7 text-amber-600" />
@@ -1311,7 +1311,7 @@ export default function KioskBoothPage() {
                 lastActivityRef.current = Date.now();
                 setIdleWarning(false);
               }}
-              className="w-full py-3 rounded-xl bg-[#C1E3D0] text-[#133825] font-bold text-xs hover:bg-[#aee0c2] transition-colors border border-[#418B63]/40 shadow-xs"
+              className="w-full py-3 rounded-xl bg-[#DE5795] text-white font-bold text-xs hover:bg-[#c93d7e] transition-colors border border-[#DE5795] shadow-xs"
             >
               Saya Masih di Sini! (Lanjutkan)
             </button>
@@ -1323,7 +1323,7 @@ export default function KioskBoothPage() {
       {/* CANCEL SESSION MODAL                                         */}
       {/* ============================================================ */}
       {showCancelModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/70 backdrop-blur-sm animate-fade-in font-poppins">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/70 backdrop-blur-sm animate-fade-in font-sora">
           <div className="relative w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl border border-gray-200 text-center space-y-4">
             <div className="w-12 h-12 rounded-2xl bg-red-100 text-red-700 flex items-center justify-center mx-auto">
               <AlertTriangle className="w-6 h-6 text-red-600" />

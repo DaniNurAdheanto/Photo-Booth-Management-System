@@ -7,10 +7,10 @@ import { Booth } from '../types/booth.types';
 
 export function BoothCard({ booth }: { booth: Booth }) {
   const statusBadge = {
-    ONLINE: <Badge variant="success">Online</Badge>,
-    OFFLINE: <Badge variant="default">Offline</Badge>,
-    IN_SESSION: <Badge variant="warning">In Session</Badge>,
-    MAINTENANCE: <Badge variant="danger">Maintenance</Badge>,
+    ONLINE: <Badge variant="success">Siap Pakai</Badge>,
+    OFFLINE: <Badge variant="default">Perlu Cek</Badge>,
+    IN_SESSION: <Badge variant="warning">Sedang Berfoto</Badge>,
+    MAINTENANCE: <Badge variant="danger">Perawatan</Badge>,
   }[booth.status] || <Badge variant="default">{booth.status}</Badge>;
 
   const paperPercentage = Math.round((booth.paperCount / booth.maxPaperCapacity) * 100);
@@ -18,21 +18,21 @@ export function BoothCard({ booth }: { booth: Booth }) {
   const getProgressColor = (pct: number) => {
     if (pct <= 20) return 'bg-error-500';
     if (pct <= 50) return 'bg-warning-500';
-    return 'bg-[#5BA87E]';
+    return 'bg-[#DE5795]';
   };
 
   return (
-    <Card className="flex flex-col justify-between group font-poppins">
+    <Card className="flex flex-col justify-between group font-sora">
       <div>
         <CardHeader className="flex flex-row items-start justify-between pb-3">
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-[11px] font-bold text-[#133825] bg-[#C1E3D0]/50 px-2 py-0.5 rounded border border-[#a8d7bc]">
+              <span className="font-mono text-[11px] font-bold text-[#9D174D] bg-[#DE5795]/15 px-2 py-0.5 rounded border border-[#DE5795]/30">
                 {booth.code}
               </span>
-              <span className="text-[11px] text-gray-400">Unit ID</span>
+              <span className="text-[11px] text-gray-400">Kode Booth</span>
             </div>
-            <CardTitle className="mt-2 text-sm font-semibold text-gray-900 group-hover:text-[#2C6D4C] transition-colors">
+            <CardTitle className="mt-2 text-sm font-semibold text-gray-900 group-hover:text-[#DE5795] transition-colors">
               {booth.name}
             </CardTitle>
           </div>
@@ -65,22 +65,22 @@ export function BoothCard({ booth }: { booth: Booth }) {
               />
             </div>
             <div className="flex justify-between text-[11px] text-gray-500">
-              <span>Kapasitas</span>
-              <span className="font-semibold text-gray-800">{paperPercentage}%</span>
+              <span>Kapasitas Roll</span>
+              <span className="font-semibold text-gray-800">{paperPercentage}% Tersisa</span>
             </div>
           </div>
 
-          {/* Telemetry info */}
+          {/* Device status info */}
           <div className="grid grid-cols-2 gap-2 text-[11px] text-gray-600">
             <div className="flex items-center gap-1.5 bg-white border border-gray-200 p-2 rounded-lg">
               <Camera className="h-3.5 w-3.5 text-gray-400 shrink-0" />
               <span className="truncate font-medium text-gray-800">
-                {booth.cameraModel || 'Canon EOS'}
+                {booth.cameraModel || 'Kamera Utama'}
               </span>
             </div>
-            <div className="flex items-center gap-1.5 bg-white border border-gray-200 p-2 rounded-lg font-mono">
-              <Wifi className="h-3.5 w-3.5 text-gray-400 shrink-0" />
-              <span className="truncate text-gray-700">{booth.ipAddress || '192.168.1.1'}</span>
+            <div className="flex items-center gap-1.5 bg-white border border-gray-200 p-2 rounded-lg">
+              <Wifi className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+              <span className="truncate text-emerald-700 font-medium">Jaringan Stabil</span>
             </div>
           </div>
         </CardContent>
@@ -88,10 +88,10 @@ export function BoothCard({ booth }: { booth: Booth }) {
 
       <CardFooter className="pt-3">
         <Button variant="ghost" size="sm" className="gap-1 text-gray-600 hover:text-gray-900">
-          <RefreshCw className="h-3.5 w-3.5" /> Ping
+          <RefreshCw className="h-3.5 w-3.5" /> Cek Status
         </Button>
         <Button variant="secondary" size="sm" className="gap-1">
-          <span>Detail Unit</span>
+          <span>Kelola Booth</span>
           <ArrowUpRight className="h-3.5 w-3.5 text-gray-400" />
         </Button>
       </CardFooter>

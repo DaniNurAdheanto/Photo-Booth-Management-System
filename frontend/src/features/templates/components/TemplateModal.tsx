@@ -30,10 +30,10 @@ interface TemplateModalProps {
 }
 
 const PRESET_COLORS = [
-  { name: 'Sage Green (Primary)', hex: '#C1E3D0' },
+  { name: 'Rose Magenta (Primary)', hex: '#DE5795' },
   { name: 'Pure White', hex: '#FFFFFF' },
   { name: 'Warm Cream', hex: '#FFF8EA' },
-  { name: 'Soft Blush', hex: '#FDF2F2' },
+  { name: 'Soft Blush', hex: '#FDF2F7' },
   { name: 'Champagne Gold', hex: '#F9F5EC' },
   { name: 'Studio Gray', hex: '#F3F4F6' },
   { name: 'Midnight Charcoal', hex: '#1E293B' },
@@ -84,7 +84,7 @@ export function TemplateModal({
     slots_count: 3,
     width: 600,
     height: 1800,
-    background_color: '#C1E3D0',
+    background_color: '#DE5795',
     background_gradient: '',
     background_image_url: '',
     overlay_png_url: '',
@@ -96,7 +96,7 @@ export function TemplateModal({
     border_radius: 8,
     slots_config: [],
     text_elements: [
-      { id: 'txt-1', text: 'PHOTO BOOTH MOMENTS', fontFamily: 'Poppins', fontSize: 24, color: '#133825' },
+      { id: 'txt-1', text: 'PHOTO BOOTH MOMENTS', fontFamily: 'Sora', fontSize: 24, color: '#ffffff' },
     ],
     logo_url: '',
     show_date: true,
@@ -120,7 +120,7 @@ export function TemplateModal({
         slots_count: initialData.slots_count || initialData.slotsCount || 3,
         width: initialData.width || 600,
         height: initialData.height || 1800,
-        background_color: initialData.background_color || initialData.backgroundColor || '#C1E3D0',
+        background_color: initialData.background_color || initialData.backgroundColor || '#DE5795',
         background_gradient: initialData.background_gradient || initialData.backgroundGradient || '',
         background_image_url: initialData.background_image_url || initialData.backgroundImageUrl || '',
         overlay_png_url: initialData.overlay_png_url || initialData.overlayPngUrl || '',
@@ -131,7 +131,7 @@ export function TemplateModal({
         gap: initialData.gap || 20,
         border_radius: initialData.border_radius || initialData.borderRadius || 8,
         slots_config: [],
-        text_elements: parsedTexts.length > 0 ? parsedTexts : [{ id: 'txt-1', text: initialData.name, fontFamily: 'Poppins', fontSize: 24, color: '#133825' }],
+        text_elements: parsedTexts.length > 0 ? parsedTexts : [{ id: 'txt-1', text: initialData.name, fontFamily: 'Sora', fontSize: 24, color: '#ffffff' }],
         logo_url: initialData.logo_url || initialData.logoUrl || '',
         show_date: initialData.show_date !== undefined ? initialData.show_date : true,
         event_name: initialData.event_name || initialData.eventName || '',
@@ -147,7 +147,7 @@ export function TemplateModal({
         slots_count: 3,
         width: 600,
         height: 1800,
-        background_color: '#C1E3D0',
+        background_color: '#DE5795',
         background_gradient: '',
         background_image_url: '',
         overlay_png_url: '',
@@ -159,7 +159,7 @@ export function TemplateModal({
         border_radius: 8,
         slots_config: [],
         text_elements: [
-          { id: 'txt-1', text: 'PHOTO BOOTH MOMENTS', fontFamily: 'Poppins', fontSize: 24, color: '#133825' },
+          { id: 'txt-1', text: 'PHOTO BOOTH MOMENTS', fontFamily: 'Sora', fontSize: 24, color: '#470F29' },
         ],
         logo_url: '',
         show_date: true,
@@ -223,16 +223,16 @@ export function TemplateModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/60 backdrop-blur-sm animate-fade-in font-poppins">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/60 backdrop-blur-sm animate-fade-in font-sora">
       <div className="relative w-full max-w-5xl rounded-3xl bg-white shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[92vh]">
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/70">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#C1E3D0]/60 border border-[#a8d7bc] flex items-center justify-center text-[#133825]">
+            <div className="h-10 w-10 rounded-xl bg-[#DE5795] text-white border border-[#DE5795] flex items-center justify-center">
               <Layers className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-gray-900">
+              <h3 className="text-base font-bold text-gray-900 font-sora">
                 {initialData ? 'Edit Desain Template Foto' : 'Buat Template & Layout Baru'}
               </h3>
               <p className="text-xs text-gray-500">
@@ -265,11 +265,11 @@ export function TemplateModal({
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`flex items-center gap-2 py-3 px-3.5 border-b-2 transition-all whitespace-nowrap ${
                   isActive
-                    ? 'border-[#2C6D4C] text-[#133825] font-bold'
+                    ? 'border-[#DE5795] text-[#9D174D] font-bold'
                     : 'border-transparent text-gray-500 hover:text-gray-800'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-[#2C6D4C]' : 'text-gray-400'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-[#DE5795]' : 'text-gray-400'}`} />
                 <span>{tab.label}</span>
               </button>
             );
@@ -304,7 +304,7 @@ export function TemplateModal({
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="Contoh: Botanical Garden Wedding Strip"
-                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#418B63] focus:ring-2 focus:ring-[#C1E3D0]"
+                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#DE5795] focus:ring-2 focus:ring-[#DE5795]/20"
                   />
                 </div>
 
@@ -322,13 +322,13 @@ export function TemplateModal({
                           onClick={() => handleLayoutSelect(opt)}
                           className={`p-3 rounded-xl border cursor-pointer transition-all ${
                             isSelected
-                              ? 'border-[#2C6D4C] bg-[#C1E3D0]/20 ring-2 ring-[#C1E3D0]'
+                              ? 'border-[#DE5795] bg-[#DE5795]/15 ring-2 ring-[#DE5795]'
                               : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                           }`}
                         >
                           <div className="flex items-center justify-between">
                             <span className="text-xs font-bold text-gray-900">{opt.label}</span>
-                            {isSelected && <Check className="w-3.5 h-3.5 text-[#2C6D4C]" />}
+                            {isSelected && <Check className="w-3.5 h-3.5 text-[#DE5795]" />}
                           </div>
                           <p className="text-[10px] text-gray-500 mt-1">{opt.desc}</p>
                         </div>
@@ -346,7 +346,7 @@ export function TemplateModal({
                     <select
                       value={formData.slots_count}
                       onChange={(e) => setFormData({ ...formData, slots_count: parseInt(e.target.value) })}
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#418B63]"
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#DE5795]"
                     >
                       <option value={1}>1 Foto (Single)</option>
                       <option value={2}>2 Foto</option>
@@ -363,7 +363,7 @@ export function TemplateModal({
                     <select
                       value={formData.orientation}
                       onChange={(e) => setFormData({ ...formData, orientation: e.target.value as any })}
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#418B63]"
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#DE5795]"
                     >
                       <option value="PORTRAIT">Portrait (Vertikal)</option>
                       <option value="LANDSCAPE">Landscape (Horisontal)</option>
@@ -437,11 +437,11 @@ export function TemplateModal({
 
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="border-2 border-dashed border-gray-300 hover:border-[#418B63] p-5 rounded-2xl bg-gray-50/50 hover:bg-[#C1E3D0]/10 cursor-pointer transition-all text-center space-y-2"
+                    className="border-2 border-dashed border-gray-300 hover:border-[#DE5795] p-5 rounded-2xl bg-gray-50/50 hover:bg-[#DE5795]/10 cursor-pointer transition-all text-center space-y-2"
                   >
-                    <UploadCloud className="w-8 h-8 text-[#2C6D4C] mx-auto" />
+                    <UploadCloud className="w-8 h-8 text-[#DE5795] mx-auto" />
                     <div>
-                      <span className="text-xs font-semibold text-[#133825]">Klik untuk upload Frame PNG</span>
+                      <span className="text-xs font-semibold text-[#9D174D]">Klik untuk upload Frame PNG</span>
                       <p className="text-[10px] text-gray-400">Harus berformat .PNG transparan (Maks. 5 MB)</p>
                     </div>
                   </div>
@@ -483,7 +483,7 @@ export function TemplateModal({
                         title={color.name}
                       >
                         {formData.background_color.toLowerCase() === color.hex.toLowerCase() && !formData.background_gradient && (
-                          <Check className="w-3.5 h-3.5 text-[#133825]" />
+                          <Check className="w-3.5 h-3.5 text-white" />
                         )}
                       </button>
                     ))}
@@ -500,8 +500,8 @@ export function TemplateModal({
                       type="text"
                       value={formData.background_color}
                       onChange={(e) => setFormData({ ...formData, background_color: e.target.value })}
-                      placeholder="#C1E3D0"
-                      className="px-3 py-1.5 text-xs font-mono rounded-lg border border-gray-200 focus:outline-hidden focus:border-[#418B63]"
+                      placeholder="#DE5795"
+                      className="px-3 py-1.5 text-xs font-mono rounded-lg border border-gray-200 focus:outline-hidden focus:border-[#DE5795]"
                     />
                   </div>
                 </div>
@@ -514,7 +514,7 @@ export function TemplateModal({
                   <div className="grid grid-cols-2 gap-2">
                     {[
                       { label: 'Solid Standar', value: '' },
-                      { label: 'Mint Sage Radiant', value: 'linear-gradient(135deg, #C1E3D0 0%, #E8F5EE 100%)' },
+                      { label: 'Rose Magenta Glow', value: 'linear-gradient(135deg, #DE5795 0%, #FDF2F7 100%)' },
                       { label: 'Pastel Sunset', value: 'linear-gradient(135deg, #FFF1EB 0%, #ACE0F9 100%)' },
                       { label: 'Champagne Glow', value: 'linear-gradient(135deg, #FDFCFB 0%, #E2D1C3 100%)' },
                     ].map((g) => (
@@ -524,7 +524,7 @@ export function TemplateModal({
                         onClick={() => setFormData({ ...formData, background_gradient: g.value })}
                         className={`p-2 rounded-xl text-left text-xs border transition-all ${
                           formData.background_gradient === g.value
-                            ? 'border-[#2C6D4C] bg-[#C1E3D0]/20 font-bold text-[#133825]'
+                            ? 'border-[#DE5795] bg-[#DE5795]/15 font-bold text-[#9D174D]'
                             : 'border-gray-200 text-gray-600 hover:bg-gray-50'
                         }`}
                       >
@@ -548,7 +548,7 @@ export function TemplateModal({
                     value={formData.event_name}
                     onChange={(e) => setFormData({ ...formData, event_name: e.target.value })}
                     placeholder="Contoh: The Wedding of Sarah & Dani"
-                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#418B63]"
+                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#DE5795]"
                   />
                 </div>
 
@@ -562,11 +562,11 @@ export function TemplateModal({
                     onChange={(e) => {
                       const updated = [...formData.text_elements];
                       if (updated[0]) updated[0].text = e.target.value;
-                      else updated.push({ id: 'txt-1', text: e.target.value, fontFamily: 'Poppins', fontSize: 24, color: '#133825' });
+                      else updated.push({ id: 'txt-1', text: e.target.value, fontFamily: 'Sora', fontSize: 24, color: '#470F29' });
                       setFormData({ ...formData, text_elements: updated });
                     }}
                     placeholder="Contoh: Forever & Always • 15 Oktober 2026"
-                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#418B63]"
+                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#DE5795]"
                   />
                 </div>
 
@@ -579,7 +579,7 @@ export function TemplateModal({
                     value={formData.logo_url}
                     onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
                     placeholder="https://example.com/logo.png"
-                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#418B63]"
+                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#DE5795]"
                   />
                 </div>
 
@@ -589,7 +589,7 @@ export function TemplateModal({
                     id="show_date_cb"
                     checked={formData.show_date}
                     onChange={(e) => setFormData({ ...formData, show_date: e.target.checked })}
-                    className="w-4 h-4 rounded text-[#2C6D4C] focus:ring-[#C1E3D0]"
+                    className="w-4 h-4 rounded text-[#DE5795] focus:ring-[#DE5795]"
                   />
                   <label htmlFor="show_date_cb" className="text-xs font-medium text-gray-700 cursor-pointer">
                     Tampilkan tanggal sesi otomatis pada bagian bawah cetakan
@@ -611,7 +611,7 @@ export function TemplateModal({
                   <select
                     value={formData.assigned_booth_id}
                     onChange={(e) => setFormData({ ...formData, assigned_booth_id: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#418B63]"
+                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#DE5795]"
                   >
                     <option value="ALL">Semua Booth (Global Library)</option>
                     <option value="bth-001">Booth Alpha - Grand Indonesia (bth-001)</option>
@@ -627,7 +627,7 @@ export function TemplateModal({
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
-                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#418B63]"
+                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#DE5795]"
                   >
                     {CATEGORIES.map((cat) => (
                       <option key={cat.id} value={cat.id}>
@@ -646,7 +646,7 @@ export function TemplateModal({
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Catatan event, konfigurasi kertas, atau instruksi operator..."
-                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#418B63]"
+                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#DE5795]"
                   />
                 </div>
 
@@ -656,7 +656,7 @@ export function TemplateModal({
                     id="is_active_cb"
                     checked={formData.is_active}
                     onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                    className="w-4 h-4 rounded text-[#2C6D4C] focus:ring-[#C1E3D0]"
+                    className="w-4 h-4 rounded text-[#DE5795] focus:ring-[#DE5795]"
                   />
                   <label htmlFor="is_active_cb" className="text-xs font-medium text-gray-700 cursor-pointer">
                     Status Aktif (Tersedia untuk dipilih pada Kiosk Booth)
@@ -669,15 +669,15 @@ export function TemplateModal({
           {/* Right Live WYSIWYG Preview Column */}
           <div className="lg:col-span-5 p-6 bg-gray-50/70 flex flex-col items-center justify-between overflow-y-auto max-h-[calc(92vh-140px)] border-t lg:border-t-0">
             <div className="w-full flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-gray-900 flex items-center gap-1.5">
-                <Eye className="w-3.5 h-3.5 text-[#2C6D4C]" />
+              <span className="text-xs font-bold text-gray-900 flex items-center gap-1.5 font-sora">
+                <Eye className="w-3.5 h-3.5 text-[#DE5795]" />
                 Live Preview Interaktif
               </span>
 
               <button
                 type="button"
                 onClick={() => setShowSamplePhotos(!showSamplePhotos)}
-                className="text-[11px] font-semibold text-[#2C6D4C] hover:text-[#133825] px-2 py-1 rounded bg-[#C1E3D0]/40 border border-[#a8d7bc] transition-colors"
+                className="text-[11px] font-semibold text-[#9D174D] hover:text-[#DE5795] px-2 py-1 rounded bg-[#DE5795]/15 border border-[#DE5795]/30 transition-colors"
               >
                 {showSamplePhotos ? 'Lihat Wireframe' : 'Lihat Foto Sampel'}
               </button>
@@ -730,9 +730,9 @@ export function TemplateModal({
             <button
               type="submit"
               disabled={isSaving}
-              className="px-6 py-2.5 rounded-xl bg-[#C1E3D0] text-[#133825] text-xs font-bold hover:bg-[#aee0c2] transition-colors border border-[#418B63]/40 shadow-xs flex items-center gap-2 disabled:opacity-50"
+              className="px-6 py-2.5 rounded-xl bg-[#DE5795] text-white text-xs font-bold hover:bg-[#c93d7e] transition-colors border border-[#DE5795] shadow-xs flex items-center gap-2 disabled:opacity-50"
             >
-              <Check className="w-4 h-4 text-[#133825]" />
+              <Check className="w-4 h-4 text-white" />
               <span>{isSaving ? 'Menyimpan...' : initialData ? 'Perbarui Template' : 'Publikasikan Template'}</span>
             </button>
           </div>

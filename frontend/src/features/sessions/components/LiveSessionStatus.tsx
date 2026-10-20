@@ -7,18 +7,18 @@ import { PhotoSession } from '../types/session.types';
 
 export function LiveSessionStatus({ session }: { session: PhotoSession }) {
   return (
-    <div className="rounded-xl border border-[#a8d7bc] bg-gradient-to-r from-[#C1E3D0]/30 via-white to-white p-5 shadow-xs font-poppins">
+    <div className="rounded-xl border border-[#DE5795]/30 bg-gradient-to-r from-[#DE5795]/10 via-white to-white p-5 shadow-xs font-sora">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Left: Session Code & Customer */}
         <div className="flex items-start sm:items-center gap-3.5">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#C1E3D0] text-[#133825] border border-[#a8d7bc] shadow-xs shrink-0">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#DE5795] text-white border border-[#DE5795] shadow-xs shrink-0">
             <Film className="h-5 w-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-sm font-bold text-[#133825]">{session.sessionCode}</span>
-              <Badge variant="warning" size="sm">
-                Live Capturing
+              <span className="font-mono text-sm font-bold text-[#9D174D]">{session.sessionCode || session.session_code}</span>
+              <Badge variant="brand" size="sm">
+                Sedang Berlangsung
               </Badge>
             </div>
             <div className="flex flex-wrap items-center gap-3 text-xs text-gray-600 mt-1">
@@ -35,14 +35,14 @@ export function LiveSessionStatus({ session }: { session: PhotoSession }) {
           </div>
         </div>
 
-        {/* Right: Sync Status & Actions */}
+        {/* Right: Status & Actions */}
         <div className="flex items-center gap-3 shrink-0">
           <div className="hidden sm:flex items-center gap-1.5 text-xs text-success-700 bg-success-50 border border-success-200 px-3 py-1.5 rounded-lg">
             <CheckCircle2 className="h-4 w-4 text-success-600 shrink-0" />
-            <span className="font-medium">TypeORM & Go API Connected</span>
+            <span className="font-medium">Kamera & Printer Siaga</span>
           </div>
           <Button variant="secondary" size="sm" className="gap-1 text-xs">
-            <span>Monitor Kamera</span>
+            <span>Lihat Detail Sesi</span>
             <ChevronRight className="h-3.5 w-3.5 text-gray-400" />
           </Button>
         </div>

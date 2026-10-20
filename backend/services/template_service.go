@@ -66,7 +66,7 @@ func (s *templateService) CreateTemplate(ctx context.Context, input models.Creat
 
 	bgColor := input.BackgroundColor
 	if bgColor == "" {
-		bgColor = "#C1E3D0" // Default brand pastel sage green
+		bgColor = "#DE5795" // Default brand vibrant rose magenta
 	}
 
 	category := input.Category

@@ -23,7 +23,7 @@ export class Template {
   @Column({ type: 'int', default: 1800 })
   height!: number;
 
-  @Column({ type: 'varchar', length: 30, name: 'background_color', default: '#C1E3D0' })
+  @Column({ type: 'varchar', length: 30, name: 'background_color', default: '#DE5795' })
   backgroundColor!: string;
 
   @Column({ type: 'varchar', length: 100, name: 'background_gradient', default: '' })

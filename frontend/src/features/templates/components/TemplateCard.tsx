@@ -38,7 +38,7 @@ export function TemplateCard({
   const isActive = template.is_active !== undefined ? template.is_active : template.isActive ?? true;
   const isArchived = template.is_archived !== undefined ? template.is_archived : template.isArchived ?? false;
   const slotsCount = template.slots_count || template.slotsCount || 4;
-  const bgColor = template.background_color || template.backgroundColor || '#C1E3D0';
+  const bgColor = template.background_color || template.backgroundColor || '#DE5795';
   const assignedBooth = template.assigned_booth_id || template.assignedBoothId || 'ALL';
   const version = template.version || 1;
   const eventName = template.event_name || template.eventName;
@@ -56,7 +56,7 @@ export function TemplateCard({
 
   return (
     <div
-      className={`rounded-2xl border transition-all flex flex-col justify-between overflow-hidden bg-white shadow-xs hover:shadow-md ${
+      className={`rounded-2xl border transition-all flex flex-col justify-between overflow-hidden bg-white shadow-xs hover:shadow-md font-sora ${
         isArchived
           ? 'opacity-70 border-dashed border-gray-300 bg-gray-50/50'
           : isActive
@@ -129,7 +129,7 @@ export function TemplateCard({
         <div className="p-4 space-y-2.5">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <h4 className="text-sm font-bold text-gray-900 truncate font-poppins">{template.name}</h4>
+              <h4 className="text-sm font-bold text-gray-900 truncate font-sora">{template.name}</h4>
               <p className="text-[11px] text-gray-500 truncate font-medium">
                 {eventName || template.description || 'Tidak ada catatan acara'}
               </p>
@@ -138,7 +138,7 @@ export function TemplateCard({
 
           {/* Badges Strip */}
           <div className="flex flex-wrap items-center gap-1.5 text-[10px]">
-            <span className="px-2 py-0.5 rounded-md bg-[#C1E3D0]/40 text-[#133825] font-semibold border border-[#a8d7bc]/60">
+            <span className="px-2 py-0.5 rounded-md bg-[#DE5795]/15 text-[#9D174D] font-semibold border border-[#DE5795]/30">
               {layoutLabel[template.layout as string] || template.layout}
             </span>
 
@@ -196,7 +196,7 @@ export function TemplateCard({
           {/* Edit Button */}
           <button
             onClick={() => onEdit(template)}
-            className="p-1.5 rounded-lg text-[#2C6D4C] hover:bg-[#C1E3D0]/40 transition-colors"
+            className="p-1.5 rounded-lg text-[#DE5795] hover:bg-[#DE5795]/15 transition-colors"
             title="Edit Template"
           >
             <Edit2 className="w-3.5 h-3.5" />

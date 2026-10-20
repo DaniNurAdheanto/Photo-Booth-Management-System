@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,9 +6,9 @@
 
 @layer base {
   :root {
-    --font-poppins: 'Poppins', sans-serif;
-    --color-primary: #C1E3D0;
-    --color-primary-dark: #133825;
+    --font-sora: 'Sora', sans-serif;
+    --color-primary: #DE5795;
+    --color-primary-dark: #831843;
   }
 
   * {
@@ -16,13 +16,13 @@
   }
 
   html, body {
-    font-family: 'Poppins', var(--font-poppins), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Sora', var(--font-sora), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6, button, input, select, textarea {
-    font-family: 'Poppins', var(--font-poppins), sans-serif;
+    font-family: 'Sora', var(--font-sora), sans-serif;
   }
 }
 
@@ -45,8 +45,8 @@
   background: #98A2B3;
 }
 
-/* Selection using #C1E3D0 */
+/* Selection using #DE5795 */
 ::selection {
-  background-color: #C1E3D0;
-  color: #133825;
+  background-color: #DE5795;
+  color: #ffffff;
 }

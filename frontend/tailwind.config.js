@@ -10,40 +10,40 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-poppins)', 'Poppins', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        poppins: ['var(--font-poppins)', 'Poppins', 'sans-serif'],
+        sans: ['var(--font-sora)', 'Sora', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        sora: ['var(--font-sora)', 'Sora', 'sans-serif'],
       },
       colors: {
-        // Primary brand palette built around user requested #C1E3D0
+        // Primary brand palette built around user requested #DE5795 (Rose Magenta)
         primary: {
-          DEFAULT: '#C1E3D0',
-          25: '#FAFCFA',
-          50: '#F2F9F5',
-          100: '#E4F3EB',
-          200: '#D2ECDE',
-          300: '#C1E3D0', // Exact Primary Color
-          400: '#A3D4B8',
-          500: '#7EC29B',
-          600: '#5BA87E',
-          700: '#418B63',
-          800: '#2C6D4C',
-          900: '#1B4E35',
-          950: '#0E2E1E',
+          DEFAULT: '#DE5795',
+          25: '#FDF7FA',
+          50: '#FDF2F7',
+          100: '#FCE7F1',
+          200: '#F9CFE3',
+          300: '#F4A6CD',
+          400: '#EC7CB2',
+          500: '#DE5795', // Exact User Primary Color
+          600: '#C93D7E',
+          700: '#A92B66',
+          800: '#8C2454',
+          900: '#742247',
+          950: '#470F29',
         },
         brand: {
-          DEFAULT: '#C1E3D0',
-          25: '#FAFCFA',
-          50: '#F2F9F5',
-          100: '#E4F3EB',
-          200: '#D2ECDE',
-          300: '#C1E3D0', // Exact Primary Color
-          400: '#A3D4B8',
-          500: '#7EC29B',
-          600: '#5BA87E',
-          700: '#418B63',
-          800: '#2C6D4C',
-          900: '#1B4E35',
-          950: '#0E2E1E',
+          DEFAULT: '#DE5795',
+          25: '#FDF7FA',
+          50: '#FDF2F7',
+          100: '#FCE7F1',
+          200: '#F9CFE3',
+          300: '#F4A6CD',
+          400: '#EC7CB2',
+          500: '#DE5795', // Exact User Primary Color
+          600: '#C93D7E',
+          700: '#A92B66',
+          800: '#8C2454',
+          900: '#742247',
+          950: '#470F29',
         },
         // Untitled UI Neutral Gray scale
         gray: {

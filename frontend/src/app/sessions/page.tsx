@@ -121,7 +121,7 @@ export default function SessionsManagementPage() {
   const avgRetake = totalCount > 0 ? (totalRetakes / totalCount).toFixed(1) : '0';
 
   return (
-    <div className="space-y-6 font-poppins">
+    <div className="space-y-6 font-sora">
         {/* Toast Notification */}
         {toastMessage && (
           <div className="fixed top-6 right-6 z-50 animate-fade-in">
@@ -142,10 +142,10 @@ export default function SessionsManagementPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+              <h1 className="text-2xl font-bold tracking-tight text-gray-900 font-sora">
                 Photo Session Management
               </h1>
-              <span className="px-2.5 py-0.5 rounded-full bg-[#C1E3D0] text-[#133825] text-xs font-bold border border-[#a8d7bc]">
+              <span className="px-2.5 py-0.5 rounded-full bg-[#DE5795] text-white text-xs font-bold border border-[#DE5795]">
                 PRD Verified
               </span>
             </div>
@@ -167,9 +167,9 @@ export default function SessionsManagementPage() {
 
             <Link
               href="/sessions/booth"
-              className="px-4.5 py-2.5 rounded-xl bg-[#C1E3D0] text-[#133825] text-xs font-bold hover:bg-[#aee0c2] transition-colors border border-[#418B63]/40 flex items-center gap-2 shadow-sm"
+              className="px-4.5 py-2.5 rounded-xl bg-[#DE5795] text-white text-xs font-bold hover:bg-[#c93d7e] transition-colors border border-[#DE5795] flex items-center gap-2 shadow-sm"
             >
-              <Play className="w-4 h-4 fill-[#133825]" />
+              <Play className="w-4 h-4 fill-white text-white" />
               <span>Buka Layar Kiosk Booth</span>
             </Link>
           </div>
@@ -188,16 +188,16 @@ export default function SessionsManagementPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-[#C1E3D0] bg-[#C1E3D0]/20 p-4 shadow-xs">
+          <div className="rounded-2xl border border-[#DE5795]/30 bg-[#DE5795]/10 p-4 shadow-xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-[#133825]">Sesi Berjalan / Live</span>
+              <span className="text-xs font-semibold text-[#9D174D]">Sesi Berjalan / Live</span>
               <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#418B63] opacity-75" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#2C6D4C]" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#DE5795] opacity-75" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#DE5795]" />
               </span>
             </div>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-[#133825]">{activeCount}</span>
+              <span className="text-2xl font-bold text-[#9D174D]">{activeCount}</span>
               <span className="text-[11px] text-[#2C6D4C] font-semibold">sedang aktif</span>
             </div>
           </div>
@@ -244,7 +244,7 @@ export default function SessionsManagementPage() {
                   onClick={() => setSelectedStatus(tab.value)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${
                     selectedStatus === tab.value
-                      ? 'bg-[#C1E3D0] text-[#133825] border border-[#a8d7bc]'
+                      ? 'bg-[#DE5795] text-white border border-[#DE5795]'
                       : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
@@ -259,7 +259,7 @@ export default function SessionsManagementPage() {
               <select
                 value={selectedBooth}
                 onChange={(e) => setSelectedBooth(e.target.value)}
-                className="px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-700 focus:outline-hidden focus:border-[#418B63]"
+                className="px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-700 focus:outline-hidden focus:border-[#DE5795]"
               >
                 <option value="">Semua Booth</option>
                 <option value="bth-001">Booth Alpha - GI</option>
@@ -277,7 +277,7 @@ export default function SessionsManagementPage() {
               placeholder="Cari berdasarkan kode sesi (SES-...) atau nama pelanggan..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#418B63] focus:ring-2 focus:ring-[#C1E3D0]"
+              className="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#DE5795] focus:ring-2 focus:ring-[#DE5795]/20"
             />
           </div>
         </div>
@@ -374,7 +374,7 @@ export default function SessionsManagementPage() {
                                 : session.status === 'REVIEWING'
                                 ? 'bg-amber-50 text-amber-700 border border-amber-200'
                                 : session.status === 'CAPTURING' || session.status === 'COUNTDOWN'
-                                ? 'bg-[#C1E3D0] text-[#133825] border border-[#a8d7bc]'
+                                ? 'bg-[#DE5795]/15 text-[#9D174D] border border-[#DE5795]/30'
                                 : 'bg-red-50 text-red-700 border border-red-200'
                             }`}
                           >
@@ -455,7 +455,7 @@ export default function SessionsManagementPage() {
 
       {/* Delete Confirmation Modal */}
       {deleteConfirmId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/60 backdrop-blur-sm animate-fade-in font-poppins">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/60 backdrop-blur-sm animate-fade-in font-sora">
           <div className="relative w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl border border-gray-100 text-center space-y-4">
             <div className="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center mx-auto">
               <AlertTriangle className="w-6 h-6" />

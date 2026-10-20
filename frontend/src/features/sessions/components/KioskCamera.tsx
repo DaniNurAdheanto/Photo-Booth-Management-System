@@ -154,7 +154,7 @@ export function KioskCamera({
   };
 
   return (
-    <div className="relative w-full h-[520px] rounded-2xl overflow-hidden bg-gray-950 border-4 border-[#C1E3D0]/60 shadow-2xl flex items-center justify-center font-poppins select-none">
+    <div className="relative w-full h-[520px] rounded-2xl overflow-hidden bg-gray-950 border-4 border-[#DE5795]/60 shadow-2xl flex items-center justify-center font-sora select-none">
       {/* Hidden processing canvas */}
       <canvas ref={canvasRef} className="hidden" />
 
@@ -178,8 +178,8 @@ export function KioskCamera({
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/50" />
 
           {/* Simulation Watermark Badge */}
-          <div className="absolute top-4 left-4 z-10 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-xs font-medium text-emerald-300">
-            <Sparkles className="w-3.5 h-3.5 text-[#C1E3D0]" />
+          <div className="absolute top-4 left-4 z-10 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-xs font-medium text-pink-300">
+            <Sparkles className="w-3.5 h-3.5 text-[#DE5795]" />
             <span>Studio Simulation Live Feed</span>
           </div>
         </div>
@@ -200,14 +200,14 @@ export function KioskCamera({
           title={soundEnabled ? 'Mute Sounds' : 'Unmute Sounds'}
         >
           {soundEnabled ? (
-            <Volume2 className="w-4 h-4 text-[#C1E3D0]" />
+            <Volume2 className="w-4 h-4 text-[#DE5795]" />
           ) : (
             <VolumeX className="w-4 h-4 text-gray-400" />
           )}
         </button>
 
         <div className="px-3.5 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/20 text-xs font-semibold text-white flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-[#C1E3D0] animate-pulse" />
+          <span className="w-2 h-2 rounded-full bg-[#DE5795] animate-pulse" />
           <span>
             Foto {currentSlot + 1} dari {totalSlots}
           </span>
@@ -229,7 +229,7 @@ export function KioskCamera({
         <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-black/35 backdrop-blur-xs">
           {countdownNum > 0 ? (
             <div className="relative flex items-center justify-center">
-              <span className="text-[120px] font-black text-[#C1E3D0] drop-shadow-[0_8px_24px_rgba(0,0,0,0.8)] animate-ping">
+              <span className="text-[120px] font-black text-[#DE5795] drop-shadow-[0_8px_24px_rgba(0,0,0,0.8)] animate-ping">
                 {countdownNum}
               </span>
               <span className="absolute text-[120px] font-black text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
@@ -238,7 +238,7 @@ export function KioskCamera({
             </div>
           ) : (
             <div className="text-center animate-bounce">
-              <span className="text-6xl font-black text-[#C1E3D0] tracking-wider drop-shadow-[0_8px_24px_rgba(0,0,0,0.9)] uppercase">
+              <span className="text-6xl font-black text-[#DE5795] tracking-wider drop-shadow-[0_8px_24px_rgba(0,0,0,0.9)] uppercase">
                 SMILE! 📸
               </span>
             </div>

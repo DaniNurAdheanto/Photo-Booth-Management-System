@@ -1,19 +1,19 @@
 import type { Metadata } from 'next';
-import { Poppins } from 'next/font/google';
+import { Sora } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/layout/header';
 import { Sidebar } from '@/components/layout/sidebar';
 
-const poppins = Poppins({
+const sora = Sora({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600', '700', '800'],
-  variable: '--font-poppins',
+  variable: '--font-sora',
   display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'Photo Booth Management System - Untitled UI',
-  description: 'Scalable Monorepo with Next.js 14, Go Gin, PostgreSQL and TypeORM styled with Untitled UI Design System, #C1E3D0 primary color, and Poppins font',
+  title: 'PhotoBooth OS - Sistem Manajemen Photo Booth',
+  description: 'Aplikasi manajemen operasional photo booth, template desain frame, dan antarmuka kiosk foto interaktif.',
 };
 
 export default function RootLayout({
@@ -22,8 +22,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id" className={`${poppins.variable} ${poppins.className} font-poppins antialiased h-full`}>
-      <body className="min-h-full bg-gray-50 text-gray-900 flex flex-col font-poppins selection:bg-[#C1E3D0] selection:text-[#133825]">
+    <html lang="id" className={`${sora.variable} ${sora.className} font-sora antialiased h-full`}>
+      <body className="min-h-full bg-gray-50 text-gray-900 flex flex-col font-sora selection:bg-[#DE5795] selection:text-white">
         <Header />
         <div className="flex flex-1 overflow-hidden">
           <Sidebar />

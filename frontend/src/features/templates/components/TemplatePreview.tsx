@@ -27,7 +27,7 @@ interface TemplatePreviewProps {
 export function TemplatePreview({
   layout,
   slotsCount = 4,
-  backgroundColor = '#C1E3D0',
+  backgroundColor = '#DE5795',
   backgroundGradient = '',
   backgroundImageUrl = '',
   overlayPngUrl = '',
@@ -69,7 +69,7 @@ export function TemplatePreview({
 
   // Background style
   const bgStyle: React.CSSProperties = {
-    backgroundColor: backgroundColor || '#C1E3D0',
+    backgroundColor: backgroundColor || '#DE5795',
     backgroundImage: backgroundGradient
       ? backgroundGradient
       : backgroundImageUrl
@@ -83,7 +83,7 @@ export function TemplatePreview({
 
   return (
     <div
-      className={`relative mx-auto rounded-xl shadow-md border border-gray-200/90 transition-all overflow-hidden flex flex-col justify-between font-poppins select-none ${className}`}
+      className={`relative mx-auto rounded-xl shadow-md border border-gray-200/90 transition-all overflow-hidden flex flex-col justify-between font-sora select-none ${className}`}
       style={bgStyle}
     >
       {/* 1. Transparent PNG Frame Overlay (if provided and valid) */}
@@ -269,7 +269,7 @@ export function TemplatePreview({
             </div>
 
             <div className="pt-2 text-center">
-              <p className="text-[10px] font-semibold text-gray-800 font-poppins truncate">
+              <p className="text-[10px] font-semibold text-gray-800 font-sora truncate">
                 {eventName || templateName}
               </p>
               {showDate && (

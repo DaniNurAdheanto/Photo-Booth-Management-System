@@ -17,7 +17,7 @@ export function Badge({
 }: BadgeProps) {
   const variants = {
     default: 'bg-gray-50 text-gray-700 border-gray-200',
-    brand: 'bg-[#C1E3D0]/45 text-[#133825] border-[#a8d7bc] font-semibold',
+    brand: 'bg-[#DE5795]/15 text-[#9D174D] border-[#DE5795]/30 font-semibold',
     success: 'bg-success-50 text-success-700 border-success-200',
     warning: 'bg-warning-50 text-warning-700 border-warning-200',
     danger: 'bg-error-50 text-error-700 border-error-200',
@@ -26,7 +26,7 @@ export function Badge({
 
   const dots = {
     default: 'bg-gray-500',
-    brand: 'bg-[#2C6D4C]',
+    brand: 'bg-[#DE5795]',
     success: 'bg-success-500',
     warning: 'bg-warning-500',
     danger: 'bg-error-500',
