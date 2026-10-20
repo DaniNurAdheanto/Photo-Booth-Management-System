@@ -198,7 +198,7 @@ export default function SessionsManagementPage() {
             </div>
             <div className="mt-2 flex items-baseline gap-2">
               <span className="text-2xl font-bold text-[#9D174D]">{activeCount}</span>
-              <span className="text-[11px] text-[#2C6D4C] font-semibold">sedang aktif</span>
+              <span className="text-[11px] text-[#9D174D] font-semibold">sedang aktif</span>
             </div>
           </div>
 
@@ -385,7 +385,7 @@ export default function SessionsManagementPage() {
                                   : session.status === 'REVIEWING'
                                   ? 'bg-amber-500'
                                   : session.status === 'CAPTURING'
-                                  ? 'bg-[#2C6D4C] animate-pulse'
+                                  ? 'bg-[#DE5795] animate-pulse'
                                   : 'bg-red-500'
                               }`}
                             />

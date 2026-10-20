@@ -60,7 +60,7 @@ export function TemplateCard({
         isArchived
           ? 'opacity-70 border-dashed border-gray-300 bg-gray-50/50'
           : isActive
-          ? 'border-gray-200 hover:border-[#a8d7bc]'
+          ? 'border-gray-200 hover:border-[#DE5795]/50'
           : 'border-gray-200 opacity-90'
       }`}
     >
@@ -70,7 +70,7 @@ export function TemplateCard({
           {/* Top Badges Bar */}
           <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-20 pointer-events-none">
             <div className="flex items-center gap-1.5 pointer-events-auto">
-              <span className="font-mono text-[10px] font-bold text-[#133825] bg-white/95 px-2 py-0.5 rounded-md border border-gray-200 shadow-2xs">
+              <span className="font-mono text-[10px] font-bold text-gray-800 bg-white/95 px-2 py-0.5 rounded-md border border-gray-200 shadow-2xs">
                 {template.id}
               </span>
               <span className="font-mono text-[9px] font-semibold text-gray-500 bg-white/90 px-1.5 py-0.5 rounded border border-gray-200">

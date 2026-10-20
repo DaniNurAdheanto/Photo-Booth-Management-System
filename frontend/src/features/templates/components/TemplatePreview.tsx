@@ -137,17 +137,17 @@ export function TemplatePreview({
 
             {/* Bottom Typography & Branding */}
             <div className="pt-1.5 text-center border-t border-black/10">
-              <p className="text-[9px] font-black uppercase text-[#133825] truncate">
+              <p className="text-[9px] font-black uppercase text-[#831843] truncate">
                 {eventName || templateName}
               </p>
               {parsedTexts.length > 0 ? (
                 parsedTexts.map((txt) => (
-                  <p key={txt.id} className="text-[7.5px] font-medium text-[#2C6D4C] truncate" style={{ color: txt.color }}>
+                  <p key={txt.id} className="text-[7.5px] font-medium text-[#9D174D] truncate" style={{ color: txt.color }}>
                     {txt.text}
                   </p>
                 ))
               ) : (
-                <p className="text-[7px] text-[#418B63] font-medium">Moments to Remember</p>
+                <p className="text-[7px] text-[#9D174D] font-medium">Moments to Remember</p>
               )}
               {showDate && (
                 <p className="text-[6.5px] text-gray-500 font-mono mt-0.5">
@@ -182,7 +182,7 @@ export function TemplatePreview({
             </div>
 
             <div className="pt-1 text-center border-t border-black/10">
-              <p className="text-[9px] font-bold text-[#133825] truncate">
+              <p className="text-[9px] font-bold text-[#831843] truncate">
                 {eventName || templateName}
               </p>
               {showDate && (
@@ -218,7 +218,7 @@ export function TemplatePreview({
             </div>
 
             <div className="flex items-center justify-between px-1 pt-1 border-t border-black/10 text-[8px]">
-              <span className="font-bold text-[#133825] truncate">{eventName || templateName}</span>
+              <span className="font-bold text-[#831843] truncate">{eventName || templateName}</span>
               {showDate && <span className="text-gray-500 font-mono">{new Date().getFullYear()}</span>}
             </div>
           </div>
@@ -246,7 +246,7 @@ export function TemplatePreview({
             </div>
 
             <div className="text-center pt-1 border-t border-black/10">
-              <p className="text-[10px] font-bold text-[#133825] truncate">{eventName || templateName}</p>
+              <p className="text-[10px] font-bold text-[#831843] truncate">{eventName || templateName}</p>
             </div>
           </div>
         )}

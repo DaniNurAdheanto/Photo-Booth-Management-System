@@ -25,7 +25,7 @@ export default function RootLayout({
     <html lang="id" className={`${sora.variable} ${sora.className} font-sora antialiased h-full`}>
       <body className="min-h-full bg-gray-50 text-gray-900 flex flex-col font-sora selection:bg-[#DE5795] selection:text-white">
         <Header />
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 overflow-hidden relative z-50">
           <Sidebar />
           <main className="flex-1 overflow-y-auto p-6 md:p-8 bg-gray-50/50">
             {children}

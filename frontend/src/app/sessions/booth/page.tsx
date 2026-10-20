@@ -633,7 +633,7 @@ export default function KioskBoothPage() {
               <button
                 onClick={handleStartSession}
                 disabled={loading}
-                className="group relative inline-flex items-center gap-3 px-8 py-4.5 rounded-2xl bg-[#DE5795] text-white font-bold text-lg sm:text-xl shadow-lg hover:shadow-xl hover:bg-[#c93d7e] active:scale-95 transition-all border-2 border-[#DE5795]"
+                className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-[#DE5795] text-white font-bold text-lg sm:text-xl shadow-lg hover:shadow-xl hover:bg-[#c93d7e] active:scale-95 transition-all border-2 border-[#DE5795]"
               >
                 {loading ? (
                   <>
@@ -676,7 +676,7 @@ export default function KioskBoothPage() {
         {step === 'TEMPLATE_SELECT' && (
           <div className="w-full max-w-4xl space-y-6 animate-fade-in">
             <div className="text-center space-y-1">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#133825]">Pilih Template Foto</h2>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">Pilih Template Foto</h2>
               <p className="text-xs sm:text-sm text-gray-600">
                 Pilih format cetak yang Anda inginkan untuk sesi foto ini
               </p>
@@ -787,7 +787,7 @@ export default function KioskBoothPage() {
             {/* Top Toolbar */}
             <div className="flex items-center justify-between bg-white px-4 py-2.5 rounded-xl border border-gray-200 shadow-xs text-xs">
               <div className="flex items-center gap-2 font-medium text-gray-700">
-                <Camera className="w-4 h-4 text-[#2C6D4C]" />
+                <Camera className="w-4 h-4 text-[#DE5795]" />
                 <span>
                   Mengambil Foto Slot #{currentSlotToCapture + 1} dari {totalSlotsNeeded}
                 </span>
@@ -985,7 +985,7 @@ export default function KioskBoothPage() {
                       {/* Retake Individual Slot Button */}
                       <button
                         onClick={() => handleRetakeIndividualSlot(item.slot)}
-                        className="absolute bottom-2 right-2 px-2.5 py-1 rounded-lg bg-white/95 text-[#133825] font-semibold text-[11px] shadow-md hover:bg-white flex items-center gap-1 border border-gray-200 transition-all active:scale-95"
+                        className="absolute bottom-2 right-2 px-2.5 py-1 rounded-lg bg-white/95 text-gray-800 font-semibold text-[11px] shadow-md hover:bg-white flex items-center gap-1 border border-gray-200 transition-all active:scale-95"
                       >
                         <RotateCcw className="w-3 h-3 text-amber-600" />
                         <span>Retake Slot Ini</span>

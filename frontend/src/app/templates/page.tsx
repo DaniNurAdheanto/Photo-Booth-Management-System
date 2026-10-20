@@ -526,68 +526,87 @@ export default function TemplatesPage() {
         isSaving={isSaving}
       />
 
-      {/* Template Library Drawer / Modal */}
+      {/* Template Library Drawer */}
       {isLibraryOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/60 backdrop-blur-sm animate-fade-in font-sora">
-          <div className="relative w-full max-w-3xl rounded-3xl bg-white shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[88vh]">
-            <div className="px-6 py-4.5 border-b border-gray-100 flex items-center justify-between bg-gray-50/70">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-[#DE5795] text-white border border-[#DE5795]">
-                  <BookOpen className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-gray-900 font-sora">Template Library</h3>
-                  <p className="text-xs text-gray-500">
-                    Pilih preset profesional siap pakai untuk langsung ditambahkan ke sistem booth Anda.
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsLibraryOpen(false)}
-                className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+        <div className="fixed inset-0 z-50 overflow-hidden font-sora">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-gray-950/60 backdrop-blur-xs transition-opacity animate-fade-in"
+            onClick={() => setIsLibraryOpen(false)}
+          />
 
-            <div className="p-6 overflow-y-auto space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {CURATED_LIBRARY_PRESETS.map((preset, idx) => (
-                  <div
-                    key={idx}
-                    className="p-4 rounded-2xl border border-gray-200 bg-white hover:border-[#DE5795] hover:shadow-md transition-all flex flex-col justify-between space-y-3"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-gray-900">{preset.name}</span>
-                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#DE5795]/15 text-[#9D174D] border border-[#DE5795]/30">
-                          {preset.print_size}
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">{preset.description}</p>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-2 border-t border-gray-100 text-xs">
-                      <span className="text-gray-400 text-[11px]">{preset.slots_count} Foto • {preset.category}</span>
-                      <button
-                        onClick={() => handleInstallPreset(preset)}
-                        className="px-3 py-1.5 rounded-lg bg-[#DE5795] text-white font-bold text-xs hover:bg-[#c93d7e] transition-colors border border-[#DE5795]"
-                      >
-                        Pasang Template
-                      </button>
-                    </div>
+          <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+            <div className="w-screen max-w-2xl bg-white shadow-2xl border-l border-gray-100 flex flex-col animate-slide-left">
+              {/* Drawer Header */}
+              <div className="px-6 py-5 border-b border-gray-200/80 flex items-center justify-between bg-white shrink-0 sticky top-0 z-20 shadow-2xs">
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="w-11 h-11 rounded-2xl bg-[#DE5795]/15 border border-[#DE5795]/30 flex items-center justify-center text-[#9D174D] shadow-xs shrink-0">
+                    <BookOpen className="w-5 h-5 text-[#DE5795]" />
                   </div>
-                ))}
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-base font-bold text-gray-900 font-sora leading-tight">Template Library</h3>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#DE5795]/15 text-[#9D174D] border border-[#DE5795]/30">
+                        Preset Hub
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-0.5 truncate">
+                      Pilih preset profesional siap pakai untuk langsung ditambahkan ke sistem booth
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsLibraryOpen(false)}
+                  className="w-9 h-9 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 border border-transparent hover:border-gray-200 transition-all flex items-center justify-center shrink-0 ml-3"
+                  title="Tutup (Esc)"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-            </div>
 
-            <div className="px-6 py-3 border-t border-gray-100 bg-gray-50 flex justify-end">
-              <button
-                onClick={() => setIsLibraryOpen(false)}
-                className="px-4 py-2 rounded-xl bg-gray-900 text-white text-xs font-semibold hover:bg-gray-800 transition-colors"
-              >
-                Tutup
-              </button>
+              {/* Drawer Body */}
+              <div className="p-6 overflow-y-auto flex-1 space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {CURATED_LIBRARY_PRESETS.map((preset, idx) => (
+                    <div
+                      key={idx}
+                      className="p-4 rounded-2xl border border-gray-200 bg-white hover:border-[#DE5795] hover:shadow-md transition-all flex flex-col justify-between space-y-3"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-gray-900">{preset.name}</span>
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#DE5795]/15 text-[#9D174D] border border-[#DE5795]/30">
+                            {preset.print_size}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">{preset.description}</p>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-2 border-t border-gray-100 text-xs">
+                        <span className="text-gray-400 text-[11px]">{preset.slots_count} Foto • {preset.category}</span>
+                        <button
+                          onClick={() => handleInstallPreset(preset)}
+                          className="px-3 py-1.5 rounded-lg bg-[#DE5795] text-white font-bold text-xs hover:bg-[#c93d7e] transition-colors border border-[#DE5795]"
+                        >
+                          Pasang Template
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Drawer Sticky Footer */}
+              <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/80 backdrop-blur-sm flex items-center justify-end gap-3 shrink-0 sticky bottom-0 z-10">
+                <button
+                  type="button"
+                  onClick={() => setIsLibraryOpen(false)}
+                  className="px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
+                >
+                  Tutup Library
+                </button>
+              </div>
             </div>
           </div>
         </div>

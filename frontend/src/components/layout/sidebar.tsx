@@ -13,8 +13,8 @@ export function Sidebar() {
     { label: 'Manajemen Sesi Foto', href: '/sessions', icon: Film, count: 'Live' },
     { label: 'Template & Desain', href: '/templates', icon: Layers, count: '5' },
     { label: 'Laporan Pembayaran', href: '/payments', icon: CreditCard, count: 'Baru' },
-    { label: 'Daftar Unit Booth', href: '/#booths', icon: Store, count: '3' },
-    { label: 'Jadwal Acara & Event', href: '/#bookings', icon: CalendarDays, count: '8' },
+    { label: 'Daftar Unit Booth', href: '/booths', icon: Store, count: '3' },
+    { label: 'Jadwal Acara & Event', href: '/events', icon: CalendarDays, count: '8' },
   ];
 
   return (

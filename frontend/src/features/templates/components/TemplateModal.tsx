@@ -223,33 +223,47 @@ export function TemplateModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/60 backdrop-blur-sm animate-fade-in font-sora">
-      <div className="relative w-full max-w-5xl rounded-3xl bg-white shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[92vh]">
-        {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/70">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#DE5795] text-white border border-[#DE5795] flex items-center justify-center">
-              <Layers className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-base font-bold text-gray-900 font-sora">
-                {initialData ? 'Edit Desain Template Foto' : 'Buat Template & Layout Baru'}
-              </h3>
-              <p className="text-xs text-gray-500">
-                Sesuaikan rasio cetak, bingkai transparan PNG, tata letak foto, dan branding acara.
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+    <div className="fixed inset-0 z-50 overflow-hidden font-sora">
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-gray-950/60 backdrop-blur-xs transition-opacity animate-fade-in"
+        onClick={onClose}
+      />
 
-        {/* Modal Tabs Bar */}
-        <div className="flex items-center px-6 border-b border-gray-200 bg-white gap-2 overflow-x-auto text-xs font-semibold">
+      <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+        <div className="w-screen max-w-4xl bg-white shadow-2xl border-l border-gray-100 flex flex-col animate-slide-left">
+          {/* Drawer Header */}
+          <div className="px-6 py-5 border-b border-gray-200/80 flex items-center justify-between bg-white shrink-0 sticky top-0 z-20 shadow-2xs">
+            <div className="flex items-center gap-3.5 min-w-0">
+              <div className="w-11 h-11 rounded-2xl bg-[#DE5795]/15 border border-[#DE5795]/30 flex items-center justify-center text-[#9D174D] shadow-xs shrink-0">
+                <Layers className="w-5 h-5 text-[#DE5795]" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="text-base font-bold text-gray-900 font-sora leading-tight">
+                    {initialData ? 'Edit Desain Template Foto' : 'Buat Template & Layout Baru'}
+                  </h3>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#DE5795]/15 text-[#9D174D] border border-[#DE5795]/30">
+                    {initialData ? 'Editor Mode' : 'Template Designer'}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 mt-0.5 truncate">
+                  Sesuaikan rasio cetak, bingkai transparan PNG, tata letak foto, dan branding acara
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-9 h-9 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 border border-transparent hover:border-gray-200 transition-all flex items-center justify-center shrink-0 ml-3"
+              title="Tutup (Esc)"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Modal Tabs Bar */}
+          <div className="flex items-center px-6 py-2 border-b border-gray-100 bg-gray-50/70 gap-2 overflow-x-auto text-xs font-semibold shrink-0">
           {[
             { id: 'layout', label: '1. Layout & Dimensi', icon: Sliders },
             { id: 'frame', label: '2. Frame PNG & Background', icon: Palette },
@@ -263,13 +277,13 @@ export function TemplateModal({
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2 py-3 px-3.5 border-b-2 transition-all whitespace-nowrap ${
+                className={`flex items-center gap-2 py-2 px-3.5 rounded-xl transition-all whitespace-nowrap ${
                   isActive
-                    ? 'border-[#DE5795] text-[#9D174D] font-bold'
-                    : 'border-transparent text-gray-500 hover:text-gray-800'
+                    ? 'bg-white text-[#9D174D] font-bold shadow-xs border border-gray-200/80 ring-1 ring-[#DE5795]/20'
+                    : 'text-gray-500 hover:text-gray-900 hover:bg-white/60'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-[#DE5795]' : 'text-gray-400'}`} />
+                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#DE5795]' : 'text-gray-400'}`} />
                 <span>{tab.label}</span>
               </button>
             );
@@ -277,9 +291,10 @@ export function TemplateModal({
         </div>
 
         {/* Form and Live WYSIWYG Preview Grid */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12">
-          {/* Left Controls Column */}
-          <div className="lg:col-span-7 p-6 overflow-y-auto space-y-5 border-r border-gray-100 max-h-[calc(92vh-140px)]">
+        <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
+          <div className="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-0">
+            {/* Left Controls Column */}
+            <div className="lg:col-span-7 p-6 overflow-y-auto space-y-5 border-r border-gray-100">
             {/* File Error Alert if validation fails */}
             {fileError && (
               <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 flex items-start gap-2.5 text-xs text-red-700 animate-shake">
@@ -383,7 +398,7 @@ export function TemplateModal({
                     max="60"
                     value={formData.padding}
                     onChange={(e) => setFormData({ ...formData, padding: parseInt(e.target.value) })}
-                    className="w-full accent-[#2C6D4C]"
+                    className="w-full accent-[#DE5795]"
                   />
 
                   <div className="flex items-center justify-between text-xs pt-1">
@@ -392,11 +407,11 @@ export function TemplateModal({
                   </div>
                   <input
                     type="range"
-                    min="6"
+                    min="0"
                     max="40"
                     value={formData.gap}
                     onChange={(e) => setFormData({ ...formData, gap: parseInt(e.target.value) })}
-                    className="w-full accent-[#2C6D4C]"
+                    className="w-full accent-[#DE5795]"
                   />
 
                   <div className="flex items-center justify-between text-xs pt-1">
@@ -409,7 +424,7 @@ export function TemplateModal({
                     max="24"
                     value={formData.border_radius}
                     onChange={(e) => setFormData({ ...formData, border_radius: parseInt(e.target.value) })}
-                    className="w-full accent-[#2C6D4C]"
+                    className="w-full accent-[#DE5795]"
                   />
                 </div>
               </div>
@@ -476,7 +491,7 @@ export function TemplateModal({
                         onClick={() => setFormData({ ...formData, background_color: color.hex, background_gradient: '' })}
                         className={`w-7 h-7 rounded-full border-2 transition-all flex items-center justify-center ${
                           formData.background_color.toLowerCase() === color.hex.toLowerCase() && !formData.background_gradient
-                            ? 'border-[#133825] scale-110 shadow-xs'
+                            ? 'border-[#DE5795] ring-2 ring-[#DE5795]/30 scale-110 shadow-xs'
                             : 'border-gray-200'
                         }`}
                         style={{ backgroundColor: color.hex }}
@@ -666,8 +681,8 @@ export function TemplateModal({
             )}
           </div>
 
-          {/* Right Live WYSIWYG Preview Column */}
-          <div className="lg:col-span-5 p-6 bg-gray-50/70 flex flex-col items-center justify-between overflow-y-auto max-h-[calc(92vh-140px)] border-t lg:border-t-0">
+            {/* Right Live WYSIWYG Preview Column */}
+            <div className="lg:col-span-5 p-6 bg-gray-50/70 flex flex-col items-center justify-between overflow-y-auto border-t lg:border-t-0">
             <div className="w-full flex items-center justify-between mb-3">
               <span className="text-xs font-bold text-gray-900 flex items-center gap-1.5 font-sora">
                 <Eye className="w-3.5 h-3.5 text-[#DE5795]" />
@@ -712,17 +727,18 @@ export function TemplateModal({
               />
             </div>
 
-            <p className="text-[10px] text-gray-400 text-center mt-3">
-              Ukuran cetak: <strong className="text-gray-700">{formData.print_size}</strong> ({formData.width}×{formData.height} px)
-            </p>
+              <p className="text-[10px] text-gray-400 text-center mt-3">
+                Ukuran cetak: <strong className="text-gray-700">{formData.print_size}</strong> ({formData.width}×{formData.height} px)
+              </p>
+            </div>
           </div>
 
-          {/* Footer Controls */}
-          <div className="lg:col-span-12 px-6 py-3.5 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between">
+          {/* Drawer Sticky Footer */}
+          <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/80 backdrop-blur-sm flex items-center justify-end gap-3 shrink-0 sticky bottom-0 z-10">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
+              className="px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
             >
               Batal
             </button>
@@ -730,7 +746,7 @@ export function TemplateModal({
             <button
               type="submit"
               disabled={isSaving}
-              className="px-6 py-2.5 rounded-xl bg-[#DE5795] text-white text-xs font-bold hover:bg-[#c93d7e] transition-colors border border-[#DE5795] shadow-xs flex items-center gap-2 disabled:opacity-50"
+              className="px-5 py-2.5 rounded-xl bg-[#DE5795] text-white text-xs font-bold hover:bg-[#c93d7e] transition-colors border border-[#DE5795] shadow-xs flex items-center gap-2 disabled:opacity-50"
             >
               <Check className="w-4 h-4 text-white" />
               <span>{isSaving ? 'Menyimpan...' : initialData ? 'Perbarui Template' : 'Publikasikan Template'}</span>
@@ -739,5 +755,6 @@ export function TemplateModal({
         </form>
       </div>
     </div>
+  </div>
   );
 }

@@ -24,7 +24,24 @@ import {
   ExternalLink,
   ShieldCheck,
   Sparkles,
+  Plus,
+  Check,
+  Banknote,
 } from 'lucide-react';
+
+const BOOTHS_LIST = [
+  { id: 'bth-001', name: 'Booth Alpha - Grand Indonesia' },
+  { id: 'bth-002', name: 'Booth Beta - Central Park' },
+  { id: 'bth-003', name: 'Booth Gamma - Paris Van Java' },
+  { id: 'bth-004', name: 'Booth Delta - Senayan City' },
+];
+
+const MANUAL_PACKAGES = [
+  { name: 'Paket Strip 2x6 (4 Pose)', price: 50000, desc: '2 lembar cetak strip + file digital' },
+  { name: 'Paket Postcard 4x6 (2 Pose)', price: 65000, desc: '1 lembar postcard jumbo' },
+  { name: 'Paket Grid 2x2 Party', price: 50000, desc: '4 foto kotak estetik modern' },
+  { name: 'Paket Polaroid Single', price: 35000, desc: '1 foto polaroid retro' },
+];
 
 interface Transaction {
   id: string;
@@ -193,6 +210,49 @@ export default function PaymentsPage() {
   const [activeReceipt, setActiveReceipt] = useState<Transaction | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Manual Payment Drawer State
+  const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+  const [manualCustomer, setManualCustomer] = useState('');
+  const [manualPhone, setManualPhone] = useState('');
+  const [manualBoothId, setManualBoothId] = useState('bth-001');
+  const [manualPackageIndex, setManualPackageIndex] = useState(0);
+  const [manualMethod, setManualMethod] = useState<'CASH' | 'EDC_CARD' | 'QRIS'>('CASH');
+  const [manualProvider, setManualProvider] = useState('Kasir Tunai Booth');
+  const [manualCopies, setManualCopies] = useState(2);
+
+  const handleSaveManualPayment = (e: React.FormEvent) => {
+    e.preventDefault();
+    const pkg = MANUAL_PACKAGES[manualPackageIndex] || MANUAL_PACKAGES[0];
+    const boothObj = BOOTHS_LIST.find((b) => b.id === manualBoothId) || BOOTHS_LIST[0];
+    const newInv = `INV-20261020-${String(transactions.length + 1).padStart(3, '0')}`;
+    const newSession = `PB-${manualBoothId.slice(-3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    const newTx: Transaction = {
+      id: `tx-${Date.now()}`,
+      invoiceNumber: newInv,
+      sessionCode: newSession,
+      customerName: manualCustomer || 'Tamu Kasir Walk-in',
+      customerPhone: manualPhone,
+      boothId: manualBoothId,
+      boothName: boothObj.name,
+      packageName: pkg.name,
+      amount: pkg.price,
+      paymentMethod: manualMethod,
+      paymentProvider: manualProvider,
+      status: 'SUCCESS',
+      paidAt: new Date().toISOString(),
+      printCopies: manualCopies,
+      digitalDownload: true,
+    };
+
+    setTransactions([newTx, ...transactions]);
+    setIsManualModalOpen(false);
+    setManualCustomer('');
+    setManualPhone('');
+    showToast(`Transaksi ${newInv} berhasil dicatat & divalidasi`);
+    setActiveReceipt(newTx);
+  };
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
@@ -294,7 +354,15 @@ export default function PaymentsPage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+          <button
+            onClick={() => setIsManualModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl bg-[#DE5795] text-white hover:bg-[#c93d7e] transition shadow-xs"
+          >
+            <Plus className="w-4 h-4 text-white" />
+            <span>Catat Kasir Tunai / Manual</span>
+          </button>
+
           <button
             onClick={handleExportCSV}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 transition shadow-xs"
@@ -739,106 +807,347 @@ export default function PaymentsPage() {
       {/* ============================================================ */}
       {/* DIGITAL RECEIPT / INVOICE MODAL                              */}
       {/* ============================================================ */}
+      {/* ============================================================ */}
+      {/* DIGITAL RECEIPT / INVOICE DRAWER                             */}
+      {/* ============================================================ */}
       {activeReceipt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/70 backdrop-blur-sm animate-fade-in font-sora">
-          <div className="relative w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl border border-gray-200 space-y-4 text-left">
-            {/* Modal Header */}
-            <div className="flex items-start justify-between border-b border-dashed border-gray-200 pb-3">
-              <div>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-gray-400">Bukti Transaksi Resmi</span>
-                <h3 className="text-base font-bold text-gray-900">PhotoBooth OS</h3>
-                <p className="text-xs text-gray-500">{activeReceipt.boothName}</p>
-              </div>
-              <button
-                onClick={() => setActiveReceipt(null)}
-                className="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+        <div className="fixed inset-0 z-50 overflow-hidden font-sora">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-gray-950/60 backdrop-blur-xs transition-opacity animate-fade-in"
+            onClick={() => setActiveReceipt(null)}
+          />
 
-            {/* Receipt Meta */}
-            <div className="space-y-1 text-xs text-gray-600 bg-gray-50 p-3 rounded-xl border border-gray-100 font-mono">
-              <div className="flex justify-between">
-                <span>No. Invoice:</span>
-                <strong className="text-gray-900">{activeReceipt.invoiceNumber}</strong>
+          <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+            <div className="w-screen max-w-md bg-white shadow-2xl border-l border-gray-100 flex flex-col animate-slide-left">
+              {/* Drawer Header */}
+              <div className="px-6 py-5 border-b border-gray-200/80 flex items-center justify-between bg-white shrink-0 sticky top-0 z-20 shadow-2xs">
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="w-11 h-11 rounded-2xl bg-[#DE5795]/15 border border-[#DE5795]/30 flex items-center justify-center text-[#9D174D] shadow-xs shrink-0">
+                    <Receipt className="w-5 h-5 text-[#DE5795]" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-base font-bold text-gray-900 leading-tight">Bukti Pembayaran</h3>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
+                        LUNAS
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-0.5 truncate font-mono">Invoice: {activeReceipt.invoiceNumber}</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveReceipt(null)}
+                  className="w-9 h-9 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 border border-transparent hover:border-gray-200 transition-all flex items-center justify-center shrink-0 ml-3"
+                  title="Tutup (Esc)"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <div className="flex justify-between">
-                <span>Kode Sesi:</span>
-                <strong className="text-gray-900">{activeReceipt.sessionCode}</strong>
+
+              {/* Drawer Body */}
+              <div className="p-6 overflow-y-auto flex-1 space-y-4 text-xs">
+                {/* Receipt Card */}
+                <div className="p-5 rounded-2xl bg-gray-50 border border-gray-200 space-y-4">
+                  <div className="flex items-start justify-between border-b border-dashed border-gray-200 pb-3">
+                    <div>
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-gray-400">Bukti Transaksi Resmi</span>
+                      <h4 className="text-sm font-bold text-gray-900">PhotoBooth OS</h4>
+                      <p className="text-xs text-gray-500">{activeReceipt.boothName}</p>
+                    </div>
+                    <div className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-semibold flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3" />
+                      <span>LUNAS</span>
+                    </div>
+                  </div>
+
+                  {/* Receipt Meta */}
+                  <div className="space-y-1.5 text-xs text-gray-600 font-mono">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">No. Invoice:</span>
+                      <strong className="text-gray-900">{activeReceipt.invoiceNumber}</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Kode Sesi:</span>
+                      <strong className="text-gray-900">{activeReceipt.sessionCode}</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Pelanggan:</span>
+                      <span className="text-gray-800 font-sans">{activeReceipt.customerName}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Waktu Bayar:</span>
+                      <span>{new Date(activeReceipt.paidAt).toLocaleString('id-ID')}</span>
+                    </div>
+                  </div>
+
+                  {/* Itemized Breakdown */}
+                  <div className="space-y-2 py-3 border-y border-dashed border-gray-200 text-xs">
+                    <div className="flex justify-between font-medium">
+                      <span>{activeReceipt.packageName}</span>
+                      <span className="font-mono">Rp {activeReceipt.amount.toLocaleString('id-ID')}</span>
+                    </div>
+                    <div className="flex justify-between text-gray-500 text-[11px]">
+                      <span>Cetak Fisik: {activeReceipt.printCopies} Lembar</span>
+                      <span>Termasuk</span>
+                    </div>
+                    <div className="flex justify-between text-gray-500 text-[11px]">
+                      <span>File Digital QR Code HD</span>
+                      <span>Gratis</span>
+                    </div>
+                  </div>
+
+                  {/* Total Section */}
+                  <div className="space-y-1.5 pt-1">
+                    <div className="flex justify-between text-xs text-gray-500">
+                      <span>Metode Pembayaran:</span>
+                      <span className="font-semibold text-gray-800">{activeReceipt.paymentProvider}</span>
+                    </div>
+                    <div className="flex justify-between text-sm font-bold text-gray-900 pt-1">
+                      <span>Total Bayar:</span>
+                      <span className="font-mono text-base text-[#9D174D]">
+                        Rp {activeReceipt.amount.toLocaleString('id-ID')}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Receipt QR Code */}
+                  <div className="text-center pt-3 border-t border-dashed border-gray-200">
+                    <img
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://photobooth.local/receipt/${activeReceipt.invoiceNumber}`}
+                      alt="Receipt QR"
+                      className="w-24 h-24 mx-auto rounded-lg border border-gray-200 p-1 bg-white"
+                    />
+                    <p className="text-[10px] text-gray-400 mt-1 font-mono">Pindai untuk unduh e-Struk digital</p>
+                  </div>
+                </div>
               </div>
-              <div className="flex justify-between">
-                <span>Pelanggan:</span>
-                <span className="text-gray-800">{activeReceipt.customerName}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Waktu Bayar:</span>
-                <span>{new Date(activeReceipt.paidAt).toLocaleString('id-ID')}</span>
+
+              {/* Drawer Sticky Footer */}
+              <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/80 backdrop-blur-sm flex items-center justify-end gap-3 shrink-0 sticky bottom-0 z-10">
+                <button
+                  type="button"
+                  onClick={() => setActiveReceipt(null)}
+                  className="px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
+                >
+                  Tutup
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.print();
+                    showToast('Perintah cetak struk dikirim');
+                  }}
+                  className="px-5 py-2.5 rounded-xl bg-[#DE5795] text-white font-bold text-xs hover:bg-[#c93d7e] transition-colors border border-[#DE5795] shadow-xs flex items-center gap-1.5"
+                >
+                  <Printer className="w-4 h-4 text-white" />
+                  <span>Cetak Struk Fisik</span>
+                </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
 
-            {/* Itemized Breakdown */}
-            <div className="space-y-2 py-2 border-y border-dashed border-gray-200 text-xs">
-              <div className="flex justify-between font-medium">
-                <span>{activeReceipt.packageName}</span>
-                <span className="font-mono">Rp {activeReceipt.amount.toLocaleString('id-ID')}</span>
-              </div>
-              <div className="flex justify-between text-gray-500 text-[11px]">
-                <span>Cetak Fisik: {activeReceipt.printCopies} Lembar</span>
-                <span>Termasuk</span>
-              </div>
-              <div className="flex justify-between text-gray-500 text-[11px]">
-                <span>File Digital QR Code HD</span>
-                <span>Gratis</span>
-              </div>
-            </div>
+      {/* ============================================================ */}
+      {/* DRAWER: CATAT PEMBAYARAN MANUAL / KASIR TUNAI                */}
+      {/* ============================================================ */}
+      {isManualModalOpen && (
+        <div className="fixed inset-0 z-50 overflow-hidden font-sora">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-gray-950/60 backdrop-blur-xs transition-opacity animate-fade-in"
+            onClick={() => setIsManualModalOpen(false)}
+          />
 
-            {/* Total Section */}
-            <div className="space-y-1.5 pt-1">
-              <div className="flex justify-between text-xs text-gray-500">
-                <span>Metode:</span>
-                <span className="font-semibold text-gray-800">{activeReceipt.paymentProvider}</span>
+          <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+            <div className="w-screen max-w-xl bg-white shadow-2xl border-l border-gray-100 flex flex-col animate-slide-left">
+              {/* Drawer Header */}
+              <div className="px-6 py-5 border-b border-gray-200/80 flex items-center justify-between bg-white shrink-0 sticky top-0 z-20 shadow-2xs">
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="w-11 h-11 rounded-2xl bg-[#DE5795]/15 border border-[#DE5795]/30 flex items-center justify-center text-[#9D174D] shadow-xs shrink-0">
+                    <Banknote className="w-5 h-5 text-[#DE5795]" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-base font-bold text-gray-900 leading-tight">Catat Pembayaran Kasir Manual</h3>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
+                        Manual POS
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-0.5 truncate">
+                      Entri transaksi tunai kasir, debit kartu EDC, atau transfer darurat
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsManualModalOpen(false)}
+                  className="w-9 h-9 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 border border-transparent hover:border-gray-200 transition-all flex items-center justify-center shrink-0 ml-3"
+                  title="Tutup (Esc)"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <div className="flex justify-between text-sm font-bold text-gray-900 pt-1">
-                <span>Total Bayar:</span>
-                <span className="font-mono text-base text-[#9D174D]">
-                  Rp {activeReceipt.amount.toLocaleString('id-ID')}
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 text-[11px] text-emerald-700 font-semibold pt-1">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Transaksi Terverifikasi Sukses</span>
-              </div>
-            </div>
 
-            {/* Receipt QR Code */}
-            <div className="text-center pt-2">
-              <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://photobooth.local/receipt/${activeReceipt.invoiceNumber}`}
-                alt="Receipt QR"
-                className="w-24 h-24 mx-auto rounded-lg border border-gray-200 p-1"
-              />
-              <p className="text-[10px] text-gray-400 mt-1 font-mono">Pindai untuk unduh e-Struk digital</p>
-            </div>
+              {/* Form Body */}
+              <form onSubmit={handleSaveManualPayment} className="flex-1 flex flex-col min-h-0">
+                <div className="p-6 overflow-y-auto flex-1 space-y-5 text-xs">
+                  {/* Metode Pembayaran Segmented Buttons */}
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-semibold text-gray-600 block">Pilih Jalur Pembayaran:</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { id: 'CASH', label: 'Tunai Kasir', icon: Banknote, provider: 'Kasir Tunai Booth' },
+                        { id: 'EDC_CARD', label: 'Kartu Debit/EDC', icon: CreditCard, provider: 'BCA EDC Mesin' },
+                        { id: 'QRIS', label: 'QRIS Statis', icon: QrCode, provider: 'QRIS Statis Kasir' },
+                      ].map((m) => {
+                        const Icon = m.icon;
+                        const isSelected = manualMethod === m.id;
+                        return (
+                          <button
+                            key={m.id}
+                            type="button"
+                            onClick={() => {
+                              setManualMethod(m.id as any);
+                              setManualProvider(m.provider);
+                            }}
+                            className={`p-3 rounded-xl border-2 text-center flex flex-col items-center justify-center gap-1 transition-all ${
+                              isSelected
+                                ? 'border-[#DE5795] bg-[#DE5795]/10 text-[#9D174D] font-bold shadow-xs ring-1 ring-[#DE5795]/20'
+                                : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-700'
+                            }`}
+                          >
+                            <Icon className={`w-4 h-4 ${isSelected ? 'text-[#DE5795]' : 'text-gray-400'}`} />
+                            <span className="text-[11px] font-semibold">{m.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
 
-            {/* Modal Actions */}
-            <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
-              <button
-                onClick={() => {
-                  window.print();
-                  showToast('Perintah cetak struk dikirim');
-                }}
-                className="flex-1 py-2.5 rounded-xl bg-[#DE5795] text-white font-bold text-xs hover:bg-[#c93d7e] transition flex items-center justify-center gap-1.5 shadow-xs"
-              >
-                <Printer className="w-3.5 h-3.5" />
-                <span>Cetak Struk Fisik</span>
-              </button>
-              <button
-                onClick={() => setActiveReceipt(null)}
-                className="px-4 py-2.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-700 hover:bg-gray-100 transition"
-              >
-                Tutup
-              </button>
+                  {/* Pilihan Paket Foto */}
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-semibold text-gray-600 block">Pilih Paket Foto:</label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {MANUAL_PACKAGES.map((pkg, idx) => {
+                        const isSelected = manualPackageIndex === idx;
+                        return (
+                          <div
+                            key={pkg.name}
+                            onClick={() => setManualPackageIndex(idx)}
+                            className={`p-3 rounded-xl border-2 cursor-pointer transition-all flex items-start justify-between ${
+                              isSelected
+                                ? 'border-[#DE5795] bg-[#DE5795]/10 shadow-2xs'
+                                : 'border-gray-200 bg-white hover:border-gray-300'
+                            }`}
+                          >
+                            <div>
+                              <p className="font-bold text-gray-900 text-xs">{pkg.name}</p>
+                              <p className="text-[10px] text-gray-500 mt-0.5">{pkg.desc}</p>
+                              <span className="font-mono font-bold text-xs text-[#9D174D] mt-1 block">
+                                Rp {pkg.price.toLocaleString('id-ID')}
+                              </span>
+                            </div>
+                            {isSelected && <Check className="w-4 h-4 text-[#DE5795] shrink-0 mt-0.5" />}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Unit Booth Alokasi */}
+                  <div className="space-y-1">
+                    <label className="font-semibold text-gray-700 block">Lokasi Unit Booth *</label>
+                    <select
+                      value={manualBoothId}
+                      onChange={(e) => setManualBoothId(e.target.value)}
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-gray-200 bg-white font-medium focus:outline-hidden focus:border-[#DE5795]"
+                    >
+                      {BOOTHS_LIST.map((b) => (
+                        <option key={b.id} value={b.id}>
+                          {b.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Data Pelanggan */}
+                  <div className="p-4 rounded-2xl bg-gray-50/70 border border-gray-200/80 space-y-3">
+                    <span className="text-[11px] font-bold text-gray-700 uppercase tracking-wider block">
+                      Informasi Pelanggan (Opsional)
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-gray-600 font-semibold">Nama Tamu / Pelanggan</label>
+                        <input
+                          type="text"
+                          placeholder="Misal: Dimas & Nisa"
+                          value={manualCustomer}
+                          onChange={(e) => setManualCustomer(e.target.value)}
+                          className="w-full px-3 py-1.5 text-xs rounded-lg border border-gray-200 bg-white focus:outline-hidden focus:border-[#DE5795]"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-gray-600 font-semibold">No. WhatsApp</label>
+                        <input
+                          type="text"
+                          placeholder="+62 812-xxxx-xxxx"
+                          value={manualPhone}
+                          onChange={(e) => setManualPhone(e.target.value)}
+                          className="w-full px-3 py-1.5 text-xs rounded-lg border border-gray-200 bg-white focus:outline-hidden focus:border-[#DE5795]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Salinan Cetak */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="font-semibold text-gray-700 block">Jumlah Lembar Cetak</label>
+                      <select
+                        value={manualCopies}
+                        onChange={(e) => setManualCopies(parseInt(e.target.value))}
+                        className="w-full px-3 py-2 text-xs rounded-xl border border-gray-200 bg-white"
+                      >
+                        <option value={1}>1 Lembar</option>
+                        <option value={2}>2 Lembar (Standar Strip)</option>
+                        <option value={4}>4 Lembar (Grup)</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="font-semibold text-gray-700 block">Total Tagihan Kasir</label>
+                      <div className="px-3.5 py-2 rounded-xl bg-gray-100 border border-gray-200 font-mono font-bold text-sm text-[#9D174D]">
+                        Rp {(MANUAL_PACKAGES[manualPackageIndex]?.price || 50000).toLocaleString('id-ID')}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/90 backdrop-blur-sm flex items-center justify-between gap-3 shrink-0 sticky bottom-0 z-10">
+                  <span className="text-[11px] text-gray-400 hidden sm:inline">
+                    Tekan <kbd className="px-1.5 py-0.5 rounded bg-gray-200 font-mono text-[10px]">ESC</kbd> untuk menutup
+                  </span>
+                  <div className="flex items-center gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setIsManualModalOpen(false)}
+                      className="px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-5 py-2.5 rounded-xl bg-[#DE5795] text-white text-xs font-bold hover:bg-[#c93d7e] transition-colors border border-[#DE5795] shadow-xs flex items-center gap-2"
+                    >
+                      <Check className="w-4 h-4 text-white" />
+                      <span>Validasi & Simpan Transaksi</span>
+                    </button>
+                  </div>
+                </div>
+              </form>
             </div>
           </div>
         </div>
