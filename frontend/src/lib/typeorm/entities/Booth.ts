@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, OneToMany } from 'typeorm';
-import { PhotoSession } from './PhotoSession';
-import { Device } from './Device';
+import type { PhotoSession } from './PhotoSession';
+import type { Device } from './Device';
 
 export enum BoothStatus {
   ONLINE = 'ONLINE',
@@ -46,10 +46,10 @@ export class Booth {
   @Column({ type: 'text', nullable: true })
   notes?: string;
 
-  @OneToMany(() => PhotoSession, (session) => session.booth)
+  @OneToMany('PhotoSession', (session: any) => session.booth)
   sessions!: PhotoSession[];
 
-  @OneToMany(() => Device, (device) => device.booth)
+  @OneToMany('Device', (device: any) => device.booth)
   devices!: Device[];
 
   @CreateDateColumn({ name: 'created_at' })

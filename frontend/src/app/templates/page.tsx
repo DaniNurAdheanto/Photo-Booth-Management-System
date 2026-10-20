@@ -20,7 +20,6 @@ import {
   SlidersHorizontal,
   ChevronDown,
 } from 'lucide-react';
-import { Sidebar } from '@/components/layout/sidebar';
 import { Template, TemplateFormData } from '@/features/templates/types/template.types';
 import { TemplateCard } from '@/features/templates/components/TemplateCard';
 import { TemplateModal } from '@/features/templates/components/TemplateModal';
@@ -301,12 +300,7 @@ export default function TemplatesPage() {
   const layoutCount = new Set(templates.map((t) => t.layout)).size;
 
   return (
-    <div className="flex min-h-screen bg-gray-50/70 font-poppins text-gray-900">
-      {/* Monorepo Sidebar */}
-      <Sidebar />
-
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto p-6 lg:p-8 space-y-6">
+    <div className="space-y-6 font-poppins">
         {/* Toast Notification */}
         {toast && (
           <div className="fixed top-6 right-6 z-50 animate-fade-in">
@@ -519,7 +513,6 @@ export default function TemplatesPage() {
             ))}
           </div>
         )}
-      </main>
 
       {/* Create / Edit Template Modal */}
       <TemplateModal

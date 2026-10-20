@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { Booth } from './Booth';
+import type { Booth } from './Booth';
 
 export enum SessionStatus {
   PENDING = 'PENDING',
@@ -20,7 +20,7 @@ export class PhotoSession {
   @Column({ type: 'varchar', length: 64, name: 'booth_id' })
   boothId!: string;
 
-  @ManyToOne(() => Booth, (booth) => booth.sessions, { onDelete: 'CASCADE' })
+  @ManyToOne('Booth', (booth: any) => booth.sessions, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'booth_id' })
   booth!: Booth;
 

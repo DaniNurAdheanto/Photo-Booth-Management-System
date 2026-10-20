@@ -21,7 +21,6 @@ import {
   ShieldCheck,
   Sparkles,
 } from 'lucide-react';
-import { Sidebar } from '@/components/layout/sidebar';
 import { PhotoSession } from '@/features/sessions/types/session.types';
 import { SessionDetailModal } from '@/features/sessions/components/SessionDetailModal';
 
@@ -122,12 +121,7 @@ export default function SessionsManagementPage() {
   const avgRetake = totalCount > 0 ? (totalRetakes / totalCount).toFixed(1) : '0';
 
   return (
-    <div className="flex min-h-screen bg-gray-50/70 font-poppins text-gray-900">
-      {/* Monorepo Sidebar */}
-      <Sidebar />
-
-      {/* Main Page Content */}
-      <main className="flex-1 overflow-y-auto p-6 lg:p-8 space-y-6">
+    <div className="space-y-6 font-poppins">
         {/* Toast Notification */}
         {toastMessage && (
           <div className="fixed top-6 right-6 z-50 animate-fade-in">
@@ -450,7 +444,6 @@ export default function SessionsManagementPage() {
             </table>
           </div>
         </div>
-      </main>
 
       {/* Inspect Session Detail Modal */}
       <SessionDetailModal
