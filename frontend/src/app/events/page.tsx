@@ -449,27 +449,28 @@ export default function EventsPage() {
         </div>
       )}
 
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200/80 pb-5">
+      {/* Page Header - Untitled UI Standard */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-5">
         <div>
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-              Jadwal Acara & Event
-            </h1>
-            <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-[#DE5795]/15 text-[#9D174D] border border-[#DE5795]/30">
-              {events.length} Terdaftar
+          <div className="flex items-center gap-2 mb-1">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-50 text-[#9D174D] border border-pink-200">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#DE5795]" />
+              {events.length} Event Terdaftar
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">
+            Jadwal Acara & Event
+          </h1>
+          <p className="text-sm text-gray-600 mt-1">
             Kelola pemesanan acara klien, alokasikan unit booth, kunci template desain khusus, dan kontrol kuota lembar cetak.
           </p>
         </div>
 
-        {/* Primary Action Button */}
-        <div className="flex items-center gap-2.5 shrink-0">
+        {/* Primary Action Button - Untitled UI Standard */}
+        <div className="flex items-center gap-3 shrink-0">
           <button
             onClick={handleOpenAddModal}
-            className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-xl bg-[#DE5795] text-white hover:bg-[#c93d7e] transition-colors shadow-xs active:scale-95"
+            className="px-4 py-2 text-sm font-semibold text-white bg-[#DE5795] hover:bg-[#c93d7e] rounded-lg shadow-xs transition-colors flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             <span>Jadwalkan Event Baru</span>
@@ -477,148 +478,161 @@ export default function EventsPage() {
         </div>
       </div>
 
-      {/* KPI Metrics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* KPI Metrics Cards - Untitled UI Standard */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* Metric 1: Live Today */}
-        <div className="p-5 rounded-2xl bg-white border border-gray-200/90 shadow-xs space-y-3 hover:border-gray-300 transition-colors">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs hover:border-gray-300 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-gray-500">Event Berjalan Hari Ini</span>
-            <div className="w-9 h-9 rounded-xl bg-[#DE5795]/15 border border-[#DE5795]/30 flex items-center justify-center text-[#9D174D]">
-              <CalendarDays className="w-4.5 h-4.5" />
+            <span className="text-sm font-medium text-gray-600">Event Hari Ini</span>
+            <div className="w-10 h-10 rounded-lg bg-pink-50 border border-pink-100 flex items-center justify-center text-[#DE5795]">
+              <CalendarDays className="w-5 h-5" />
             </div>
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-2xl font-black text-gray-900 tracking-tight">
-                {metrics.liveCount} Acara
-              </h3>
-              <span className="flex h-2.5 w-2.5 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#DE5795] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#DE5795]"></span>
-              </span>
-            </div>
-            <p className="text-xs text-gray-400 mt-1">Hotel Mulia & Ritz-Carlton</p>
+          <div className="mt-4 flex items-baseline justify-between">
+            <h3 className="text-3xl font-semibold text-gray-900 tracking-tight">
+              {metrics.liveCount} <span className="text-lg font-normal text-gray-500">Acara</span>
+            </h3>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-pink-50 text-[#9D174D] border border-pink-200 animate-pulse">
+              Sedang Live
+            </span>
+          </div>
+          <div className="mt-3 text-xs text-gray-500">
+            Hotel Mulia & Ritz-Carlton
           </div>
         </div>
 
         {/* Metric 2: Upcoming */}
-        <div className="p-5 rounded-2xl bg-white border border-gray-200/90 shadow-xs space-y-3 hover:border-gray-300 transition-colors">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs hover:border-gray-300 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-gray-500">Event Mendatang (Bulan Ini)</span>
-            <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700">
-              <Clock className="w-4.5 h-4.5" />
+            <span className="text-sm font-medium text-gray-600">Event Mendatang</span>
+            <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-700">
+              <Clock className="w-5 h-5" />
             </div>
           </div>
-          <div>
-            <h3 className="text-2xl font-black text-gray-900 tracking-tight">
-              {metrics.upcomingCount} Acara
+          <div className="mt-4 flex items-baseline justify-between">
+            <h3 className="text-3xl font-semibold text-gray-900 tracking-tight">
+              {metrics.upcomingCount} <span className="text-lg font-normal text-gray-500">Acara</span>
             </h3>
-            <p className="text-xs text-gray-400 mt-1">Siap disiapkan dalam 14 hari</p>
+          </div>
+          <div className="mt-3 text-xs text-gray-500">
+            Terjadwal dalam 14 hari ke depan
           </div>
         </div>
 
         {/* Metric 3: Prints Used */}
-        <div className="p-5 rounded-2xl bg-white border border-gray-200/90 shadow-xs space-y-3 hover:border-gray-300 transition-colors">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs hover:border-gray-300 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-gray-500">Total Foto Tercetak</span>
-            <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
-              <Printer className="w-4.5 h-4.5" />
+            <span className="text-sm font-medium text-gray-600">Total Foto Tercetak</span>
+            <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700">
+              <Printer className="w-5 h-5" />
             </div>
           </div>
-          <div>
-            <h3 className="text-2xl font-black text-gray-900 tracking-tight">
-              {metrics.totalPrintsUsed.toLocaleString('id-ID')} Lembar
+          <div className="mt-4 flex items-baseline justify-between">
+            <h3 className="text-3xl font-semibold text-gray-900 tracking-tight">
+              {metrics.totalPrintsUsed.toLocaleString('id-ID')} <span className="text-lg font-normal text-gray-500">Lembar</span>
             </h3>
-            <p className="text-xs text-emerald-700 font-semibold mt-1 flex items-center gap-1">
-              <CheckCircle2 className="w-3.5 h-3.5" /> Konsumsi kertas terkontrol
-            </p>
+          </div>
+          <div className="mt-3 flex items-center gap-1.5 text-xs text-emerald-700 font-medium">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            <span>Konsumsi kuota stabil & terkontrol</span>
           </div>
         </div>
 
         {/* Metric 4: Assigned Booths */}
-        <div className="p-5 rounded-2xl bg-white border border-gray-200/90 shadow-xs space-y-3 hover:border-gray-300 transition-colors">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs hover:border-gray-300 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-gray-500">Unit Booth Terjadwal</span>
-            <div className="w-9 h-9 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-700">
-              <Store className="w-4.5 h-4.5" />
+            <span className="text-sm font-medium text-gray-600">Unit Booth Terjadwal</span>
+            <div className="w-10 h-10 rounded-lg bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-700">
+              <Store className="w-5 h-5" />
             </div>
           </div>
-          <div>
-            <h3 className="text-2xl font-black text-gray-900 tracking-tight">
-              {metrics.assignedBoothsCount} dari {AVAILABLE_BOOTHS.length} Unit
+          <div className="mt-4 flex items-baseline justify-between">
+            <h3 className="text-3xl font-semibold text-gray-900 tracking-tight">
+              {metrics.assignedBoothsCount} / {AVAILABLE_BOOTHS.length} <span className="text-lg font-normal text-gray-500">Unit</span>
             </h3>
-            <p className="text-xs text-gray-400 mt-1">Semua unit beroperasi aktif</p>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+              100% Siaga
+            </span>
+          </div>
+          <div className="mt-3 text-xs text-gray-500">
+            Semua unit telah teralokasi
           </div>
         </div>
       </div>
 
-      {/* Filter Tabs & Search Bar */}
-      <div className="p-4 rounded-2xl bg-white border border-gray-200/90 shadow-xs space-y-3">
+      {/* Filter Tabs & Search Bar - Untitled UI Standard */}
+      <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-xs space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          {/* Status Tabs */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+          {/* Status Tabs - Segmented Button Group */}
+          <div className="p-1 bg-gray-50 border border-gray-200 rounded-lg inline-flex items-center gap-1 overflow-x-auto">
             {[
               { id: 'ALL', label: 'Semua Event', count: events.length },
               { id: 'LIVE', label: 'Sedang Berlangsung', count: events.filter((e) => e.status === 'LIVE').length },
               { id: 'UPCOMING', label: 'Mendatang', count: events.filter((e) => e.status === 'UPCOMING').length },
               { id: 'COMPLETED', label: 'Selesai', count: events.filter((e) => e.status === 'COMPLETED').length },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap flex items-center gap-1.5 ${
-                  activeTab === tab.id
-                    ? 'bg-[#DE5795] text-white shadow-xs'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                <span>{tab.label}</span>
-                <span
-                  className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                    activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'
+            ].map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                    isActive
+                      ? 'bg-white text-gray-900 shadow-xs border border-gray-200/50'
+                      : 'text-gray-500 hover:text-gray-900'
                   }`}
                 >
-                  {tab.count}
-                </span>
-              </button>
-            ))}
+                  <span>{tab.label}</span>
+                  <span
+                    className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                      isActive ? 'bg-pink-50 text-[#9D174D]' : 'bg-gray-200/70 text-gray-600'
+                    }`}
+                  >
+                    {tab.count}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
-          {/* Search Box */}
-          <div className="relative flex-1 max-w-xs">
+          {/* Search Box - Untitled UI Standard */}
+          <div className="relative flex-1 max-w-sm">
             <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Cari event, klien, atau venue..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-1.5 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#DE5795] focus:ring-2 focus:ring-[#DE5795]/20 font-sora"
+              className="w-full pl-9 pr-4 py-2 text-sm bg-white border border-gray-300 rounded-lg placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#DE5795]/20 focus:border-[#DE5795] shadow-xs"
             />
           </div>
         </div>
 
         {/* Category Filters */}
-        <div className="flex items-center gap-2 pt-2 border-t border-gray-100 text-xs">
-          <span className="text-[11px] font-medium text-gray-500 mr-1">Kategori:</span>
+        <div className="flex items-center gap-1.5 pt-3 border-t border-gray-200 text-xs overflow-x-auto">
+          <span className="text-xs font-medium text-gray-500 mr-2">Kategori:</span>
           {[
-            { id: 'ALL', label: 'Semua' },
+            { id: 'ALL', label: 'Semua Kategori' },
             { id: 'WEDDING', label: 'Wedding' },
             { id: 'BIRTHDAY', label: 'Birthday' },
             { id: 'CORPORATE', label: 'Corporate' },
             { id: 'EXHIBITION', label: 'Exhibition' },
-          ].map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setSelectedType(cat.id)}
-              className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition ${
-                selectedType === cat.id
-                  ? 'bg-gray-900 text-white'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
+          ].map((cat) => {
+            const isCatActive = selectedType === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedType(cat.id)}
+                className={`px-2.5 py-1 rounded-md text-xs font-medium transition ${
+                  isCatActive
+                    ? 'bg-gray-900 text-white shadow-xs'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                {cat.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 

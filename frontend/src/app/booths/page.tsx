@@ -382,124 +382,145 @@ export default function BoothsPage() {
       )}
 
       {/* ============================================================ */}
-      {/* HEADER SECTION                                               */}
+      {/* PAGE HEADER - UNTITLED UI STANDARD                           */}
       {/* ============================================================ */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-5">
         <div>
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-gray-900">
-              Daftar Unit Booth
-            </h1>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#DE5795]/15 text-[#9D174D] border border-[#DE5795]/30">
-              {totalCount} Terdaftar
+          <div className="flex items-center gap-2 mb-1">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-50 text-[#9D174D] border border-pink-200">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#DE5795]" />
+              {totalCount} Unit Terdaftar
             </span>
           </div>
-          <p className="text-xs text-gray-500 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">
+            Daftar Unit Booth
+          </h1>
+          <p className="text-sm text-gray-600 mt-1">
             Pantau status operasional mesin photo booth, sisa roll kertas printer, status kamera DSLR, dan remote control.
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        {/* Action Button Group - Untitled UI Standard */}
+        <div className="flex items-center gap-3 shrink-0">
           <Link
             href="/sessions/booth"
             target="_blank"
-            className="px-3.5 py-2 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 transition shadow-xs flex items-center gap-1.5"
+            className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 shadow-xs transition-colors flex items-center gap-2"
           >
-            <ExternalLink className="w-3.5 h-3.5 text-gray-500" />
+            <ExternalLink className="w-4 h-4 text-gray-500" />
             <span>Kiosk Booth Tamu</span>
           </Link>
 
           <button
             onClick={handleOpenCreateDrawer}
-            className="px-4 py-2 rounded-xl bg-[#DE5795] text-white font-bold text-xs hover:bg-[#c93d7e] transition-colors border border-[#DE5795] shadow-xs flex items-center gap-2"
+            className="px-4 py-2 text-sm font-semibold text-white bg-[#DE5795] hover:bg-[#c93d7e] rounded-lg shadow-xs transition-colors flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
-            <span>+ Tambah Unit Booth</span>
+            <span>Tambah Unit Booth</span>
           </button>
         </div>
       </div>
 
       {/* ============================================================ */}
-      {/* EXECUTIVE KPI METRIC CARDS                                    */}
+      {/* EXECUTIVE KPI METRIC CARDS - UNTITLED UI STANDARD             */}
       {/* ============================================================ */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* Total Booth */}
-        <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-xs flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-xs font-medium text-gray-500">Total Unit Terdaftar</span>
-            <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-gray-900">{totalCount}</span>
-              <span className="text-xs text-gray-400">Mesin Aktif</span>
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs hover:border-gray-300 transition-all">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-600">Total Unit Booth</span>
+            <div className="w-10 h-10 rounded-lg bg-pink-50 border border-pink-100 flex items-center justify-center text-[#DE5795]">
+              <Store className="w-5 h-5" />
             </div>
-            <p className="text-[11px] text-gray-500">Tersebar di 5 mall & venue</p>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-[#DE5795]/15 text-[#9D174D] flex items-center justify-center border border-[#DE5795]/30">
-            <Store className="w-6 h-6" />
+          <div className="mt-4 flex items-baseline justify-between">
+            <h3 className="text-3xl font-semibold text-gray-900 tracking-tight">
+              {totalCount} <span className="text-lg font-normal text-gray-500">Unit</span>
+            </h3>
+          </div>
+          <div className="mt-3 text-xs text-gray-500">
+            Tersebar di 5 mall & venue mitra
           </div>
         </div>
 
         {/* Online & Siaga */}
-        <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-xs flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-xs font-medium text-gray-500">Unit Siaga & Berjalan</span>
-            <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-emerald-600">{onlineCount}</span>
-              <span className="text-xs text-gray-400">dari {totalCount} unit</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-[11px] text-emerald-600 font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>{Math.round((onlineCount / totalCount) * 100)}% Kesiapan Mesin</span>
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs hover:border-gray-300 transition-all">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-600">Unit Siaga & Berjalan</span>
+            <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700">
+              <CheckCircle2 className="w-5 h-5" />
             </div>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200">
-            <CheckCircle2 className="w-6 h-6" />
+          <div className="mt-4 flex items-baseline justify-between">
+            <h3 className="text-3xl font-semibold text-gray-900 tracking-tight">
+              {onlineCount} <span className="text-lg font-normal text-gray-500">Unit</span>
+            </h3>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+              {Math.round((onlineCount / totalCount) * 100)}% Siaga
+            </span>
+          </div>
+          <div className="mt-3 flex items-center gap-1.5 text-xs text-emerald-700 font-medium">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Koneksi & kamera normal</span>
           </div>
         </div>
 
         {/* Sedang Sesi Tamu */}
-        <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-xs flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-xs font-medium text-gray-500">Sedang Digunakan Tamu</span>
-            <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-[#DE5795]">{inSessionCount}</span>
-              <span className="text-xs text-gray-400">Sesi Live</span>
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs hover:border-gray-300 transition-all">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-600">Sedang Sesi Foto</span>
+            <div className="w-10 h-10 rounded-lg bg-pink-50 border border-pink-100 flex items-center justify-center text-[#DE5795]">
+              <Camera className="w-5 h-5" />
             </div>
-            <p className="text-[11px] text-[#9D174D] font-medium">Capture & Countdown aktif</p>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-[#DE5795]/15 text-[#9D174D] flex items-center justify-center border border-[#DE5795]/30">
-            <Camera className="w-6 h-6" />
+          <div className="mt-4 flex items-baseline justify-between">
+            <h3 className="text-3xl font-semibold text-gray-900 tracking-tight">
+              {inSessionCount} <span className="text-lg font-normal text-gray-500">Sesi Live</span>
+            </h3>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-pink-50 text-[#9D174D] border border-pink-200 animate-pulse">
+              Live
+            </span>
+          </div>
+          <div className="mt-3 text-xs text-gray-500">
+            Capture & countdown aktif
           </div>
         </div>
 
         {/* Sisa Kertas Kritis */}
-        <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-xs flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-xs font-medium text-gray-500">Peringatan Kertas Roll</span>
-            <div className="flex items-baseline gap-2">
-              <span className={`text-2xl font-bold ${criticalPaperCount > 0 ? 'text-amber-600' : 'text-gray-900'}`}>
-                {criticalPaperCount}
-              </span>
-              <span className="text-xs text-gray-400">Unit Butuh Refill</span>
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs hover:border-gray-300 transition-all">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-600">Status Kertas Printer</span>
+            <div className={`w-10 h-10 rounded-lg flex items-center justify-center border ${
+              criticalPaperCount > 0
+                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                : 'bg-gray-50 text-gray-600 border-gray-200'
+            }`}>
+              <Printer className="w-5 h-5" />
             </div>
-            <p className="text-[11px] text-gray-500">&lt; 200 lembar tersisa</p>
           </div>
-          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border ${
-            criticalPaperCount > 0
-              ? 'bg-amber-50 text-amber-700 border-amber-200'
-              : 'bg-gray-100 text-gray-500 border-gray-200'
-          }`}>
-            <Printer className="w-6 h-6" />
+          <div className="mt-4 flex items-baseline justify-between">
+            <h3 className="text-3xl font-semibold text-gray-900 tracking-tight">
+              {criticalPaperCount} <span className="text-lg font-normal text-gray-500">Unit</span>
+            </h3>
+            {criticalPaperCount > 0 && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                Perlu Refill
+              </span>
+            )}
+          </div>
+          <div className="mt-3 text-xs text-gray-500">
+            {criticalPaperCount > 0 ? 'Sisa roll < 200 lembar' : 'Kapasitas semua printer prima'}
           </div>
         </div>
       </div>
 
       {/* ============================================================ */}
-      {/* FILTER & SEARCH BAR                                           */}
+      {/* FILTER & SEARCH BAR - UNTITLED UI STANDARD                   */}
       {/* ============================================================ */}
-      <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-xs space-y-3">
+      <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-xs space-y-3">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          {/* Status Tabs */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 text-xs">
+          {/* Status Tabs - Segmented Button Group */}
+          <div className="p-1 bg-gray-50 border border-gray-200 rounded-lg inline-flex items-center gap-1 overflow-x-auto text-xs">
             {[
               { id: 'ALL', label: 'Semua Booth', count: totalCount },
               { id: 'ONLINE', label: 'Online Siaga', count: booths.filter((b) => b.status === 'ONLINE').length },
@@ -512,16 +533,16 @@ export default function BoothsPage() {
                 <button
                   key={tab.id}
                   onClick={() => setStatusFilter(tab.id as any)}
-                  className={`px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-md font-medium transition-all whitespace-nowrap flex items-center gap-1.5 ${
                     isActive
-                      ? 'bg-[#DE5795] text-white shadow-2xs font-bold'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      ? 'bg-white text-gray-900 shadow-xs border border-gray-200/50 font-semibold'
+                      : 'text-gray-500 hover:text-gray-900'
                   }`}
                 >
                   <span>{tab.label}</span>
                   <span
-                    className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-                      isActive ? 'bg-white/25 text-white' : 'bg-gray-200 text-gray-700'
+                    className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                      isActive ? 'bg-pink-50 text-[#9D174D]' : 'bg-gray-200/70 text-gray-600'
                     }`}
                   >
                     {tab.count}
@@ -531,15 +552,15 @@ export default function BoothsPage() {
             })}
           </div>
 
-          {/* Search Box */}
-          <div className="relative w-full md:w-72">
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
+          {/* Search Box - Untitled UI Standard */}
+          <div className="relative w-full md:w-80">
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Cari nama booth, mall, atau IP..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#DE5795] focus:ring-2 focus:ring-[#DE5795]/20 bg-gray-50/50"
+              className="w-full pl-9 pr-4 py-2 text-sm bg-white border border-gray-300 rounded-lg placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#DE5795]/20 focus:border-[#DE5795] shadow-xs"
             />
           </div>
         </div>

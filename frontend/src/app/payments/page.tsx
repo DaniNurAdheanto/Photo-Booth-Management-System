@@ -337,35 +337,28 @@ export default function PaymentsPage() {
         </div>
       )}
 
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200/80 pb-5">
+      {/* Page Header - Untitled UI Standard */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-5">
         <div>
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-              Laporan & Pembayaran
-            </h1>
-            <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-[#DE5795]/15 text-[#9D174D] border border-[#DE5795]/30">
-              Financial POS
+          <div className="flex items-center gap-2 mb-1">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-50 text-[#9D174D] border border-pink-200">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#DE5795]" />
+              Financial POS & Ledger
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">
+            Laporan & Pembayaran
+          </h1>
+          <p className="text-sm text-gray-600 mt-1">
             Pantau arus kas masuk, performa omzet per unit booth, transaksi QRIS dinamis, dan riwayat struk pembayaran.
           </p>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
-          <button
-            onClick={() => setIsManualModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl bg-[#DE5795] text-white hover:bg-[#c93d7e] transition shadow-xs"
-          >
-            <Plus className="w-4 h-4 text-white" />
-            <span>Catat Kasir Tunai / Manual</span>
-          </button>
-
+        {/* Action Buttons - Untitled UI Standard */}
+        <div className="flex items-center gap-3 shrink-0 flex-wrap">
           <button
             onClick={handleExportCSV}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 transition shadow-xs"
+            className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 shadow-xs transition-colors flex items-center gap-2"
             title="Ekspor ke Excel / CSV"
           >
             <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
@@ -374,111 +367,121 @@ export default function PaymentsPage() {
 
           <button
             onClick={handlePrintReport}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 transition shadow-xs"
+            className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 shadow-xs transition-colors flex items-center gap-2"
             title="Cetak Laporan ke Printer atau PDF"
           >
-            <Printer className="w-4 h-4 text-gray-600" />
+            <Printer className="w-4 h-4 text-gray-500" />
             <span>Cetak PDF</span>
+          </button>
+
+          <button
+            onClick={() => setIsManualModalOpen(true)}
+            className="px-4 py-2 text-sm font-semibold text-white bg-[#DE5795] hover:bg-[#c93d7e] rounded-lg shadow-xs transition-colors flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4 text-white" />
+            <span>Catat Kasir Manual</span>
           </button>
         </div>
       </div>
 
-      {/* KPI Metrics Cards (Untitled UI Standard) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* KPI Metrics Cards - Untitled UI Standard */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* Card 1: Gross Revenue */}
-        <div className="p-5 rounded-2xl bg-white border border-gray-200/90 shadow-xs space-y-3 hover:border-gray-300 transition-colors">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs hover:border-gray-300 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-gray-500">Total Omzet (Bulan Ini)</span>
-            <div className="w-9 h-9 rounded-xl bg-[#DE5795]/15 border border-[#DE5795]/30 flex items-center justify-center text-[#9D174D]">
-              <TrendingUp className="w-4.5 h-4.5" />
+            <span className="text-sm font-medium text-gray-600">Total Omzet (Bulan Ini)</span>
+            <div className="w-10 h-10 rounded-lg bg-pink-50 border border-pink-100 flex items-center justify-center text-[#DE5795]">
+              <TrendingUp className="w-5 h-5" />
             </div>
           </div>
-          <div>
-            <h3 className="text-2xl font-black text-gray-900 tracking-tight">
+          <div className="mt-4">
+            <h3 className="text-3xl font-semibold text-gray-900 tracking-tight font-mono">
               Rp {metrics.totalRevenue.toLocaleString('id-ID')}
             </h3>
-            <div className="flex items-center gap-1.5 mt-1 text-xs">
-              <span className="text-emerald-700 font-semibold flex items-center">
-                <ArrowUpRight className="w-3.5 h-3.5" /> +14.2%
-              </span>
-              <span className="text-gray-400">vs bulan lalu</span>
-            </div>
+          </div>
+          <div className="mt-3 flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <ArrowUpRight className="w-3.5 h-3.5 text-emerald-600" /> +14.2%
+            </span>
+            <span className="text-xs text-gray-500">vs bulan lalu</span>
           </div>
         </div>
 
         {/* Card 2: Successful Transactions */}
-        <div className="p-5 rounded-2xl bg-white border border-gray-200/90 shadow-xs space-y-3 hover:border-gray-300 transition-colors">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs hover:border-gray-300 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-gray-500">Transaksi Berhasil</span>
-            <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
-              <CheckCircle2 className="w-4.5 h-4.5" />
+            <span className="text-sm font-medium text-gray-600">Transaksi Berhasil</span>
+            <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700">
+              <CheckCircle2 className="w-5 h-5" />
             </div>
           </div>
-          <div>
-            <h3 className="text-2xl font-black text-gray-900 tracking-tight">
-              {metrics.successCount} Sesi
+          <div className="mt-4 flex items-baseline justify-between">
+            <h3 className="text-3xl font-semibold text-gray-900 tracking-tight">
+              {metrics.successCount} <span className="text-lg font-normal text-gray-500">Sesi</span>
             </h3>
-            <div className="flex items-center gap-1.5 mt-1 text-xs text-gray-500">
-              <span className="font-semibold text-emerald-700">
-                {Math.round((metrics.successCount / (metrics.totalCount || 1)) * 100)}%
-              </span>
-              <span>tingkat sukses pembayaran</span>
-            </div>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+              {Math.round((metrics.successCount / (metrics.totalCount || 1)) * 100)}% Sukses
+            </span>
+          </div>
+          <div className="mt-3 text-xs text-gray-500">
+            Tingkat keberhasilan pembayaran stabil
           </div>
         </div>
 
         {/* Card 3: Average Order Value */}
-        <div className="p-5 rounded-2xl bg-white border border-gray-200/90 shadow-xs space-y-3 hover:border-gray-300 transition-colors">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs hover:border-gray-300 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-gray-500">Rata-rata per Tamu (AOV)</span>
-            <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700">
-              <Receipt className="w-4.5 h-4.5" />
+            <span className="text-sm font-medium text-gray-600">Rata-rata per Tamu (AOV)</span>
+            <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-700">
+              <Receipt className="w-5 h-5" />
             </div>
           </div>
-          <div>
-            <h3 className="text-2xl font-black text-gray-900 tracking-tight">
+          <div className="mt-4">
+            <h3 className="text-3xl font-semibold text-gray-900 tracking-tight font-mono">
               Rp {metrics.aov.toLocaleString('id-ID')}
             </h3>
-            <p className="text-xs text-gray-400 mt-1">Paket terlaris: Strip 2x6</p>
+          </div>
+          <div className="mt-3 text-xs text-gray-500">
+            Paket terlaris: Strip 2x6
           </div>
         </div>
 
         {/* Card 4: QRIS Digital Share */}
-        <div className="p-5 rounded-2xl bg-white border border-gray-200/90 shadow-xs space-y-3 hover:border-gray-300 transition-colors">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs hover:border-gray-300 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-gray-500">Pangsa QRIS Dinamis</span>
-            <div className="w-9 h-9 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-700">
-              <QrCode className="w-4.5 h-4.5" />
+            <span className="text-sm font-medium text-gray-600">Pangsa QRIS Dinamis</span>
+            <div className="w-10 h-10 rounded-lg bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-700">
+              <QrCode className="w-5 h-5" />
             </div>
           </div>
-          <div>
-            <h3 className="text-2xl font-black text-gray-900 tracking-tight">
+          <div className="mt-4 flex items-baseline justify-between">
+            <h3 className="text-3xl font-semibold text-gray-900 tracking-tight">
               {metrics.qrisShare}%
             </h3>
-            <p className="text-xs text-gray-400 mt-1">
-              Rp {metrics.qrisRevenue.toLocaleString('id-ID')} via GoPay / BCA
-            </p>
+          </div>
+          <div className="mt-3 text-xs text-gray-500">
+            Rp {metrics.qrisRevenue.toLocaleString('id-ID')} via GoPay / BCA
           </div>
         </div>
       </div>
 
-      {/* Visual Analytics / Revenue Breakdown Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      {/* Visual Analytics / Revenue Breakdown Cards - Untitled UI Standard */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Weekly Trend Mini Visual */}
-        <div className="lg:col-span-2 p-5 rounded-2xl bg-white border border-gray-200/90 shadow-xs space-y-4">
-          <div className="flex items-center justify-between">
+        <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl shadow-xs overflow-hidden">
+          <div className="px-6 py-5 border-b border-gray-200 flex items-center justify-between">
             <div>
-              <h4 className="text-sm font-bold text-gray-900">Grafik Penjualan 7 Hari Terakhir</h4>
-              <p className="text-xs text-gray-500">Aktivitas penerimaan transaksi per hari</p>
+              <h4 className="text-base font-semibold text-gray-900">Grafik Penjualan 7 Hari Terakhir</h4>
+              <p className="text-xs text-gray-500 mt-0.5">Aktivitas penerimaan transaksi per hari</p>
             </div>
-            <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded-md bg-gray-100 text-gray-700">
+            <span className="text-xs font-mono font-medium px-2.5 py-1 rounded-md bg-gray-50 text-gray-600 border border-gray-200">
               Update Otomatis
             </span>
           </div>
 
           {/* Stylized Weekly Bars */}
-          <div className="pt-2">
-            <div className="h-40 flex items-end justify-between gap-2 sm:gap-4 px-2 border-b border-gray-100 pb-2">
+          <div className="p-6">
+            <div className="h-44 flex items-end justify-between gap-2 sm:gap-4 px-2 border-b border-gray-100 pb-2">
               {[
                 { day: 'Sen', amount: 2800000, height: '45%' },
                 { day: 'Sel', amount: 3200000, height: '52%' },
@@ -489,14 +492,14 @@ export default function PaymentsPage() {
                 { day: 'Min', amount: 5400000, height: '88%' },
               ].map((item, idx) => (
                 <div key={idx} className="flex-1 flex flex-col items-center gap-2 group cursor-pointer">
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-mono font-semibold text-[#9D174D] bg-[#DE5795]/15 px-1.5 py-0.5 rounded shadow-xs whitespace-nowrap">
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-mono font-semibold text-[#9D174D] bg-pink-50 px-2 py-0.5 rounded border border-pink-200 whitespace-nowrap">
                     Rp {(item.amount / 1000000).toFixed(1)}jt
                   </div>
                   <div className="w-full bg-gray-100 rounded-t-lg h-32 flex items-end overflow-hidden">
                     <div
                       className={`w-full rounded-t-lg transition-all duration-500 ${
                         item.isPeak
-                          ? 'bg-[#DE5795] shadow-xs'
+                          ? 'bg-[#DE5795]'
                           : 'bg-[#DE5795]/50 group-hover:bg-[#DE5795]'
                       }`}
                       style={{ height: item.height }}
@@ -508,7 +511,7 @@ export default function PaymentsPage() {
                 </div>
               ))}
             </div>
-            <div className="flex items-center justify-between text-[11px] text-gray-400 pt-2">
+            <div className="flex items-center justify-between text-xs text-gray-500 pt-3">
               <span>*Hari Sabtu merupakan puncak kunjungan terpadat (Rp 6,2 Juta)</span>
               <span>Satuan: IDR</span>
             </div>
@@ -516,16 +519,16 @@ export default function PaymentsPage() {
         </div>
 
         {/* Share of Payment Method & Booth Breakdown */}
-        <div className="p-5 rounded-2xl bg-white border border-gray-200/90 shadow-xs space-y-4 flex flex-col justify-between">
-          <div>
-            <h4 className="text-sm font-bold text-gray-900">Metode Pembayaran</h4>
-            <p className="text-xs text-gray-500">Proporsi saluran penerimaan dana</p>
+        <div className="bg-white border border-gray-200 rounded-xl shadow-xs overflow-hidden flex flex-col justify-between">
+          <div className="px-6 py-5 border-b border-gray-200">
+            <h4 className="text-base font-semibold text-gray-900">Metode Pembayaran</h4>
+            <p className="text-xs text-gray-500 mt-0.5">Proporsi saluran penerimaan dana</p>
           </div>
 
-          <div className="space-y-3">
+          <div className="p-6 space-y-4">
             <div>
-              <div className="flex items-center justify-between text-xs font-semibold mb-1">
-                <span className="flex items-center gap-1.5 text-gray-800">
+              <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
+                <span className="flex items-center gap-1.5 text-gray-700">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#DE5795]" /> QRIS Dinamis
                 </span>
                 <span className="font-mono text-gray-900">78%</span>
@@ -536,8 +539,8 @@ export default function PaymentsPage() {
             </div>
 
             <div>
-              <div className="flex items-center justify-between text-xs font-semibold mb-1">
-                <span className="flex items-center gap-1.5 text-gray-800">
+              <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
+                <span className="flex items-center gap-1.5 text-gray-700">
                   <span className="w-2.5 h-2.5 rounded-full bg-blue-600" /> EDC Kartu Debit/Kredit
                 </span>
                 <span className="font-mono text-gray-900">16%</span>
@@ -548,35 +551,29 @@ export default function PaymentsPage() {
             </div>
 
             <div>
-              <div className="flex items-center justify-between text-xs font-semibold mb-1">
-                <span className="flex items-center gap-1.5 text-gray-800">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500" /> Kasir Tunai (Cash)
+              <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
+                <span className="flex items-center gap-1.5 text-gray-700">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" /> Kasir Tunai / Manual
                 </span>
                 <span className="font-mono text-gray-900">6%</span>
               </div>
               <div className="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
-                <div className="h-full bg-amber-500 rounded-full" style={{ width: '6%' }} />
+                <div className="h-full bg-emerald-600 rounded-full" style={{ width: '6%' }} />
               </div>
             </div>
           </div>
 
-          {/* Settlement Info Banner */}
-          <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 text-xs text-gray-600 flex items-start gap-2.5">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold text-gray-800">Auto-Settlement T+1</p>
-              <p className="text-[11px] text-gray-500 mt-0.5">
-                Dana QRIS otomatis dicairkan ke rekening operasional setiap pukul 02:00 WIB.
-              </p>
-            </div>
+          <div className="px-6 py-3.5 bg-gray-50 border-t border-gray-200 text-xs text-gray-500 flex items-center justify-between">
+            <span>Settlement: Otomatis T+0</span>
+            <span className="font-medium text-gray-700">BCA / Midtrans</span>
           </div>
         </div>
       </div>
 
-      {/* Filters & Search Toolbar */}
-      <div className="p-4 rounded-2xl bg-white border border-gray-200/90 shadow-xs space-y-3">
+      {/* Filters & Search - Untitled UI Standard */}
+      <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-xs space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          {/* Search Box */}
+          {/* Search Box - Untitled UI Standard */}
           <div className="relative flex-1 max-w-md">
             <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
@@ -584,42 +581,45 @@ export default function PaymentsPage() {
               placeholder="Cari invoice, kode sesi, atau nama tamu..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#DE5795] focus:ring-2 focus:ring-[#DE5795]/20 font-sora"
+              className="w-full pl-9 pr-4 py-2 text-sm bg-white border border-gray-300 rounded-lg placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#DE5795]/20 focus:border-[#DE5795] shadow-xs"
             />
           </div>
 
-          {/* Quick Period Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+          {/* Quick Period Segmented Buttons */}
+          <div className="p-1 bg-gray-50 border border-gray-200 rounded-lg inline-flex items-center gap-1 overflow-x-auto">
             {[
               { id: 'TODAY', label: 'Hari Ini' },
               { id: 'WEEK', label: '7 Hari' },
               { id: 'MONTH', label: 'Bulan Ini' },
               { id: 'ALL', label: 'Semua' },
-            ].map((p) => (
-              <button
-                key={p.id}
-                onClick={() => setSelectedPeriod(p.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
-                  selectedPeriod === p.id
-                    ? 'bg-[#DE5795] text-white shadow-xs'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                {p.label}
-              </button>
-            ))}
+            ].map((p) => {
+              const isActive = selectedPeriod === p.id;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => setSelectedPeriod(p.id)}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all whitespace-nowrap ${
+                    isActive
+                      ? 'bg-white text-gray-900 shadow-xs border border-gray-200/50'
+                      : 'text-gray-500 hover:text-gray-900'
+                  }`}
+                >
+                  {p.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
         {/* Dropdowns Filter Bar */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2 border-t border-gray-100 text-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-gray-200 text-xs">
           {/* Booth Filter */}
           <div>
-            <label className="text-[11px] font-medium text-gray-500 block mb-1">Unit Booth</label>
+            <label className="text-xs font-medium text-gray-700 block mb-1">Unit Booth</label>
             <select
               value={selectedBooth}
               onChange={(e) => setSelectedBooth(e.target.value)}
-              className="w-full px-3 py-1.5 rounded-lg border border-gray-200 focus:outline-hidden focus:border-[#DE5795]"
+              className="w-full px-3.5 py-2 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE5795]/20 focus:border-[#DE5795] shadow-xs"
             >
               <option value="ALL">Semua Booth</option>
               <option value="bth-001">Booth Alpha - Grand Indonesia</option>
@@ -630,11 +630,11 @@ export default function PaymentsPage() {
 
           {/* Payment Method Filter */}
           <div>
-            <label className="text-[11px] font-medium text-gray-500 block mb-1">Metode Bayar</label>
+            <label className="text-xs font-medium text-gray-700 block mb-1">Metode Bayar</label>
             <select
               value={selectedMethod}
               onChange={(e) => setSelectedMethod(e.target.value)}
-              className="w-full px-3 py-1.5 rounded-lg border border-gray-200 focus:outline-hidden focus:border-[#DE5795]"
+              className="w-full px-3.5 py-2 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE5795]/20 focus:border-[#DE5795] shadow-xs"
             >
               <option value="ALL">Semua Metode</option>
               <option value="QRIS">QRIS Dinamis</option>
@@ -645,11 +645,11 @@ export default function PaymentsPage() {
 
           {/* Status Filter */}
           <div>
-            <label className="text-[11px] font-medium text-gray-500 block mb-1">Status Transaksi</label>
+            <label className="text-xs font-medium text-gray-700 block mb-1">Status Transaksi</label>
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full px-3 py-1.5 rounded-lg border border-gray-200 focus:outline-hidden focus:border-[#DE5795]"
+              className="w-full px-3.5 py-2 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE5795]/20 focus:border-[#DE5795] shadow-xs"
             >
               <option value="ALL">Semua Status</option>
               <option value="SUCCESS">Berhasil / Lunas</option>
@@ -660,33 +660,33 @@ export default function PaymentsPage() {
         </div>
       </div>
 
-      {/* Transactions Table Ledger */}
-      <div className="rounded-2xl bg-white border border-gray-200/90 shadow-xs overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm font-bold text-gray-900">Daftar Transaksi Kasir & Kios</h3>
-            <span className="px-2 py-0.5 rounded-md bg-gray-100 text-gray-700 text-[11px] font-semibold">
+      {/* Transactions Table Ledger - Untitled UI Standard */}
+      <div className="bg-white border border-gray-200 rounded-xl shadow-xs overflow-hidden">
+        <div className="px-6 py-5 border-b border-gray-200 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <h3 className="text-base font-semibold text-gray-900">Daftar Transaksi Kasir & Kios</h3>
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
               {filteredTransactions.length} Baris
             </span>
           </div>
-          <span className="text-xs text-gray-400">Sinkronisasi otomatis real-time</span>
+          <span className="text-xs text-gray-500">Sinkronisasi otomatis real-time</span>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-gray-50/70 border-b border-gray-200 text-gray-500 font-semibold uppercase tracking-wider text-[10px]">
+          <table className="min-w-full divide-y divide-gray-200 text-left text-xs">
+            <thead className="bg-gray-50">
               <tr>
-                <th className="px-5 py-3.5">Invoice & Waktu</th>
-                <th className="px-5 py-3.5">Kode Sesi & Tamu</th>
-                <th className="px-5 py-3.5">Unit Booth</th>
-                <th className="px-5 py-3.5">Paket & Cetak</th>
-                <th className="px-5 py-3.5">Metode Bayar</th>
-                <th className="px-5 py-3.5 text-right">Nominal</th>
-                <th className="px-5 py-3.5 text-center">Status</th>
-                <th className="px-5 py-3.5 text-right">Aksi</th>
+                <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider">Invoice & Waktu</th>
+                <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider">Kode Sesi & Tamu</th>
+                <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider">Unit Booth</th>
+                <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider">Paket & Cetak</th>
+                <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider">Metode Bayar</th>
+                <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Nominal</th>
+                <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Status</th>
+                <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-200 bg-white">
               {filteredTransactions.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="px-5 py-12 text-center text-gray-400">

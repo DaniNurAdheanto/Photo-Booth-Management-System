@@ -138,36 +138,37 @@ export default function SessionsManagementPage() {
           </div>
         )}
 
-        {/* Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold tracking-tight text-gray-900 font-sora">
-                Photo Session Management
-              </h1>
-              <span className="px-2.5 py-0.5 rounded-full bg-[#DE5795] text-white text-xs font-bold border border-[#DE5795]">
-                PRD Verified
+        {/* Page Header - Untitled UI Standard */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-5">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-50 text-[#9D174D] border border-pink-200">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#DE5795]" />
+                {totalCount} Sesi Tercatat
               </span>
             </div>
-            <p className="text-xs text-gray-500 max-w-2xl">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">
+              Manajemen Sesi Foto Kiosk
+            </h1>
+            <p className="text-sm text-gray-600 mt-1">
               Pantau dan kelola seluruh alur sesi pengambilan foto, live camera preview, perlindungan idempotency transaksi, dan pemulihan sesi terputus.
             </p>
           </div>
 
-          {/* Action CTAs */}
-          <div className="flex items-center gap-3">
+          {/* Action CTAs - Untitled UI Standard */}
+          <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={fetchSessions}
-              className="px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors flex items-center gap-2 shadow-xs"
+              className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 shadow-xs transition-colors flex items-center gap-2"
               title="Refresh Sesi"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
               <span>Refresh</span>
             </button>
 
             <Link
               href="/sessions/booth"
-              className="px-4.5 py-2.5 rounded-xl bg-[#DE5795] text-white text-xs font-bold hover:bg-[#c93d7e] transition-colors border border-[#DE5795] flex items-center gap-2 shadow-sm"
+              className="px-4 py-2 text-sm font-semibold text-white bg-[#DE5795] hover:bg-[#c93d7e] rounded-lg shadow-xs transition-colors flex items-center gap-2"
             >
               <Play className="w-4 h-4 fill-white text-white" />
               <span>Buka Layar Kiosk Booth</span>
@@ -175,91 +176,119 @@ export default function SessionsManagementPage() {
           </div>
         </div>
 
-        {/* Metrics Row - Untitled UI Card Aesthetics */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-xs">
+        {/* Metrics Row - Untitled UI Standard */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs hover:border-gray-300 transition-all">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-gray-500">Total Sesi Foto</span>
-              <Film className="w-4 h-4 text-gray-400" />
+              <span className="text-sm font-medium text-gray-600">Total Sesi Foto</span>
+              <div className="w-10 h-10 rounded-lg bg-pink-50 border border-pink-100 flex items-center justify-center text-[#DE5795]">
+                <Film className="w-5 h-5" />
+              </div>
             </div>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-gray-900">{totalCount}</span>
-              <span className="text-[11px] text-gray-500 font-medium">tersimpan di DB</span>
+            <div className="mt-4 flex items-baseline justify-between">
+              <h3 className="text-3xl font-semibold text-gray-900 tracking-tight">
+                {totalCount} <span className="text-lg font-normal text-gray-500">Sesi</span>
+              </h3>
+            </div>
+            <div className="mt-3 text-xs text-gray-500">
+              Tersimpan dalam database sistem
             </div>
           </div>
 
-          <div className="rounded-2xl border border-[#DE5795]/30 bg-[#DE5795]/10 p-4 shadow-xs">
+          <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs hover:border-gray-300 transition-all">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-[#9D174D]">Sesi Berjalan / Live</span>
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#DE5795] opacity-75" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#DE5795]" />
+              <span className="text-sm font-medium text-gray-600">Sesi Sedang Berjalan</span>
+              <div className="w-10 h-10 rounded-lg bg-pink-50 border border-pink-100 flex items-center justify-center text-[#DE5795]">
+                <Camera className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="mt-4 flex items-baseline justify-between">
+              <h3 className="text-3xl font-semibold text-gray-900 tracking-tight">
+                {activeCount} <span className="text-lg font-normal text-gray-500">Live</span>
+              </h3>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-pink-50 text-[#9D174D] border border-pink-200 animate-pulse">
+                Aktif
               </span>
             </div>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-[#9D174D]">{activeCount}</span>
-              <span className="text-[11px] text-[#9D174D] font-semibold">sedang aktif</span>
+            <div className="mt-3 text-xs text-gray-500">
+              Pengunjung sedang di dalam bilik
             </div>
           </div>
 
-          <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-xs">
+          <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs hover:border-gray-300 transition-all">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-gray-500">Selesai Dicetak</span>
-              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span className="text-sm font-medium text-gray-600">Selesai Dicetak</span>
+              <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
             </div>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-gray-900">{completedCount}</span>
-              <span className="text-[11px] text-emerald-600 font-medium">
-                {totalCount > 0 ? `${Math.round((completedCount / totalCount) * 100)}% berhasil` : '100%'}
+            <div className="mt-4 flex items-baseline justify-between">
+              <h3 className="text-3xl font-semibold text-gray-900 tracking-tight">
+                {completedCount} <span className="text-lg font-normal text-gray-500">Selesai</span>
+              </h3>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                {totalCount > 0 ? `${Math.round((completedCount / totalCount) * 100)}%` : '100%'}
               </span>
             </div>
+            <div className="mt-3 text-xs text-gray-500">
+              Foto sukses tercetak & terdistribusi
+            </div>
           </div>
 
-          <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-xs">
+          <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs hover:border-gray-300 transition-all">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-gray-500">Rata-rata Retake</span>
-              <RotateCcw className="w-4 h-4 text-amber-500" />
+              <span className="text-sm font-medium text-gray-600">Rata-rata Retake</span>
+              <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-700">
+                <RotateCcw className="w-5 h-5" />
+              </div>
             </div>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-gray-900">{avgRetake}</span>
-              <span className="text-[11px] text-gray-500 font-medium">retake / sesi</span>
+            <div className="mt-4 flex items-baseline justify-between">
+              <h3 className="text-3xl font-semibold text-gray-900 tracking-tight">
+                {avgRetake} <span className="text-lg font-normal text-gray-500">x / sesi</span>
+              </h3>
+            </div>
+            <div className="mt-3 text-xs text-gray-500">
+              Rasio kepuasan pose foto tamu
             </div>
           </div>
         </div>
 
-        {/* Filter Bar */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-xs space-y-3">
+        {/* Filter Bar - Untitled UI Standard */}
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-xs space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            {/* Status Tabs */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+            {/* Status Segmented Buttons */}
+            <div className="p-1 bg-gray-50 border border-gray-200 rounded-lg inline-flex items-center gap-1 overflow-x-auto text-xs">
               {[
                 { label: 'Semua Status', value: 'ALL' },
                 { label: 'Selesai', value: 'COMPLETED' },
                 { label: 'Tinjauan (Review)', value: 'REVIEWING' },
                 { label: 'Sedang Foto (Capturing)', value: 'CAPTURING' },
                 { label: 'Dibatalkan', value: 'CANCELLED' },
-              ].map((tab) => (
-                <button
-                  key={tab.value}
-                  onClick={() => setSelectedStatus(tab.value)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${
-                    selectedStatus === tab.value
-                      ? 'bg-[#DE5795] text-white border border-[#DE5795]'
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+              ].map((tab) => {
+                const isActive = selectedStatus === tab.value;
+                return (
+                  <button
+                    key={tab.value}
+                    onClick={() => setSelectedStatus(tab.value)}
+                    className={`px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-all ${
+                      isActive
+                        ? 'bg-white text-gray-900 shadow-xs border border-gray-200/50'
+                        : 'text-gray-500 hover:text-gray-900'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
             </div>
 
             {/* Booth Selector */}
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-gray-500">Booth:</span>
+              <span className="text-xs font-medium text-gray-700">Booth:</span>
               <select
                 value={selectedBooth}
                 onChange={(e) => setSelectedBooth(e.target.value)}
-                className="px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-700 focus:outline-hidden focus:border-[#DE5795]"
+                className="px-3.5 py-1.5 text-xs bg-white border border-gray-300 rounded-lg font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#DE5795]/20 focus:border-[#DE5795] shadow-xs"
               >
                 <option value="">Semua Booth</option>
                 <option value="bth-001">Booth Alpha - GI</option>
@@ -269,7 +298,7 @@ export default function SessionsManagementPage() {
             </div>
           </div>
 
-          {/* Search Input */}
+          {/* Search Input - Untitled UI Standard */}
           <div className="relative">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
@@ -277,29 +306,29 @@ export default function SessionsManagementPage() {
               placeholder="Cari berdasarkan kode sesi (SES-...) atau nama pelanggan..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-gray-200 focus:outline-hidden focus:border-[#DE5795] focus:ring-2 focus:ring-[#DE5795]/20"
+              className="w-full pl-10 pr-4 py-2 text-sm bg-white border border-gray-300 rounded-lg placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#DE5795]/20 focus:border-[#DE5795] shadow-xs"
             />
           </div>
         </div>
 
-        {/* Sessions Table - Untitled UI Aesthetics */}
-        <div className="rounded-2xl border border-gray-200 bg-white shadow-xs overflow-hidden">
+        {/* Sessions Table - Untitled UI Standard */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-gray-600">
-              <thead className="bg-gray-50/80 text-[11px] font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200">
+            <table className="min-w-full divide-y divide-gray-200 text-left text-xs text-gray-600">
+              <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-5 py-3.5">Kode Sesi & ID</th>
-                  <th className="px-4 py-3.5">Booth</th>
-                  <th className="px-4 py-3.5">Pelanggan</th>
-                  <th className="px-4 py-3.5">Template</th>
-                  <th className="px-4 py-3.5">Status</th>
-                  <th className="px-4 py-3.5">Foto Diambil</th>
-                  <th className="px-4 py-3.5">Cetak & Retake</th>
-                  <th className="px-4 py-3.5">Waktu</th>
-                  <th className="px-5 py-3.5 text-right">Aksi</th>
+                  <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider">Kode Sesi & ID</th>
+                  <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider">Booth</th>
+                  <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider">Pelanggan</th>
+                  <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider">Template</th>
+                  <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider">Foto Diambil</th>
+                  <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider">Cetak & Retake</th>
+                  <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider">Waktu</th>
+                  <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-200 bg-white">
                 {loading ? (
                   <tr>
                     <td colSpan={9} className="py-12 text-center text-xs text-gray-500">
