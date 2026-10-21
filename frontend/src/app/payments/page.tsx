@@ -651,6 +651,7 @@ export default function PaymentsPage() {
                 <table className="w-full text-left text-xs">
                   <thead>
                     <tr className="bg-gray-50/80 border-b border-gray-200/80 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                      <th className="py-3 px-3 text-center w-12 font-mono text-gray-400 font-bold uppercase tracking-wider">No.</th>
                       <th className="py-3 px-4">Mall Pengelola & Unit Booth</th>
                       <th className="py-3 px-4">Skema Kontrak</th>
                       <th className="py-3 px-4">Omzet Kotor</th>
@@ -662,12 +663,17 @@ export default function PaymentsPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {mallPartnerships.map((mall) => {
+                    {mallPartnerships.map((mall, index) => {
                       const isPaid = mall.settlementStatus === 'LUNAS';
                       const isDueSoon = mall.settlementStatus === 'JATUH_TEMPO';
 
                       return (
                         <tr key={mall.id} className="hover:bg-gray-50/60 transition-colors group">
+                          {/* 0. No. */}
+                          <td className="py-3.5 px-3 text-center font-mono font-bold text-gray-400">
+                            {index + 1}
+                          </td>
+
                           {/* 1. Mall & Booth */}
                           <td className="py-3.5 px-4">
                             <div className="flex items-center gap-3">
@@ -846,6 +852,7 @@ export default function PaymentsPage() {
                 <table className="w-full text-left text-xs">
                   <thead>
                     <tr className="bg-gray-50/80 border-b border-gray-200/80 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                      <th className="py-3 px-3 text-center w-12 font-mono text-gray-400 font-bold uppercase tracking-wider">No.</th>
                       <th className="py-3 px-4">No. Invoice & Kode Sesi</th>
                       <th className="py-3 px-4">Unit Booth & Lokasi</th>
                       <th className="py-3 px-4">Paket Foto & Cetakan</th>
@@ -856,8 +863,11 @@ export default function PaymentsPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {filteredTransactions.map((tx) => (
+                    {filteredTransactions.map((tx, index) => (
                       <tr key={tx.id} className="hover:bg-gray-50/60 transition-colors">
+                        <td className="py-3.5 px-3 text-center font-mono font-bold text-gray-400">
+                          {index + 1}
+                        </td>
                         <td className="py-3.5 px-4">
                           <div className="font-bold text-gray-900 font-mono">{tx.invoiceNumber}</div>
                           <div className="text-[10px] text-gray-400 font-mono">Sesi: {tx.sessionCode}</div>
@@ -935,6 +945,7 @@ export default function PaymentsPage() {
                 <table className="w-full text-left text-xs">
                   <thead>
                     <tr className="bg-gray-50/80 border-b border-gray-200/80 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                      <th className="py-3 px-3 text-center w-12 font-mono text-gray-400 font-bold uppercase tracking-wider">No.</th>
                       <th className="py-3 px-4">Waktu Audit & ID</th>
                       <th className="py-3 px-4">Unit Booth</th>
                       <th className="py-3 px-4">Uang Sistem Kiosk</th>
@@ -944,8 +955,11 @@ export default function PaymentsPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {cashReconciliations.map((rec) => (
+                    {cashReconciliations.map((rec, index) => (
                       <tr key={rec.id} className="hover:bg-gray-50/60 transition-colors">
+                        <td className="py-3.5 px-3 text-center font-mono font-bold text-gray-400">
+                          {index + 1}
+                        </td>
                         <td className="py-3.5 px-4">
                           <div className="font-semibold text-gray-900">{rec.reconciliationDate}</div>
                           <div className="text-[10px] font-mono text-gray-400">{rec.id}</div>

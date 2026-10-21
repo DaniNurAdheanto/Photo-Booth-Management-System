@@ -51,6 +51,7 @@ export default function KioskBoothPage() {
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [customerName, setCustomerName] = useState<string>('');
   const [customerEmail, setCustomerEmail] = useState<string>('');
+  const [customerPhone, setCustomerPhone] = useState<string>('');
   const [printCopies, setPrintCopies] = useState<number>(2);
   const [filterPreset, setFilterPreset] = useState<FilterPreset>('ORIGINAL');
 
@@ -600,11 +601,21 @@ export default function KioskBoothPage() {
               </p>
             </div>
 
-            {/* Quick Guest Inputs (Optional) */}
-            <div className="max-w-md mx-auto p-4 rounded-2xl bg-white border border-[#DE5795]/25 shadow-sm space-y-3 text-left">
+            {/* Quick Guest Inputs (Walk-in tanpa perlu buat akun) */}
+            <div className="max-w-md mx-auto p-4 sm:p-5 rounded-2xl bg-white border border-[#DE5795]/25 shadow-md space-y-3 text-left">
+              <div className="flex items-center justify-between pb-2 border-b border-gray-100">
+                <span className="text-xs font-bold text-gray-900 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-[#DE5795]" />
+                  <span>Data Tamu (Tanpa Perlu Buat Akun)</span>
+                </span>
+                <span className="text-[10px] font-bold text-[#9D174D] bg-pink-50 px-2 py-0.5 rounded-md">
+                  Langsung Berfoto
+                </span>
+              </div>
+
               <div>
                 <label className="text-xs font-semibold text-gray-700 block mb-1">
-                  Nama Anda (Opsional)
+                  Nama Anda / Pasangan
                 </label>
                 <input
                   type="text"
@@ -614,15 +625,29 @@ export default function KioskBoothPage() {
                   className="w-full px-3.5 py-2 text-sm rounded-lg border border-gray-200 focus:outline-hidden focus:border-[#DE5795] focus:ring-2 focus:ring-[#DE5795]/20"
                 />
               </div>
+
               <div>
                 <label className="text-xs font-semibold text-gray-700 block mb-1">
-                  Email Unduhan (Opsional)
+                  Alamat Email (Untuk Pengiriman File Foto & GIF) *
                 </label>
                 <input
                   type="email"
                   placeholder="nama@email.com"
                   value={customerEmail}
                   onChange={(e) => setCustomerEmail(e.target.value)}
+                  className="w-full px-3.5 py-2 text-sm rounded-lg border border-gray-200 focus:outline-hidden focus:border-[#DE5795] focus:ring-2 focus:ring-[#DE5795]/20"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-gray-700 block mb-1">
+                  Nomor HP / WhatsApp (Opsional)
+                </label>
+                <input
+                  type="tel"
+                  placeholder="0812-xxxx-xxxx"
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value)}
                   className="w-full px-3.5 py-2 text-sm rounded-lg border border-gray-200 focus:outline-hidden focus:border-[#DE5795] focus:ring-2 focus:ring-[#DE5795]/20"
                 />
               </div>

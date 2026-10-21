@@ -662,7 +662,8 @@ export default function DashboardPage() {
               <table className="w-full text-left text-xs">
                 <thead className="bg-gray-50 text-[11px] font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
                   <tr>
-                    <th className="px-5 py-3 w-10"></th>
+                    <th className="px-3 py-3 w-10 text-center font-mono font-bold text-gray-400">No.</th>
+                    <th className="px-3 py-3 w-10"></th>
                     <th className="px-2 py-3">Title / Task</th>
                     <th className="px-4 py-3">Assigned To</th>
                     <th className="px-4 py-3">Status</th>
@@ -670,15 +671,20 @@ export default function DashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {tasks.map((task) => (
+                  {tasks.map((task, index) => (
                     <tr
                       key={task.id}
                       className={`hover:bg-gray-50/80 transition-colors ${
                         task.completed ? 'bg-gray-50/40 text-gray-400' : ''
                       }`}
                     >
+                      {/* No. */}
+                      <td className="px-3 py-3.5 text-center font-mono font-bold text-gray-400">
+                        {index + 1}
+                      </td>
+
                       {/* Checkbox */}
-                      <td className="px-5 py-3.5">
+                      <td className="px-3 py-3.5">
                         <button
                           onClick={() => toggleTask(task.id)}
                           className="text-gray-400 hover:text-[#DE5795] transition-colors"

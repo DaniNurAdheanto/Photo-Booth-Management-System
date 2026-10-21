@@ -122,10 +122,8 @@ export default function CustomersPage() {
   const segmentCounts = useMemo(() => {
     return {
       ALL: customersList.length,
-      VIP: customersList.filter((c) => c.segment === 'VIP').length,
-      REGULAR: customersList.filter((c) => c.segment === 'REGULAR').length,
+      RETURNING: customersList.filter((c) => c.segment === 'RETURNING').length,
       NEW: customersList.filter((c) => c.segment === 'NEW').length,
-      INACTIVE: customersList.filter((c) => c.segment === 'INACTIVE').length,
     };
   }, [customersList]);
 
@@ -182,8 +180,8 @@ export default function CustomersPage() {
       city: newCustomerForm.city,
       birthDate: newCustomerForm.birthDate,
       segment: newCustomerForm.segment,
-      totalSpent: newCustomerForm.segment === 'VIP' ? 1200000 : 50000,
-      totalSessions: newCustomerForm.segment === 'VIP' ? 24 : 1,
+      totalSpent: newCustomerForm.segment === 'RETURNING' ? 250000 : 50000,
+      totalSessions: newCustomerForm.segment === 'RETURNING' ? 5 : 1,
       averageSpent: 50000,
       favoriteBooth: newCustomerForm.favoriteBooth,
       favoriteTemplate: newCustomerForm.favoriteTemplate,
@@ -290,7 +288,7 @@ export default function CustomersPage() {
             CRM & Database Pelanggan
           </h1>
           <p className="text-sm text-gray-500 mt-1">
-            Kelola profil kontak, riwayat sesi foto, preferensi booth, segmentasi tamu, serta jalin relasi langsung via WhatsApp.
+            Kelola direktori kontak tamu walk-in (Email & WhatsApp), riwayat sesi foto, serta pelacakan tamu baru vs tamu berulang tanpa perlu registrasi akun.
           </p>
         </div>
 
@@ -336,62 +334,62 @@ export default function CustomersPage() {
           </div>
         </div>
 
-        {/* Card 2: Tamu VIP & Loyal */}
+        {/* Card 2: Tamu Berulang (Returning) */}
         <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tamu VIP & Loyal</span>
-            <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
-              <Crown className="w-5 h-5" />
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tamu Berulang (Returning)</span>
+            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+              <History className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-3">
             <div className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
-              428
+              {segmentCounts.RETURNING}
             </div>
-            <div className="flex items-center gap-1.5 mt-2 text-xs text-amber-600 font-semibold">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>28.9%</span>
-              <span className="text-gray-400 font-normal">kontributor omset booth</span>
+            <div className="flex items-center gap-1.5 mt-2 text-xs text-blue-600 font-semibold">
+              <UserCheck className="w-3.5 h-3.5" />
+              <span>{((segmentCounts.RETURNING / (customersList.length || 1)) * 100).toFixed(0)}%</span>
+              <span className="text-gray-400 font-normal">kembali berfoto (2+ sesi)</span>
             </div>
           </div>
         </div>
 
-        {/* Card 3: Rata-Rata Sesi */}
+        {/* Card 3: Tamu Baru */}
         <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Rata-Rata Kunjungan</span>
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tamu Baru (Kunjungan Pertama)</span>
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+              <Sparkles className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="mt-3">
+            <div className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+              {segmentCounts.NEW}
+            </div>
+            <div className="flex items-center gap-1.5 mt-2 text-xs text-emerald-600 font-semibold">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>{((segmentCounts.NEW / (customersList.length || 1)) * 100).toFixed(0)}%</span>
+              <span className="text-gray-400 font-normal">tamu walk-in pertama</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 4: Rata-Rata Sesi per Tamu */}
+        <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs hover:shadow-md transition-all">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Rata-Rata Sesi / Tamu</span>
             <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
               <Camera className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-3">
             <div className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
-              {avgSessions}x / Tamu
+              {avgSessions}x
             </div>
             <div className="flex items-center gap-1.5 mt-2 text-xs text-purple-600 font-semibold">
               <History className="w-3.5 h-3.5" />
               <span>{customersList.reduce((acc, c) => acc + c.totalSessions, 0)} Total Sesi</span>
               <span className="text-gray-400 font-normal">tercatat</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 4: Retensi Tamu */}
-        <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs hover:shadow-md transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tingkat Retensi</span>
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
-              <UserCheck className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="mt-3">
-            <div className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
-              68.4%
-            </div>
-            <div className="flex items-center gap-1.5 mt-2 text-xs text-emerald-600 font-semibold">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Sangat Baik</span>
-              <span className="text-gray-400 font-normal">kembali dlm 60 hari</span>
             </div>
           </div>
         </div>
@@ -422,43 +420,23 @@ export default function CustomersPage() {
           </button>
 
           <button
-            onClick={() => setSelectedSegmentFilter('VIP')}
+            onClick={() => setSelectedSegmentFilter('RETURNING')}
             className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
-              selectedSegmentFilter === 'VIP'
+              selectedSegmentFilter === 'RETURNING'
                 ? 'bg-[#DE5795] text-white shadow-xs'
                 : 'bg-gray-100 hover:bg-gray-200/70 text-gray-700'
             }`}
           >
-            <Crown className="w-3.5 h-3.5" />
-            <span>VIP & Loyal</span>
+            <History className="w-3.5 h-3.5" />
+            <span>Tamu Berulang (2+ Sesi)</span>
             <span
               className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-                selectedSegmentFilter === 'VIP'
-                  ? 'bg-white/20 text-white'
-                  : 'bg-amber-100 text-amber-800'
-              }`}
-            >
-              {segmentCounts.VIP}
-            </span>
-          </button>
-
-          <button
-            onClick={() => setSelectedSegmentFilter('REGULAR')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
-              selectedSegmentFilter === 'REGULAR'
-                ? 'bg-[#DE5795] text-white shadow-xs'
-                : 'bg-gray-100 hover:bg-gray-200/70 text-gray-700'
-            }`}
-          >
-            <span>Regular</span>
-            <span
-              className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-                selectedSegmentFilter === 'REGULAR'
+                selectedSegmentFilter === 'RETURNING'
                   ? 'bg-white/20 text-white'
                   : 'bg-blue-100 text-blue-800'
               }`}
             >
-              {segmentCounts.REGULAR}
+              {segmentCounts.RETURNING}
             </span>
           </button>
 
@@ -470,7 +448,8 @@ export default function CustomersPage() {
                 : 'bg-gray-100 hover:bg-gray-200/70 text-gray-700'
             }`}
           >
-            <span>Pengunjung Baru (New)</span>
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Tamu Baru (1 Sesi)</span>
             <span
               className={`px-2 py-0.5 rounded-full text-xs font-bold ${
                 selectedSegmentFilter === 'NEW'
@@ -479,26 +458,6 @@ export default function CustomersPage() {
               }`}
             >
               {segmentCounts.NEW}
-            </span>
-          </button>
-
-          <button
-            onClick={() => setSelectedSegmentFilter('INACTIVE')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
-              selectedSegmentFilter === 'INACTIVE'
-                ? 'bg-[#DE5795] text-white shadow-xs'
-                : 'bg-gray-100 hover:bg-gray-200/70 text-gray-700'
-            }`}
-          >
-            <span>Inactive (&gt; 60 Hari)</span>
-            <span
-              className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-                selectedSegmentFilter === 'INACTIVE'
-                  ? 'bg-white/20 text-white'
-                  : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              {segmentCounts.INACTIVE}
             </span>
           </button>
         </div>
@@ -562,6 +521,7 @@ export default function CustomersPage() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50/80 border-b border-gray-200 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                <th className="py-3.5 px-3.5 text-center w-12 font-mono text-gray-400 font-bold uppercase tracking-wider">No.</th>
                 <th className="py-3.5 px-5">Tamu / Profil</th>
                 <th className="py-3.5 px-4">Kontak & Domisili</th>
                 <th className="py-3.5 px-4 text-center">Segmentasi</th>
@@ -574,20 +534,23 @@ export default function CustomersPage() {
             <tbody className="divide-y divide-gray-100 text-sm">
               {filteredCustomers.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-gray-400">
+                  <td colSpan={8} className="py-12 text-center text-gray-400">
                     <Users className="w-12 h-12 mx-auto text-gray-300 mb-3" />
                     <p className="text-base font-semibold text-gray-600">Tidak ada data tamu yang cocok</p>
                     <p className="text-xs text-gray-400 mt-1">Coba ubah kata kunci pencarian atau filter segmen</p>
                   </td>
                 </tr>
               ) : (
-                filteredCustomers.map((cust) => {
+                filteredCustomers.map((cust, index) => {
                   return (
                     <tr
                       key={cust.id}
                       onClick={() => handleOpenDetail(cust)}
                       className="hover:bg-pink-50/20 cursor-pointer transition-colors group"
                     >
+                      <td className="py-4 px-3.5 text-center font-mono font-bold text-gray-400">
+                        {index + 1}
+                      </td>
                       {/* Name & Avatar */}
                       <td className="py-4 px-5">
                         <div className="flex items-center gap-3">
@@ -631,25 +594,15 @@ export default function CustomersPage() {
 
                       {/* Segment Badge */}
                       <td className="py-4 px-4 text-center">
-                        {cust.segment === 'VIP' && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
-                            <Crown className="w-3 h-3 text-amber-600" />
-                            VIP Tamu
+                        {cust.segment === 'RETURNING' ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                            <History className="w-3.5 h-3.5 text-blue-600" />
+                            Tamu Berulang ({cust.totalSessions}x)
                           </span>
-                        )}
-                        {cust.segment === 'REGULAR' && (
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 border border-blue-200">
-                            Regular
-                          </span>
-                        )}
-                        {cust.segment === 'NEW' && (
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                            Pengunjung Baru
-                          </span>
-                        )}
-                        {cust.segment === 'INACTIVE' && (
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-200">
-                            Inactive &gt;60h
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                            Tamu Baru (1x)
                           </span>
                         )}
                       </td>
@@ -775,14 +728,13 @@ export default function CustomersPage() {
                     <div>
                       <div className="flex items-center gap-2">
                         <h2 className="text-xl font-bold text-gray-900">{selectedCustomer.name}</h2>
-                        {selectedCustomer.segment === 'VIP' && (
-                          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1">
-                            <Crown className="w-3 h-3 text-amber-600" /> VIP
+                        {selectedCustomer.segment === 'RETURNING' ? (
+                          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1">
+                            <History className="w-3 h-3 text-blue-600" /> Tamu Berulang ({selectedCustomer.totalSessions}x Sesi)
                           </span>
-                        )}
-                        {selectedCustomer.segment === 'NEW' && (
-                          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                            New
+                        ) : (
+                          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                            <Sparkles className="w-3 h-3 text-emerald-600" /> Tamu Baru (Kunjungan Pertama)
                           </span>
                         )}
                       </div>
@@ -1105,9 +1057,8 @@ export default function CustomersPage() {
                       }
                       className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#DE5795] transition-all text-gray-700"
                     >
-                      <option value="NEW">Pengunjung Baru (New)</option>
-                      <option value="REGULAR">Regular Member</option>
-                      <option value="VIP">VIP & Loyal</option>
+                      <option value="NEW">Tamu Baru (Kunjungan Pertama - 1 Sesi)</option>
+                      <option value="RETURNING">Tamu Berulang (Pernah Foto Sebelumnya - 2+ Sesi)</option>
                     </select>
                   </div>
 

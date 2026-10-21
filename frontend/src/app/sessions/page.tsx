@@ -317,6 +317,7 @@ export default function SessionsManagementPage() {
             <table className="min-w-full divide-y divide-gray-200 text-left text-xs text-gray-600">
               <thead className="bg-gray-50">
                 <tr>
+                  <th className="px-4 py-3.5 text-center w-12 text-xs font-semibold text-gray-400 uppercase tracking-wider font-mono">No.</th>
                   <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider">Kode Sesi & ID</th>
                   <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider">Booth</th>
                   <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider">Pelanggan</th>
@@ -331,20 +332,20 @@ export default function SessionsManagementPage() {
               <tbody className="divide-y divide-gray-200 bg-white">
                 {loading ? (
                   <tr>
-                    <td colSpan={9} className="py-12 text-center text-xs text-gray-500">
+                    <td colSpan={10} className="py-12 text-center text-xs text-gray-500">
                       <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-gray-400" />
                       Memuat data sesi foto dari database...
                     </td>
                   </tr>
                 ) : filteredSessions.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="py-12 text-center text-xs text-gray-500">
+                    <td colSpan={10} className="py-12 text-center text-xs text-gray-500">
                       <Camera className="w-8 h-8 text-gray-300 mx-auto mb-2" />
                       Tidak ada sesi foto yang cocok dengan filter.
                     </td>
                   </tr>
                 ) : (
-                  filteredSessions.map((session) => {
+                  filteredSessions.map((session, index) => {
                     const sessionCode = session.session_code || session.sessionCode;
                     const boothId = session.booth_id || session.boothId;
                     const customerName = session.customer_name || session.customerName || 'Walk-in Guest';
@@ -367,6 +368,11 @@ export default function SessionsManagementPage() {
 
                     return (
                       <tr key={session.id} className="hover:bg-gray-50/60 transition-colors">
+                        {/* No. */}
+                        <td className="px-4 py-3.5 text-center font-mono font-bold text-gray-400">
+                          {index + 1}
+                        </td>
+
                         {/* Session Code & ID */}
                         <td className="px-5 py-3.5">
                           <span className="font-mono font-bold text-gray-900 block">{sessionCode}</span>

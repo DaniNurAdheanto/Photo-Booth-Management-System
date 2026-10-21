@@ -18,6 +18,7 @@ import {
   Images,
   Boxes,
   Users,
+  BellRing,
 } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 
@@ -47,6 +48,7 @@ export function Sidebar() {
       category: t('sidebar.categories.operations', undefined, 'OPERASIONAL KIOSK'),
       items: [
         { label: t('sidebar.menu.booths', undefined, 'Daftar Unit Booth'), href: '/booths', icon: Store },
+        { label: t('sidebar.menu.queue', undefined, 'Antrean & Reminder Email'), href: '/queue', icon: BellRing },
         { label: t('sidebar.menu.events', undefined, 'Jadwal Acara & Event'), href: '/events', icon: CalendarDays },
         { label: t('sidebar.menu.inventory', undefined, 'Stok & Inventaris'), href: '/inventory', icon: Boxes },
       ],

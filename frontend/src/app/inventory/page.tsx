@@ -598,6 +598,7 @@ export default function InventoryPage() {
               <table className="w-full text-left text-xs">
                 <thead>
                   <tr className="bg-gray-50/80 border-b border-gray-200/80 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                    <th className="py-3 px-3 text-center w-12 font-mono text-gray-400 font-bold uppercase tracking-wider">No.</th>
                     <th className="py-3 px-4">Barang & SKU</th>
                     <th className="py-3 px-4">Kategori & Lokasi</th>
                     <th className="py-3 px-4">Tingkat Persediaan</th>
@@ -610,20 +611,25 @@ export default function InventoryPage() {
                 <tbody className="divide-y divide-gray-100">
                   {filteredItems.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="text-center py-12 text-gray-400">
+                      <td colSpan={8} className="text-center py-12 text-gray-400">
                         <Boxes className="w-10 h-10 mx-auto text-gray-300 mb-2" />
                         <p className="text-sm font-semibold text-gray-600">Tidak ada item inventaris yang cocok</p>
                         <p className="text-xs text-gray-400 mt-0.5">Coba ubah kata kunci pencarian atau lokasi gudang.</p>
                       </td>
                     </tr>
                   ) : (
-                    filteredItems.map((item) => {
+                    filteredItems.map((item, index) => {
                       const isCritical = item.status === 'Kritis' || (item.category !== 'hardware' && item.currentStock <= item.minThreshold / 2);
                       const isLow = item.status === 'Menipis' || (item.category !== 'hardware' && item.currentStock <= item.minThreshold);
                       const percentage = Math.min(100, Math.round((item.currentStock / item.maxCapacity) * 100));
 
                       return (
                         <tr key={item.id} className="hover:bg-gray-50/60 transition-colors group">
+                          {/* 0. No. */}
+                          <td className="py-3.5 px-3 text-center font-mono font-bold text-gray-400">
+                            {index + 1}
+                          </td>
+
                           {/* 1. Item & SKU */}
                           <td className="py-3.5 px-4">
                             <div className="flex items-center gap-3">
@@ -805,6 +811,7 @@ export default function InventoryPage() {
               <table className="w-full text-left text-xs">
                 <thead>
                   <tr className="bg-gray-50/80 border-b border-gray-200/80 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                    <th className="py-3 px-3 text-center w-12 font-mono text-gray-400 font-bold uppercase tracking-wider">No.</th>
                     <th className="py-3 px-4">Waktu & Ref ID</th>
                     <th className="py-3 px-4">Jenis Mutasi</th>
                     <th className="py-3 px-4">Nama Barang & SKU</th>
@@ -814,8 +821,11 @@ export default function InventoryPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {mutationLogs.map((log) => (
+                  {mutationLogs.map((log, index) => (
                     <tr key={log.id} className="hover:bg-gray-50/60 transition-colors">
+                      <td className="py-3 px-3 text-center font-mono font-bold text-gray-400">
+                        {index + 1}
+                      </td>
                       <td className="py-3 px-4">
                         <div className="font-semibold text-gray-900">{log.timestamp}</div>
                         <div className="text-[10px] font-mono text-gray-400">{log.id}</div>

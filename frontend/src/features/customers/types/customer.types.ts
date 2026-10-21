@@ -1,4 +1,4 @@
-export type CustomerSegment = 'VIP' | 'REGULAR' | 'NEW' | 'INACTIVE';
+export type CustomerSegment = 'RETURNING' | 'NEW';
 
 export interface CustomerSessionHistory {
   sessionId: string;
