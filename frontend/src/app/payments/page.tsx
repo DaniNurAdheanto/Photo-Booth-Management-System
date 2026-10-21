@@ -27,7 +27,30 @@ import {
   Plus,
   Check,
   Banknote,
+  Building2,
+  PieChart,
+  Percent,
+  Wallet,
+  ArrowRightLeft,
+  ChevronRight,
+  Landmark,
+  BadgePercent,
+  CalendarDays,
+  FileText,
+  User,
+  Phone,
 } from 'lucide-react';
+import {
+  MallPartnership,
+  CashDrawerReconciliation,
+  Transaction,
+  ContractScheme,
+  SettlementStatus,
+} from '@/features/payments/types/payments.types';
+import {
+  INITIAL_MALL_PARTNERSHIPS,
+  INITIAL_CASH_RECONCILIATIONS,
+} from '@/features/payments/data/payments.mock';
 
 const BOOTHS_LIST = [
   { id: 'bth-001', name: 'Booth Alpha - Grand Indonesia' },
@@ -42,24 +65,6 @@ const MANUAL_PACKAGES = [
   { name: 'Paket Grid 2x2 Party', price: 50000, desc: '4 foto kotak estetik modern' },
   { name: 'Paket Polaroid Single', price: 35000, desc: '1 foto polaroid retro' },
 ];
-
-interface Transaction {
-  id: string;
-  invoiceNumber: string;
-  sessionCode: string;
-  customerName: string;
-  customerPhone?: string;
-  boothId: string;
-  boothName: string;
-  packageName: string;
-  amount: number;
-  paymentMethod: 'QRIS' | 'EDC_CARD' | 'CASH';
-  paymentProvider: string; // e.g., 'GoPay', 'BCA QRIS', 'Mandiri EDC', 'Kasir Tunai'
-  status: 'SUCCESS' | 'PENDING' | 'REFUNDED' | 'FAILED';
-  paidAt: string;
-  printCopies: number;
-  digitalDownload: boolean;
-}
 
 const INITIAL_TRANSACTIONS: Transaction[] = [
   {
@@ -201,14 +206,25 @@ const INITIAL_TRANSACTIONS: Transaction[] = [
 ];
 
 export default function PaymentsPage() {
+  // Navigation Tabs: 'revenue-share' | 'transactions' | 'cash-reconciliation'
+  const [activeTab, setActiveTab] = useState<'revenue-share' | 'transactions' | 'cash-reconciliation'>('revenue-share');
+
+  // Transactions State
   const [transactions, setTransactions] = useState<Transaction[]>(INITIAL_TRANSACTIONS);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBooth, setSelectedBooth] = useState('ALL');
   const [selectedMethod, setSelectedMethod] = useState('ALL');
   const [selectedStatus, setSelectedStatus] = useState('ALL');
-  const [selectedPeriod, setSelectedPeriod] = useState('TODAY');
   const [activeReceipt, setActiveReceipt] = useState<Transaction | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Mall Partnerships State
+  const [mallPartnerships, setMallPartnerships] = useState<MallPartnership[]>(INITIAL_MALL_PARTNERSHIPS);
+  const [selectedMallDetail, setSelectedMallDetail] = useState<MallPartnership | null>(null);
+  const [isConfigMallOpen, setIsConfigMallOpen] = useState(false);
+
+  // Cash Reconciliations State
+  const [cashReconciliations, setCashReconciliations] = useState<CashDrawerReconciliation[]>(INITIAL_CASH_RECONCILIATIONS);
 
   // Manual Payment Drawer State
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
@@ -219,6 +235,24 @@ export default function PaymentsPage() {
   const [manualMethod, setManualMethod] = useState<'CASH' | 'EDC_CARD' | 'QRIS'>('CASH');
   const [manualProvider, setManualProvider] = useState('Kasir Tunai Booth');
   const [manualCopies, setManualCopies] = useState(2);
+
+  // Form State: Tambah / Edit Skema Mall
+  const [newMallName, setNewMallName] = useState('');
+  const [newMallBranch, setNewMallBranch] = useState('');
+  const [newMallBoothId, setNewMallBoothId] = useState('bth-001');
+  const [newContractType, setNewContractType] = useState<ContractScheme>('PERCENTAGE_REVENUE_SHARE');
+  const [newSharePercent, setNewSharePercent] = useState<number>(20);
+  const [newFlatRent, setNewFlatRent] = useState<number>(7500000);
+  const [newPicMall, setNewPicMall] = useState('');
+  const [newPicPhone, setNewPicPhone] = useState('');
+  const [newBankName, setNewBankName] = useState('BCA');
+  const [newAccountNo, setNewAccountNo] = useState('');
+  const [newAccountHolder, setNewAccountHolder] = useState('');
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
 
   const handleSaveManualPayment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -253,74 +287,125 @@ export default function PaymentsPage() {
     setActiveReceipt(newTx);
   };
 
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
+  const handleSaveMallScheme = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMallName) {
+      alert('Nama mall pengelola harus diisi');
+      return;
+    }
+
+    const boothObj = BOOTHS_LIST.find((b) => b.id === newMallBoothId) || BOOTHS_LIST[0];
+    const newPartner: MallPartnership = {
+      id: `MALL-${Date.now().toString().slice(-4)}`,
+      mallName: newMallName,
+      mallBranch: newMallBranch || 'Area Kios PhotoBooth',
+      boothId: newMallBoothId,
+      boothName: boothObj.name,
+      contractType: newContractType,
+      contractTypeLabel:
+        newContractType === 'PERCENTAGE_REVENUE_SHARE'
+          ? `Bagi Hasil Omzet ${newSharePercent}%`
+          : 'Sewa Tetap Flat Bulanan',
+      revenueSharePercent: newContractType === 'PERCENTAGE_REVENUE_SHARE' ? newSharePercent : 0,
+      flatRentAmount: newContractType === 'FLAT_RENT' ? newFlatRent : undefined,
+      grossRevenueMonth: 25000000,
+      totalSessions: 500,
+      materialHppCost: 2900000,
+      qrisMdrFee: 175000,
+      mallShareDue:
+        newContractType === 'PERCENTAGE_REVENUE_SHARE'
+          ? (25000000 * newSharePercent) / 100
+          : newFlatRent,
+      netProfitVendor:
+        newContractType === 'PERCENTAGE_REVENUE_SHARE'
+          ? 25000000 - (25000000 * newSharePercent) / 100 - 2900000 - 175000
+          : 25000000 - newFlatRent - 2900000 - 175000,
+      settlementStatus: 'SIAP_TRANSFER',
+      period: 'Oktober 2026',
+      settlementDueDate: '30 Okt 2026',
+      bankDetails: {
+        bankName: newBankName,
+        accountNumber: newAccountNo || '112-99-0021-99',
+        accountHolder: newAccountHolder || `PT ${newMallName}`,
+      },
+      picMall: newPicMall || 'Tenant Relation Dept',
+      picPhone: newPicPhone || '+62 812-0000-0000',
+      contractEndDate: '31 Des 2027',
+    };
+
+    setMallPartnerships([...mallPartnerships, newPartner]);
+    setIsConfigMallOpen(false);
+    showToast(`Skema kemitraan "${newPartner.mallName}" berhasil didaftarkan`);
+
+    // Reset Form
+    setNewMallName('');
+    setNewMallBranch('');
+  };
+
+  const handleMarkSettlementPaid = (mallId: string) => {
+    setMallPartnerships((prev) =>
+      prev.map((m) => (m.id === mallId ? { ...m, settlementStatus: 'LUNAS' } : m))
+    );
+    if (selectedMallDetail && selectedMallDetail.id === mallId) {
+      setSelectedMallDetail({ ...selectedMallDetail, settlementStatus: 'LUNAS' });
+    }
+    showToast('Status tagihan berhasil diubah menjadi LUNAS');
   };
 
   // Filtered transactions
   const filteredTransactions = useMemo(() => {
     return transactions.filter((tx) => {
-      // Search
       const matchSearch =
         tx.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
         tx.sessionCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
         tx.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         tx.packageName.toLowerCase().includes(searchQuery.toLowerCase());
 
-      // Booth
       const matchBooth = selectedBooth === 'ALL' || tx.boothId === selectedBooth;
-
-      // Method
       const matchMethod = selectedMethod === 'ALL' || tx.paymentMethod === selectedMethod;
-
-      // Status
       const matchStatus = selectedStatus === 'ALL' || tx.status === selectedStatus;
 
       return matchSearch && matchBooth && matchMethod && matchStatus;
     });
   }, [transactions, searchQuery, selectedBooth, selectedMethod, selectedStatus]);
 
-  // Aggregate KPI metrics
-  const metrics = useMemo(() => {
-    const successList = transactions.filter((t) => t.status === 'SUCCESS');
-    const totalRevenue = successList.reduce((acc, curr) => acc + curr.amount, 0);
-    const totalCount = transactions.length;
-    const successCount = successList.length;
-    const aov = successCount > 0 ? Math.round(totalRevenue / successCount) : 0;
-
-    const qrisRevenue = successList
-      .filter((t) => t.paymentMethod === 'QRIS')
-      .reduce((acc, curr) => acc + curr.amount, 0);
-    const qrisShare = totalRevenue > 0 ? Math.round((qrisRevenue / totalRevenue) * 100) : 0;
+  // Aggregate Metrics for Mall Revenue Sharing & Financials
+  const mallAggregates = useMemo(() => {
+    const totalGross = mallPartnerships.reduce((acc, curr) => acc + curr.grossRevenueMonth, 0);
+    const totalMallDue = mallPartnerships.reduce((acc, curr) => acc + curr.mallShareDue, 0);
+    const totalHpp = mallPartnerships.reduce((acc, curr) => acc + curr.materialHppCost + curr.qrisMdrFee, 0);
+    const totalNetProfit = mallPartnerships.reduce((acc, curr) => acc + curr.netProfitVendor, 0);
+    const totalSessions = mallPartnerships.reduce((acc, curr) => acc + curr.totalSessions, 0);
+    const pendingSettlementCount = mallPartnerships.filter((m) => m.settlementStatus !== 'LUNAS').length;
 
     return {
-      totalRevenue,
-      successCount,
-      totalCount,
-      aov,
-      qrisRevenue,
-      qrisShare,
+      totalGross,
+      totalMallDue,
+      totalHpp,
+      totalNetProfit,
+      totalSessions,
+      pendingSettlementCount,
+      netMarginPercentage: totalGross > 0 ? Math.round((totalNetProfit / totalGross) * 100) : 0,
     };
-  }, [transactions]);
+  }, [mallPartnerships]);
 
   const handleExportCSV = () => {
-    const headers = 'Invoice,Kode Sesi,Pelanggan,Unit Booth,Paket,Metode,Provider,Nominal,Status,Waktu\n';
-    const rows = filteredTransactions
+    const headers = 'Mall,Unit Booth,Skema Kontrak,Omzet Kotor,Hak Mall Due,HPP Bahan,MDR QRIS,Laba Bersih,Status,Jatuh Tempo\n';
+    const rows = mallPartnerships
       .map(
-        (t) =>
-          `"${t.invoiceNumber}","${t.sessionCode}","${t.customerName}","${t.boothName}","${t.packageName}","${t.paymentMethod}","${t.paymentProvider}",${t.amount},"${t.status}","${t.paidAt}"`
+        (m) =>
+          `"${m.mallName}","${m.boothName}","${m.contractTypeLabel}",${m.grossRevenueMonth},${m.mallShareDue},${m.materialHppCost},${m.qrisMdrFee},${m.netProfitVendor},"${m.settlementStatus}","${m.settlementDueDate}"`
       )
       .join('\n');
     const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `laporan-pembayaran-photobooth-${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `laporan-bagi-hasil-mall-${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    showToast('Laporan berhasil diekspor ke file CSV');
+    showToast('Laporan Finansial & Bagi Hasil berhasil diekspor (CSV)');
   };
 
   const handlePrintReport = () => {
@@ -328,608 +413,687 @@ export default function PaymentsPage() {
   };
 
   return (
-    <div className="space-y-6 font-sora animate-fade-in text-gray-900 pb-16">
+    <div className="flex-1 flex flex-col min-w-0 bg-[#F9FAFB] font-sora min-h-screen text-gray-900 pb-16">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl bg-gray-900 text-white text-xs font-semibold shadow-2xl flex items-center gap-2 border border-gray-800 animate-slide-up">
-          <CheckCircle2 className="w-4 h-4 text-[#DE5795]" />
+        <div className="fixed top-5 right-5 z-50 flex items-center gap-2.5 px-4 py-3 bg-gray-900 text-white text-xs rounded-2xl shadow-2xl border border-gray-700 animate-fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Page Header - Untitled UI Standard */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-5">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-50 text-[#9D174D] border border-pink-200">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#DE5795]" />
-              Financial POS & Ledger
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">
-            Laporan & Pembayaran
-          </h1>
-          <p className="text-sm text-gray-600 mt-1">
-            Pantau arus kas masuk, performa omzet per unit booth, transaksi QRIS dinamis, dan riwayat struk pembayaran.
-          </p>
-        </div>
-
-        {/* Action Buttons - Untitled UI Standard */}
-        <div className="flex items-center gap-3 shrink-0 flex-wrap">
-          <button
-            onClick={handleExportCSV}
-            className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 shadow-xs transition-colors flex items-center gap-2"
-            title="Ekspor ke Excel / CSV"
-          >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
-            <span>Ekspor CSV</span>
-          </button>
-
-          <button
-            onClick={handlePrintReport}
-            className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 shadow-xs transition-colors flex items-center gap-2"
-            title="Cetak Laporan ke Printer atau PDF"
-          >
-            <Printer className="w-4 h-4 text-gray-500" />
-            <span>Cetak PDF</span>
-          </button>
-
-          <button
-            onClick={() => setIsManualModalOpen(true)}
-            className="px-4 py-2 text-sm font-semibold text-white bg-[#DE5795] hover:bg-[#c93d7e] rounded-lg shadow-xs transition-colors flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4 text-white" />
-            <span>Catat Kasir Manual</span>
-          </button>
-        </div>
-      </div>
-
-      {/* KPI Metrics Cards - Untitled UI Standard */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {/* Card 1: Gross Revenue */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs hover:border-gray-300 transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-600">Total Omzet (Bulan Ini)</span>
-            <div className="w-10 h-10 rounded-lg bg-pink-50 border border-pink-100 flex items-center justify-center text-[#DE5795]">
-              <TrendingUp className="w-5 h-5" />
+      {/* Main Container */}
+      <div className="px-6 py-6 lg:px-8 space-y-6 max-w-7xl">
+        {/* 1. Page Header (Untitled UI Standard) */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-200/80 pb-5">
+          <div>
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
+                Laporan Finansial Kasir & Bagi Hasil Mall
+              </h1>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-pink-50 text-[#9D174D] border border-pink-200 shadow-2xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#DE5795] animate-pulse" />
+                Financial POS & Settlement Live
+              </span>
             </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Rekonsiliasi omzet harian, bagi hasil sewa mall kiosk (revenue sharing), biaya MDR QRIS, serta audit kasir fisik.
+            </p>
           </div>
-          <div className="mt-4">
-            <h3 className="text-3xl font-semibold text-gray-900 tracking-tight font-mono">
-              Rp {metrics.totalRevenue.toLocaleString('id-ID')}
-            </h3>
-          </div>
-          <div className="mt-3 flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-              <ArrowUpRight className="w-3.5 h-3.5 text-emerald-600" /> +14.2%
-            </span>
-            <span className="text-xs text-gray-500">vs bulan lalu</span>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+            <button
+              onClick={handleExportCSV}
+              className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-200/90 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-2xs"
+              title="Ekspor Laporan ke Excel / CSV"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Ekspor CSV</span>
+            </button>
+            <button
+              onClick={() => setIsConfigMallOpen(true)}
+              className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-200/90 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-2xs"
+            >
+              <Building2 className="w-3.5 h-3.5 text-blue-600" />
+              <span>+ Atur Skema Mall</span>
+            </button>
+            <button
+              onClick={() => setIsManualModalOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-pink-600 to-[#DE5795] rounded-xl hover:opacity-95 transition-all shadow-xs"
+            >
+              <Plus className="w-4 h-4" />
+              <span>+ Catat Kasir Manual</span>
+            </button>
           </div>
         </div>
 
-        {/* Card 2: Successful Transactions */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs hover:border-gray-300 transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-600">Transaksi Berhasil</span>
-            <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700">
-              <CheckCircle2 className="w-5 h-5" />
+        {/* 2. Top Metric Cards Strip (Untitled UI 4 Cards) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Card 1: Gross Revenue */}
+          <div className="p-4.5 bg-white border border-gray-200/90 rounded-2xl shadow-2xs space-y-2">
+            <div className="flex items-center justify-between text-xs text-gray-500">
+              <span className="font-medium">Total Omzet Kotor (Gross)</span>
+              <div className="w-8 h-8 rounded-xl bg-pink-50 text-[#DE5795] flex items-center justify-center">
+                <TrendingUp className="w-4 h-4" />
+              </div>
             </div>
-          </div>
-          <div className="mt-4 flex items-baseline justify-between">
-            <h3 className="text-3xl font-semibold text-gray-900 tracking-tight">
-              {metrics.successCount} <span className="text-lg font-normal text-gray-500">Sesi</span>
-            </h3>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-              {Math.round((metrics.successCount / (metrics.totalCount || 1)) * 100)}% Sukses
-            </span>
-          </div>
-          <div className="mt-3 text-xs text-gray-500">
-            Tingkat keberhasilan pembayaran stabil
-          </div>
-        </div>
-
-        {/* Card 3: Average Order Value */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs hover:border-gray-300 transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-600">Rata-rata per Tamu (AOV)</span>
-            <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-700">
-              <Receipt className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="mt-4">
-            <h3 className="text-3xl font-semibold text-gray-900 tracking-tight font-mono">
-              Rp {metrics.aov.toLocaleString('id-ID')}
-            </h3>
-          </div>
-          <div className="mt-3 text-xs text-gray-500">
-            Paket terlaris: Strip 2x6
-          </div>
-        </div>
-
-        {/* Card 4: QRIS Digital Share */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs hover:border-gray-300 transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-600">Pangsa QRIS Dinamis</span>
-            <div className="w-10 h-10 rounded-lg bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-700">
-              <QrCode className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="mt-4 flex items-baseline justify-between">
-            <h3 className="text-3xl font-semibold text-gray-900 tracking-tight">
-              {metrics.qrisShare}%
-            </h3>
-          </div>
-          <div className="mt-3 text-xs text-gray-500">
-            Rp {metrics.qrisRevenue.toLocaleString('id-ID')} via GoPay / BCA
-          </div>
-        </div>
-      </div>
-
-      {/* Visual Analytics / Revenue Breakdown Cards - Untitled UI Standard */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Weekly Trend Mini Visual */}
-        <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl shadow-xs overflow-hidden">
-          <div className="px-6 py-5 border-b border-gray-200 flex items-center justify-between">
             <div>
-              <h4 className="text-base font-semibold text-gray-900">Grafik Penjualan 7 Hari Terakhir</h4>
-              <p className="text-xs text-gray-500 mt-0.5">Aktivitas penerimaan transaksi per hari</p>
+              <div className="text-2xl font-bold text-gray-900 tracking-tight font-mono">
+                Rp {mallAggregates.totalGross.toLocaleString('id-ID')}
+              </div>
+              <p className="text-[11px] text-gray-500 mt-1 flex items-center gap-1.5">
+                <span className="font-semibold text-gray-700">{mallAggregates.totalSessions.toLocaleString('id-ID')} sesi cetak</span> di 4 mall
+              </p>
             </div>
-            <span className="text-xs font-mono font-medium px-2.5 py-1 rounded-md bg-gray-50 text-gray-600 border border-gray-200">
-              Update Otomatis
-            </span>
           </div>
 
-          {/* Stylized Weekly Bars */}
-          <div className="p-6">
-            <div className="h-44 flex items-end justify-between gap-2 sm:gap-4 px-2 border-b border-gray-100 pb-2">
-              {[
-                { day: 'Sen', amount: 2800000, height: '45%' },
-                { day: 'Sel', amount: 3200000, height: '52%' },
-                { day: 'Rab', amount: 2950000, height: '48%' },
-                { day: 'Kam', amount: 3800000, height: '62%' },
-                { day: 'Jum', amount: 4900000, height: '80%' },
-                { day: 'Sab', amount: 6200000, height: '100%', isPeak: true },
-                { day: 'Min', amount: 5400000, height: '88%' },
-              ].map((item, idx) => (
-                <div key={idx} className="flex-1 flex flex-col items-center gap-2 group cursor-pointer">
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-mono font-semibold text-[#9D174D] bg-pink-50 px-2 py-0.5 rounded border border-pink-200 whitespace-nowrap">
-                    Rp {(item.amount / 1000000).toFixed(1)}jt
+          {/* Card 2: Bagi Hasil Hak Mall */}
+          <div className="p-4.5 bg-white border border-gray-200/90 rounded-2xl shadow-2xs space-y-2">
+            <div className="flex items-center justify-between text-xs text-gray-500">
+              <span className="font-medium">Bagi Hasil & Sewa Mall (Due)</span>
+              <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <Building2 className="w-4 h-4" />
+              </div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-blue-700 tracking-tight font-mono">
+                Rp {mallAggregates.totalMallDue.toLocaleString('id-ID')}
+              </div>
+              <p className="text-[11px] text-blue-600 mt-1 font-semibold flex items-center gap-1">
+                <span>{mallAggregates.pendingSettlementCount} Tagihan Perlu Ditransfer</span>
+              </p>
+            </div>
+          </div>
+
+          {/* Card 3: Biaya Bahan (HPP) & MDR QRIS */}
+          <div className="p-4.5 bg-white border border-gray-200/90 rounded-2xl shadow-2xs space-y-2">
+            <div className="flex items-center justify-between text-xs text-gray-500">
+              <span className="font-medium">Biaya HPP Kertas & MDR</span>
+              <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                <PieChart className="w-4 h-4" />
+              </div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-amber-700 tracking-tight font-mono">
+                Rp {mallAggregates.totalHpp.toLocaleString('id-ID')}
+              </div>
+              <p className="text-[11px] text-gray-500 mt-1">
+                Kertas dye-sub, ribbon & MDR QRIS 0.7%
+              </p>
+            </div>
+          </div>
+
+          {/* Card 4: Net Profit Vendor */}
+          <div className="p-4.5 bg-white border border-gray-200/90 rounded-2xl shadow-2xs space-y-2">
+            <div className="flex items-center justify-between text-xs text-gray-500">
+              <span className="font-medium">Laba Bersih Vendor (Net)</span>
+              <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <Wallet className="w-4 h-4" />
+              </div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-emerald-700 tracking-tight font-mono">
+                Rp {mallAggregates.totalNetProfit.toLocaleString('id-ID')}
+              </div>
+              <p className="text-[11px] text-emerald-600 mt-1 font-semibold flex items-center gap-1">
+                <ArrowUpRight className="w-3.5 h-3.5" />
+                <span>Margin Bersih {mallAggregates.netMarginPercentage}%</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* 3. Navigation Tabs (Untitled UI Segmented Tabs) */}
+        <div className="flex items-center gap-2 border-b border-gray-200 pb-1">
+          <button
+            onClick={() => setActiveTab('revenue-share')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+              activeTab === 'revenue-share'
+                ? 'bg-gray-900 text-white shadow-2xs'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+            }`}
+          >
+            <Building2 className="w-3.5 h-3.5" />
+            <span>Bagi Hasil & Sewa Mall ({mallPartnerships.length})</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('transactions')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+              activeTab === 'transactions'
+                ? 'bg-gray-900 text-white shadow-2xs'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+            }`}
+          >
+            <Receipt className="w-3.5 h-3.5" />
+            <span>Sesi Kasir & Transaksi ({transactions.length})</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('cash-reconciliation')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+              activeTab === 'cash-reconciliation'
+                ? 'bg-gray-900 text-white shadow-2xs'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+            }`}
+          >
+            <Banknote className="w-3.5 h-3.5" />
+            <span>Audit Selisih Kasir & Kas Fisik ({cashReconciliations.length})</span>
+          </button>
+        </div>
+
+        {/* ================================================================= */}
+        {/* TAB 1: BAGI HASIL MALL & REVENUE SHARING (THE HERO FEATURE)       */}
+        {/* ================================================================= */}
+        {activeTab === 'revenue-share' && (
+          <div className="space-y-4">
+            {/* Alert Rekonsiliasi Tagihan */}
+            {mallAggregates.pendingSettlementCount > 0 && (
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-50 via-pink-50 to-amber-50 border border-blue-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <Landmark className="w-5 h-5" />
                   </div>
-                  <div className="w-full bg-gray-100 rounded-t-lg h-32 flex items-end overflow-hidden">
-                    <div
-                      className={`w-full rounded-t-lg transition-all duration-500 ${
-                        item.isPeak
-                          ? 'bg-[#DE5795]'
-                          : 'bg-[#DE5795]/50 group-hover:bg-[#DE5795]'
-                      }`}
-                      style={{ height: item.height }}
-                    />
+                  <div>
+                    <p className="text-xs font-bold text-gray-900">
+                      Periode Tutup Buku {mallPartnerships[0]?.period}: Terdapat {mallAggregates.pendingSettlementCount} Tagihan Bagi Hasil Mall Siap Ditransfer
+                    </p>
+                    <p className="text-[11px] text-gray-600 mt-0.5">
+                      Total hak bagi hasil pengelola mall bulan ini: <strong className="text-blue-700">Rp {mallAggregates.totalMallDue.toLocaleString('id-ID')}</strong>. Verifikasi rincian sebelum batas jatuh tempo.
+                    </p>
                   </div>
-                  <span className="text-xs font-medium text-gray-600 group-hover:text-gray-900">
-                    {item.day}
+                </div>
+                <button
+                  onClick={() => setSelectedMallDetail(mallPartnerships[0])}
+                  className="px-3.5 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all shrink-0 shadow-xs flex items-center gap-1.5"
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>Lihat Slip Tagihan Terdekat</span>
+                </button>
+              </div>
+            )}
+
+            {/* Table of Mall Revenue Sharing */}
+            <div className="bg-white border border-gray-200/90 rounded-2xl shadow-2xs overflow-hidden">
+              <div className="p-4 border-b border-gray-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
+                    Rincian Kemitraan & Perhitungan Bagi Hasil Booth Mall
+                  </h3>
+                  <p className="text-[11px] text-gray-500 mt-0.5">
+                    Kalkulasi otomatis: Omzet Kotor dikurangi Hak Mall, Biaya Kertas (HPP), dan MDR QRIS menghasilkan Laba Bersih Vendor.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-gray-400">Periode:</span>
+                  <span className="font-bold text-gray-800 bg-gray-100 px-2.5 py-1 rounded-lg">
+                    Oktober 2026
                   </span>
                 </div>
-              ))}
-            </div>
-            <div className="flex items-center justify-between text-xs text-gray-500 pt-3">
-              <span>*Hari Sabtu merupakan puncak kunjungan terpadat (Rp 6,2 Juta)</span>
-              <span>Satuan: IDR</span>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="bg-gray-50/80 border-b border-gray-200/80 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                      <th className="py-3 px-4">Mall Pengelola & Unit Booth</th>
+                      <th className="py-3 px-4">Skema Kontrak</th>
+                      <th className="py-3 px-4">Omzet Kotor</th>
+                      <th className="py-3 px-4">Hak Mall (Due)</th>
+                      <th className="py-3 px-4">Biaya Bahan (HPP)</th>
+                      <th className="py-3 px-4">Laba Bersih Vendor</th>
+                      <th className="py-3 px-4">Status & Jatuh Tempo</th>
+                      <th className="py-3 px-4 text-right">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {mallPartnerships.map((mall) => {
+                      const isPaid = mall.settlementStatus === 'LUNAS';
+                      const isDueSoon = mall.settlementStatus === 'JATUH_TEMPO';
+
+                      return (
+                        <tr key={mall.id} className="hover:bg-gray-50/60 transition-colors group">
+                          {/* 1. Mall & Booth */}
+                          <td className="py-3.5 px-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shrink-0 font-bold">
+                                <Building2 className="w-4 h-4" />
+                              </div>
+                              <div className="min-w-0">
+                                <div className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate max-w-xs">
+                                  {mall.mallName}
+                                </div>
+                                <div className="text-[11px] text-gray-500 flex items-center gap-1">
+                                  <Store className="w-3 h-3 text-gray-400 shrink-0" />
+                                  <span className="truncate max-w-[180px]">{mall.boothName}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* 2. Skema Kontrak */}
+                          <td className="py-3.5 px-4">
+                            <span className="inline-block px-2.5 py-0.5 text-[11px] font-semibold bg-gray-100 text-gray-800 rounded-md">
+                              {mall.contractTypeLabel}
+                            </span>
+                            <div className="text-[10px] text-gray-400 mt-0.5">
+                              Berakhir: {mall.contractEndDate}
+                            </div>
+                          </td>
+
+                          {/* 3. Omzet Kotor */}
+                          <td className="py-3.5 px-4">
+                            <div className="font-mono font-bold text-gray-900 text-sm">
+                              Rp {mall.grossRevenueMonth.toLocaleString('id-ID')}
+                            </div>
+                            <div className="text-[10px] text-gray-400">
+                              {mall.totalSessions} sesi selesai
+                            </div>
+                          </td>
+
+                          {/* 4. Hak Mall */}
+                          <td className="py-3.5 px-4">
+                            <div className="font-mono font-bold text-blue-700 text-sm">
+                              Rp {mall.mallShareDue.toLocaleString('id-ID')}
+                            </div>
+                            <div className="text-[10px] text-gray-400">
+                              {mall.contractType === 'PERCENTAGE_REVENUE_SHARE'
+                                ? `${mall.revenueSharePercent}% Omzet`
+                                : 'Flat Bulanan'}
+                            </div>
+                          </td>
+
+                          {/* 5. Biaya Bahan & MDR */}
+                          <td className="py-3.5 px-4">
+                            <div className="font-mono font-semibold text-gray-700">
+                              Rp {(mall.materialHppCost + mall.qrisMdrFee).toLocaleString('id-ID')}
+                            </div>
+                            <div className="text-[10px] text-gray-400">
+                              HPP: {mall.materialHppCost.toLocaleString('id-ID')}
+                            </div>
+                          </td>
+
+                          {/* 6. Laba Bersih Vendor */}
+                          <td className="py-3.5 px-4">
+                            <div className="font-mono font-bold text-emerald-700 text-sm">
+                              Rp {mall.netProfitVendor.toLocaleString('id-ID')}
+                            </div>
+                            <div className="text-[10px] text-emerald-600 font-semibold">
+                              {Math.round((mall.netProfitVendor / mall.grossRevenueMonth) * 100)}% Margin
+                            </div>
+                          </td>
+
+                          {/* 7. Status */}
+                          <td className="py-3.5 px-4">
+                            {isPaid ? (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                                Lunas Ditransfer
+                              </span>
+                            ) : isDueSoon ? (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                <Clock className="w-3 h-3 text-rose-500" />
+                                Jatuh Tempo
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                <Clock className="w-3 h-3 text-blue-500" />
+                                Siap Transfer
+                              </span>
+                            )}
+                            <div className="text-[10px] text-gray-400 mt-1 font-mono">
+                              Due: {mall.settlementDueDate}
+                            </div>
+                          </td>
+
+                          {/* 8. Aksi */}
+                          <td className="py-3.5 px-4 text-right">
+                            <button
+                              onClick={() => setSelectedMallDetail(mall)}
+                              className="px-3 py-1.5 text-xs font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 hover:text-blue-600 border border-gray-200 rounded-xl transition-all shadow-2xs inline-flex items-center gap-1.5"
+                            >
+                              <FileText className="w-3.5 h-3.5" />
+                              <span>Lihat Slip</span>
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Share of Payment Method & Booth Breakdown */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-xs overflow-hidden flex flex-col justify-between">
-          <div className="px-6 py-5 border-b border-gray-200">
-            <h4 className="text-base font-semibold text-gray-900">Metode Pembayaran</h4>
-            <p className="text-xs text-gray-500 mt-0.5">Proporsi saluran penerimaan dana</p>
-          </div>
-
-          <div className="p-6 space-y-4">
-            <div>
-              <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
-                <span className="flex items-center gap-1.5 text-gray-700">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#DE5795]" /> QRIS Dinamis
-                </span>
-                <span className="font-mono text-gray-900">78%</span>
+        {/* ================================================================= */}
+        {/* TAB 2: SESI KASIR & TRANSAKSI (POS LOG)                           */}
+        {/* ================================================================= */}
+        {activeTab === 'transactions' && (
+          <div className="space-y-4">
+            {/* Filter Bar */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-white p-3 border border-gray-200/90 rounded-2xl shadow-2xs">
+              <div className="relative flex-1 min-w-[240px]">
+                <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="text"
+                  placeholder="Cari invoice, kode sesi, pelanggan, atau paket foto..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-8 pr-11 py-2 text-xs bg-gray-50/70 border border-gray-200/90 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-hidden focus:bg-white focus:border-[#DE5795] focus:ring-3 focus:ring-[#DE5795]/10 transition-all"
+                />
+                <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[9px] font-mono text-gray-400 bg-white border border-gray-200 rounded shadow-2xs">
+                  ⌘K
+                </kbd>
               </div>
-              <div className="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
-                <div className="h-full bg-[#DE5795] rounded-full" style={{ width: '78%' }} />
-              </div>
-            </div>
 
-            <div>
-              <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
-                <span className="flex items-center gap-1.5 text-gray-700">
-                  <span className="w-2.5 h-2.5 rounded-full bg-blue-600" /> EDC Kartu Debit/Kredit
-                </span>
-                <span className="font-mono text-gray-900">16%</span>
-              </div>
-              <div className="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
-                <div className="h-full bg-blue-600 rounded-full" style={{ width: '16%' }} />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
-                <span className="flex items-center gap-1.5 text-gray-700">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" /> Kasir Tunai / Manual
-                </span>
-                <span className="font-mono text-gray-900">6%</span>
-              </div>
-              <div className="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
-                <div className="h-full bg-emerald-600 rounded-full" style={{ width: '6%' }} />
-              </div>
-            </div>
-          </div>
-
-          <div className="px-6 py-3.5 bg-gray-50 border-t border-gray-200 text-xs text-gray-500 flex items-center justify-between">
-            <span>Settlement: Otomatis T+0</span>
-            <span className="font-medium text-gray-700">BCA / Midtrans</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Filters & Search - Untitled UI Standard */}
-      <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-xs space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          {/* Search Box - Untitled UI Standard */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Cari invoice, kode sesi, atau nama tamu..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-sm bg-white border border-gray-300 rounded-lg placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#DE5795]/20 focus:border-[#DE5795] shadow-xs"
-            />
-          </div>
-
-          {/* Quick Period Segmented Buttons */}
-          <div className="p-1 bg-gray-50 border border-gray-200 rounded-lg inline-flex items-center gap-1 overflow-x-auto">
-            {[
-              { id: 'TODAY', label: 'Hari Ini' },
-              { id: 'WEEK', label: '7 Hari' },
-              { id: 'MONTH', label: 'Bulan Ini' },
-              { id: 'ALL', label: 'Semua' },
-            ].map((p) => {
-              const isActive = selectedPeriod === p.id;
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => setSelectedPeriod(p.id)}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all whitespace-nowrap ${
-                    isActive
-                      ? 'bg-white text-gray-900 shadow-xs border border-gray-200/50'
-                      : 'text-gray-500 hover:text-gray-900'
-                  }`}
+              <div className="flex items-center gap-2 flex-wrap">
+                <select
+                  value={selectedBooth}
+                  onChange={(e) => setSelectedBooth(e.target.value)}
+                  className="px-3 py-2 text-xs bg-gray-50/70 border border-gray-200/90 rounded-xl text-gray-700 focus:outline-hidden focus:border-[#DE5795]"
                 >
-                  {p.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+                  <option value="ALL">Semua Booth</option>
+                  {BOOTHS_LIST.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.name}
+                    </option>
+                  ))}
+                </select>
 
-        {/* Dropdowns Filter Bar */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-gray-200 text-xs">
-          {/* Booth Filter */}
-          <div>
-            <label className="text-xs font-medium text-gray-700 block mb-1">Unit Booth</label>
-            <select
-              value={selectedBooth}
-              onChange={(e) => setSelectedBooth(e.target.value)}
-              className="w-full px-3.5 py-2 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE5795]/20 focus:border-[#DE5795] shadow-xs"
-            >
-              <option value="ALL">Semua Booth</option>
-              <option value="bth-001">Booth Alpha - Grand Indonesia</option>
-              <option value="bth-002">Booth Beta - Central Park</option>
-              <option value="bth-003">Booth Gamma - Paris Van Java</option>
-            </select>
-          </div>
+                <select
+                  value={selectedMethod}
+                  onChange={(e) => setSelectedMethod(e.target.value)}
+                  className="px-3 py-2 text-xs bg-gray-50/70 border border-gray-200/90 rounded-xl text-gray-700 focus:outline-hidden focus:border-[#DE5795]"
+                >
+                  <option value="ALL">Semua Metode</option>
+                  <option value="QRIS">QRIS Dinamis</option>
+                  <option value="EDC_CARD">Mesin EDC / Debit</option>
+                  <option value="CASH">Tunai Kasir</option>
+                </select>
 
-          {/* Payment Method Filter */}
-          <div>
-            <label className="text-xs font-medium text-gray-700 block mb-1">Metode Bayar</label>
-            <select
-              value={selectedMethod}
-              onChange={(e) => setSelectedMethod(e.target.value)}
-              className="w-full px-3.5 py-2 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE5795]/20 focus:border-[#DE5795] shadow-xs"
-            >
-              <option value="ALL">Semua Metode</option>
-              <option value="QRIS">QRIS Dinamis</option>
-              <option value="EDC_CARD">EDC Kartu</option>
-              <option value="CASH">Kasir Tunai</option>
-            </select>
-          </div>
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  className="px-3 py-2 text-xs bg-gray-50/70 border border-gray-200/90 rounded-xl text-gray-700 focus:outline-hidden focus:border-[#DE5795]"
+                >
+                  <option value="ALL">Semua Status</option>
+                  <option value="SUCCESS">Sukses (Lunas)</option>
+                  <option value="PENDING">Menunggu Bayar</option>
+                  <option value="REFUNDED">Refund</option>
+                </select>
+              </div>
+            </div>
 
-          {/* Status Filter */}
-          <div>
-            <label className="text-xs font-medium text-gray-700 block mb-1">Status Transaksi</label>
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full px-3.5 py-2 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE5795]/20 focus:border-[#DE5795] shadow-xs"
-            >
-              <option value="ALL">Semua Status</option>
-              <option value="SUCCESS">Berhasil / Lunas</option>
-              <option value="PENDING">Menunggu Pembayaran</option>
-              <option value="REFUNDED">Refund / Dibatalkan</option>
-            </select>
+            {/* Transactions Table */}
+            <div className="bg-white border border-gray-200/90 rounded-2xl shadow-2xs overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="bg-gray-50/80 border-b border-gray-200/80 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                      <th className="py-3 px-4">No. Invoice & Kode Sesi</th>
+                      <th className="py-3 px-4">Unit Booth & Lokasi</th>
+                      <th className="py-3 px-4">Paket Foto & Cetakan</th>
+                      <th className="py-3 px-4">Metode Bayar</th>
+                      <th className="py-3 px-4">Nominal</th>
+                      <th className="py-3 px-4">Status Transaksi</th>
+                      <th className="py-3 px-4 text-right">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {filteredTransactions.map((tx) => (
+                      <tr key={tx.id} className="hover:bg-gray-50/60 transition-colors">
+                        <td className="py-3.5 px-4">
+                          <div className="font-bold text-gray-900 font-mono">{tx.invoiceNumber}</div>
+                          <div className="text-[10px] text-gray-400 font-mono">Sesi: {tx.sessionCode}</div>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <div className="font-semibold text-gray-800 truncate max-w-[180px]">{tx.boothName}</div>
+                          <div className="text-[10px] text-gray-400">{tx.customerName}</div>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <div className="font-semibold text-gray-800">{tx.packageName}</div>
+                          <div className="text-[10px] text-gray-400">{tx.printCopies} Lembar Cetak Fisik</div>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-700">
+                            {tx.paymentProvider}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 font-mono font-bold text-gray-900">
+                          Rp {tx.amount.toLocaleString('id-ID')}
+                        </td>
+                        <td className="py-3.5 px-4">
+                          {tx.status === 'SUCCESS' ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                              Lunas
+                            </span>
+                          ) : tx.status === 'PENDING' ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                              <Clock className="w-3 h-3 text-amber-500" />
+                              Pending
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                              <RotateCcw className="w-3 h-3 text-rose-500" />
+                              Refund
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3.5 px-4 text-right">
+                          <button
+                            onClick={() => setActiveReceipt(tx)}
+                            className="p-1.5 text-gray-500 hover:text-[#DE5795] hover:bg-pink-50 rounded-lg transition-colors"
+                            title="Lihat Bukti e-Struk"
+                          >
+                            <Receipt className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* ================================================================= */}
+        {/* TAB 3: AUDIT SELISIH KASIR & KAS FISIK                            */}
+        {/* ================================================================= */}
+        {activeTab === 'cash-reconciliation' && (
+          <div className="space-y-4">
+            <div className="bg-white border border-gray-200/90 rounded-2xl shadow-2xs overflow-hidden">
+              <div className="p-4 border-b border-gray-200/80 flex items-center justify-between">
+                <div>
+                  <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
+                    Log Rekonsiliasi Kasir & Uang Fisik Bill Acceptor
+                  </h3>
+                  <p className="text-[11px] text-gray-500 mt-0.5">
+                    Pencocokan antara penerimaan tunai sistem kiosk dengan uang fisik yang dihitung saat kasir tutup shift.
+                  </p>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="bg-gray-50/80 border-b border-gray-200/80 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                      <th className="py-3 px-4">Waktu Audit & ID</th>
+                      <th className="py-3 px-4">Unit Booth</th>
+                      <th className="py-3 px-4">Uang Sistem Kiosk</th>
+                      <th className="py-3 px-4">Uang Fisik Dihitung</th>
+                      <th className="py-3 px-4">Selisih Kas</th>
+                      <th className="py-3 px-4">Status & Auditor</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {cashReconciliations.map((rec) => (
+                      <tr key={rec.id} className="hover:bg-gray-50/60 transition-colors">
+                        <td className="py-3.5 px-4">
+                          <div className="font-semibold text-gray-900">{rec.reconciliationDate}</div>
+                          <div className="text-[10px] font-mono text-gray-400">{rec.id}</div>
+                        </td>
+                        <td className="py-3.5 px-4 font-bold text-gray-800">{rec.boothName}</td>
+                        <td className="py-3.5 px-4 font-mono font-semibold text-gray-700">
+                          Rp {rec.systemExpectedCash.toLocaleString('id-ID')}
+                        </td>
+                        <td className="py-3.5 px-4 font-mono font-bold text-gray-900">
+                          Rp {rec.actualCountedCash.toLocaleString('id-ID')}
+                        </td>
+                        <td className="py-3.5 px-4 font-mono font-bold text-emerald-600">
+                          {rec.difference === 0 ? 'Rp 0 (Sesuai 100%)' : `Rp ${rec.difference.toLocaleString('id-ID')}`}
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <div className="flex items-center gap-1.5">
+                            <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                              {rec.status === 'SUDAH_SETOR_BANK' ? 'Sudah Setor Bank' : 'Audit Sesuai'}
+                            </span>
+                            <span className="text-[11px] text-gray-500">oleh {rec.auditorName}</span>
+                          </div>
+                          {rec.notes && <div className="text-[10px] text-gray-400 italic mt-0.5">{rec.notes}</div>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Transactions Table Ledger - Untitled UI Standard */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-xs overflow-hidden">
-        <div className="px-6 py-5 border-b border-gray-200 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <h3 className="text-base font-semibold text-gray-900">Daftar Transaksi Kasir & Kios</h3>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-              {filteredTransactions.length} Baris
-            </span>
-          </div>
-          <span className="text-xs text-gray-500">Sinkronisasi otomatis real-time</span>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 text-left text-xs">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider">Invoice & Waktu</th>
-                <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider">Kode Sesi & Tamu</th>
-                <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider">Unit Booth</th>
-                <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider">Paket & Cetak</th>
-                <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider">Metode Bayar</th>
-                <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Nominal</th>
-                <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Status</th>
-                <th className="px-6 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Aksi</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
-              {filteredTransactions.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="px-5 py-12 text-center text-gray-400">
-                    <Receipt className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-                    <p className="font-medium">Tidak ada transaksi yang cocok dengan filter ini.</p>
-                  </td>
-                </tr>
-              ) : (
-                filteredTransactions.map((tx) => (
-                  <tr key={tx.id} className="hover:bg-gray-50/80 transition-colors">
-                    {/* Invoice & Time */}
-                    <td className="px-5 py-4">
-                      <div className="font-mono font-bold text-gray-900">{tx.invoiceNumber}</div>
-                      <div className="text-[11px] text-gray-500 mt-0.5">
-                        {new Date(tx.paidAt).toLocaleTimeString('id-ID', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}{' '}
-                        •{' '}
-                        {new Date(tx.paidAt).toLocaleDateString('id-ID', {
-                          day: 'numeric',
-                          month: 'short',
-                        })}
-                      </div>
-                    </td>
-
-                    {/* Session & Guest */}
-                    <td className="px-5 py-4">
-                      <div className="font-semibold text-gray-900">{tx.customerName}</div>
-                      <span className="font-mono text-[10px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
-                        {tx.sessionCode}
-                      </span>
-                    </td>
-
-                    {/* Booth */}
-                    <td className="px-5 py-4 text-gray-700">
-                      <div className="font-medium truncate max-w-[150px]">{tx.boothName}</div>
-                      <span className="text-[10px] text-gray-400">{tx.boothId}</span>
-                    </td>
-
-                    {/* Package */}
-                    <td className="px-5 py-4">
-                      <div className="font-medium text-gray-800">{tx.packageName}</div>
-                      <div className="text-[11px] text-gray-500">
-                        {tx.printCopies} Lembar Cetak • {tx.digitalDownload ? 'QR Aktif' : 'Tanpa QR'}
-                      </div>
-                    </td>
-
-                    {/* Method */}
-                    <td className="px-5 py-4">
-                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-gray-100 text-gray-800 border border-gray-200">
-                        {tx.paymentMethod === 'QRIS' && <QrCode className="w-3 h-3 text-[#DE5795]" />}
-                        {tx.paymentMethod === 'EDC_CARD' && <CreditCard className="w-3 h-3 text-blue-600" />}
-                        {tx.paymentMethod === 'CASH' && <Receipt className="w-3 h-3 text-emerald-600" />}
-                        <span>{tx.paymentProvider}</span>
-                      </div>
-                    </td>
-
-                    {/* Amount */}
-                    <td className="px-5 py-4 text-right">
-                      <span className="font-mono font-bold text-sm text-gray-900">
-                        Rp {tx.amount.toLocaleString('id-ID')}
-                      </span>
-                    </td>
-
-                    {/* Status */}
-                    <td className="px-5 py-4 text-center">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
-                          tx.status === 'SUCCESS'
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                            : tx.status === 'PENDING'
-                            ? 'bg-amber-50 text-amber-700 border-amber-200'
-                            : 'bg-gray-100 text-gray-600 border-gray-200'
-                        }`}
-                      >
-                        {tx.status === 'SUCCESS' && <CheckCircle2 className="w-3 h-3" />}
-                        {tx.status === 'PENDING' && <Clock className="w-3 h-3" />}
-                        {tx.status === 'REFUNDED' && <RotateCcw className="w-3 h-3" />}
-                        <span>
-                          {tx.status === 'SUCCESS' && 'Lunas'}
-                          {tx.status === 'PENDING' && 'Pending'}
-                          {tx.status === 'REFUNDED' && 'Refund'}
-                        </span>
-                      </span>
-                    </td>
-
-                    {/* Actions */}
-                    <td className="px-5 py-4 text-right">
-                      <button
-                        onClick={() => setActiveReceipt(tx)}
-                        className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white border border-gray-200 text-gray-700 hover:bg-[#DE5795]/10 hover:text-[#9D174D] hover:border-[#DE5795]/40 transition shadow-xs"
-                      >
-                        Struk Kasir
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Table Footer Summary */}
-        <div className="px-5 py-3.5 bg-gray-50/80 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-gray-500 gap-2">
-          <span>
-            Menampilkan <strong className="text-gray-900">{filteredTransactions.length}</strong> transaksi dari total {transactions.length}
-          </span>
-          <div className="flex items-center gap-2">
-            <span>Subtotal Ditampilkan:</span>
-            <strong className="text-sm font-mono font-bold text-[#9D174D]">
-              Rp {filteredTransactions.reduce((acc, c) => acc + (c.status === 'SUCCESS' ? c.amount : 0), 0).toLocaleString('id-ID')}
-            </strong>
-          </div>
-        </div>
-      </div>
-
-      {/* ============================================================ */}
-      {/* DIGITAL RECEIPT / INVOICE MODAL                              */}
-      {/* ============================================================ */}
-      {/* ============================================================ */}
-      {/* DIGITAL RECEIPT / INVOICE DRAWER                             */}
-      {/* ============================================================ */}
-      {activeReceipt && (
+      {/* ========================================================================= */}
+      {/* DRAWER 1: SLIP REKONSILIASI & TAGIHAN MALL (Floating Slide-Over)          */}
+      {/* ========================================================================= */}
+      {selectedMallDetail && (
         <div className="fixed inset-0 z-50 overflow-hidden font-sora">
-          {/* Backdrop with smooth blur */}
           <div
-            className="fixed inset-0 bg-gray-950/45 backdrop-blur-xs transition-opacity animate-fade-in"
-            onClick={() => setActiveReceipt(null)}
+            onClick={() => setSelectedMallDetail(null)}
+            className="absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity animate-fade-in"
           />
 
           <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none">
-            <div className="w-screen max-w-md bg-white shadow-2xl border border-gray-200/90 rounded-3xl flex flex-col animate-slide-left overflow-hidden ring-1 ring-black/10 pointer-events-auto">
-              {/* Drawer Header (Ref: Modern SaaS Floating Drawer) */}
-              <div className="px-8 pt-7 pb-7.5 border-b border-gray-200/80 flex items-center justify-between bg-white/95 backdrop-blur-md shrink-0 sticky top-0 z-20 shadow-2xs">
-                <div className="flex items-center gap-4 min-w-0">
-                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-pink-500/15 to-[#DE5795]/20 border border-[#DE5795]/30 flex items-center justify-center text-[#9D174D] shadow-xs shrink-0">
-                    <Receipt className="w-5 h-5 text-[#DE5795]" />
+            <div className="w-screen max-w-xl bg-white shadow-2xl border border-gray-200/90 rounded-3xl flex flex-col animate-slide-left overflow-hidden ring-1 ring-black/10 pointer-events-auto">
+              {/* Header with generous pb-7.5 and pt-7 */}
+              <div className="px-8 pt-7 pb-7.5 border-b border-gray-200/80 flex items-start justify-between bg-white">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-xs">
+                    <Building2 className="w-5 h-5" />
                   </div>
-                  <div className="min-w-0 pr-2">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="text-base font-bold text-gray-900 leading-tight">Bukti Pembayaran</h3>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs">
-                        LUNAS
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1.5 truncate font-mono">Invoice: {activeReceipt.invoiceNumber}</p>
+                  <div>
+                    <h2 className="text-base font-bold text-gray-900">Slip Tagihan Bagi Hasil Mall</h2>
+                    <p className="text-xs text-gray-500 mt-0.5">{selectedMallDetail.mallName}</p>
                   </div>
                 </div>
                 <button
-                  type="button"
-                  onClick={() => setActiveReceipt(null)}
-                  className="w-9 h-9 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 border border-gray-200/80 transition-all flex items-center justify-center shrink-0 ml-4 shadow-2xs"
-                  title="Tutup (Esc)"
+                  onClick={() => setSelectedMallDetail(null)}
+                  className="p-2 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-100 transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Drawer Body */}
-              <div className="px-8 py-6 overflow-y-auto flex-1 space-y-4 text-xs">
-                {/* Receipt Card */}
-                <div className="p-5 rounded-2xl bg-gray-50 border border-gray-200 space-y-4">
-                  <div className="flex items-start justify-between border-b border-dashed border-gray-200 pb-3">
-                    <div>
-                      <span className="text-[10px] font-mono uppercase tracking-widest text-gray-400">Bukti Transaksi Resmi</span>
-                      <h4 className="text-sm font-bold text-gray-900">PhotoBooth OS</h4>
-                      <p className="text-xs text-gray-500">{activeReceipt.boothName}</p>
-                    </div>
-                    <div className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-semibold flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3" />
-                      <span>LUNAS</span>
-                    </div>
+              {/* Body */}
+              <div className="px-8 py-6 overflow-y-auto flex-1 space-y-5 text-xs">
+                {/* Status Box */}
+                <div className="p-4 rounded-2xl bg-blue-50/60 border border-blue-200/80 flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] uppercase font-bold text-blue-600 tracking-wider">Status Tagihan Periode Ini</span>
+                    <h4 className="text-sm font-bold text-gray-900 mt-0.5">{selectedMallDetail.settlementStatus}</h4>
+                    <p className="text-[11px] text-gray-500">Jatuh Tempo: {selectedMallDetail.settlementDueDate}</p>
                   </div>
+                  {selectedMallDetail.settlementStatus !== 'LUNAS' ? (
+                    <button
+                      onClick={() => handleMarkSettlementPaid(selectedMallDetail.id)}
+                      className="px-3.5 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition-all flex items-center gap-1.5"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Tandai Lunas Ditransfer</span>
+                    </button>
+                  ) : (
+                    <span className="px-3 py-1 text-xs font-bold bg-emerald-100 text-emerald-800 rounded-xl border border-emerald-300">
+                      LUNAS
+                    </span>
+                  )}
+                </div>
 
-                  {/* Receipt Meta */}
-                  <div className="space-y-1.5 text-xs text-gray-600 font-mono">
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">No. Invoice:</span>
-                      <strong className="text-gray-900">{activeReceipt.invoiceNumber}</strong>
+                {/* Calculation Breakdown Table */}
+                <div className="space-y-2">
+                  <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
+                    Rincian Kalkulasi Rekonsiliasi Finansial
+                  </h4>
+                  <div className="p-4 rounded-xl border border-gray-200 bg-white space-y-2.5 text-xs">
+                    <div className="flex justify-between py-1 border-b border-gray-100">
+                      <span className="text-gray-600">Omzet Kotor Kios ({selectedMallDetail.totalSessions} sesi)</span>
+                      <span className="font-mono font-bold text-gray-900">
+                        Rp {selectedMallDetail.grossRevenueMonth.toLocaleString('id-ID')}
+                      </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Kode Sesi:</span>
-                      <strong className="text-gray-900">{activeReceipt.sessionCode}</strong>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Pelanggan:</span>
-                      <span className="text-gray-800 font-sans">{activeReceipt.customerName}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Waktu Bayar:</span>
-                      <span>{new Date(activeReceipt.paidAt).toLocaleString('id-ID')}</span>
-                    </div>
-                  </div>
 
-                  {/* Itemized Breakdown */}
-                  <div className="space-y-2 py-3 border-y border-dashed border-gray-200 text-xs">
-                    <div className="flex justify-between font-medium">
-                      <span>{activeReceipt.packageName}</span>
-                      <span className="font-mono">Rp {activeReceipt.amount.toLocaleString('id-ID')}</span>
+                    <div className="flex justify-between py-1 border-b border-gray-100 text-blue-700">
+                      <span>Hak Bagi Hasil Pengelola Mall ({selectedMallDetail.contractTypeLabel})</span>
+                      <span className="font-mono font-bold">
+                        - Rp {selectedMallDetail.mallShareDue.toLocaleString('id-ID')}
+                      </span>
                     </div>
-                    <div className="flex justify-between text-gray-500 text-[11px]">
-                      <span>Cetak Fisik: {activeReceipt.printCopies} Lembar</span>
-                      <span>Termasuk</span>
-                    </div>
-                    <div className="flex justify-between text-gray-500 text-[11px]">
-                      <span>File Digital QR Code HD</span>
-                      <span>Gratis</span>
-                    </div>
-                  </div>
 
-                  {/* Total Section */}
-                  <div className="space-y-1.5 pt-1">
-                    <div className="flex justify-between text-xs text-gray-500">
-                      <span>Metode Pembayaran:</span>
-                      <span className="font-semibold text-gray-800">{activeReceipt.paymentProvider}</span>
+                    <div className="flex justify-between py-1 border-b border-gray-100 text-gray-600">
+                      <span>Biaya Bahan Habis Pakai Kertas Dye-Sub (HPP)</span>
+                      <span className="font-mono">
+                        - Rp {selectedMallDetail.materialHppCost.toLocaleString('id-ID')}
+                      </span>
                     </div>
-                    <div className="flex justify-between text-sm font-bold text-gray-900 pt-1">
-                      <span>Total Bayar:</span>
-                      <span className="font-mono text-base text-[#9D174D]">
-                        Rp {activeReceipt.amount.toLocaleString('id-ID')}
+
+                    <div className="flex justify-between py-1 border-b border-gray-100 text-gray-600">
+                      <span>Biaya MDR Transaksi QRIS (0.7%)</span>
+                      <span className="font-mono">
+                        - Rp {selectedMallDetail.qrisMdrFee.toLocaleString('id-ID')}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between pt-2 text-sm font-bold text-emerald-700">
+                      <span>Laba Bersih Vendor (Net Profit)</span>
+                      <span className="font-mono text-base">
+                        Rp {selectedMallDetail.netProfitVendor.toLocaleString('id-ID')}
                       </span>
                     </div>
                   </div>
+                </div>
 
-                  {/* Receipt QR Code */}
-                  <div className="text-center pt-3 border-t border-dashed border-gray-200">
-                    <img
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://photobooth.local/receipt/${activeReceipt.invoiceNumber}`}
-                      alt="Receipt QR"
-                      className="w-24 h-24 mx-auto rounded-lg border border-gray-200 p-1 bg-white"
-                    />
-                    <p className="text-[10px] text-gray-400 mt-1 font-mono">Pindai untuk unduh e-Struk digital</p>
+                {/* Bank Transfer Details for Mall */}
+                <div className="space-y-2">
+                  <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider flex items-center gap-1.5">
+                    <Landmark className="w-4 h-4 text-gray-500" />
+                    <span>Rekening Bank Pengelola Mall (Tujuan Transfer)</span>
+                  </h4>
+                  <div className="p-4 rounded-xl border border-gray-200 bg-gray-50/70 space-y-2 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Bank Tujuan:</span>
+                      <span className="font-bold text-gray-800">{selectedMallDetail.bankDetails.bankName}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Nomor Rekening:</span>
+                      <span className="font-mono font-bold text-blue-700 text-sm">{selectedMallDetail.bankDetails.accountNumber}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Atas Nama (A/N):</span>
+                      <span className="font-semibold text-gray-800">{selectedMallDetail.bankDetails.accountHolder}</span>
+                    </div>
+                    <div className="flex justify-between pt-1 border-t border-gray-200/80">
+                      <span className="text-gray-500">Kontak PIC Leasing Mall:</span>
+                      <span className="font-semibold text-gray-800">{selectedMallDetail.picMall} ({selectedMallDetail.picPhone})</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Drawer Sticky Footer */}
-              <div className="px-8 pt-5.5 pb-7 border-t border-gray-100 bg-gray-50/80 backdrop-blur-sm flex items-center justify-end gap-3 shrink-0 sticky bottom-0 z-10">
+              {/* Footer with generous padding */}
+              <div className="px-8 pt-5.5 pb-7 border-t border-gray-200/80 bg-white/95 backdrop-blur-md flex items-center justify-between">
                 <button
                   type="button"
-                  onClick={() => setActiveReceipt(null)}
-                  className="px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
+                  onClick={() => setSelectedMallDetail(null)}
+                  className="px-4 py-2.5 text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
                 >
                   Tutup
                 </button>
@@ -937,12 +1101,12 @@ export default function PaymentsPage() {
                   type="button"
                   onClick={() => {
                     window.print();
-                    showToast('Perintah cetak struk dikirim');
+                    showToast('Dokumen tagihan dikirim ke printer/PDF');
                   }}
-                  className="px-5 py-2.5 rounded-xl bg-[#DE5795] text-white font-bold text-xs hover:bg-[#c93d7e] transition-colors border border-[#DE5795] shadow-xs flex items-center gap-1.5"
+                  className="px-5 py-2.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all shadow-xs flex items-center gap-1.5"
                 >
-                  <Printer className="w-4 h-4 text-white" />
-                  <span>Cetak Struk Fisik</span>
+                  <Printer className="w-4 h-4" />
+                  <span>Cetak Slip Rekonsiliasi PDF</span>
                 </button>
               </div>
             </div>
@@ -950,48 +1114,247 @@ export default function PaymentsPage() {
         </div>
       )}
 
-      {/* ============================================================ */}
-      {/* DRAWER: CATAT PEMBAYARAN MANUAL / KASIR TUNAI                */}
-      {/* ============================================================ */}
-      {isManualModalOpen && (
+      {/* ========================================================================= */}
+      {/* DRAWER 2: ATUR SKEMA BAGI HASIL MALL BARU (Floating Slide-Over)           */}
+      {/* ========================================================================= */}
+      {isConfigMallOpen && (
         <div className="fixed inset-0 z-50 overflow-hidden font-sora">
-          {/* Backdrop with smooth blur */}
           <div
-            className="fixed inset-0 bg-gray-950/45 backdrop-blur-xs transition-opacity animate-fade-in"
-            onClick={() => setIsManualModalOpen(false)}
+            onClick={() => setIsConfigMallOpen(false)}
+            className="absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity animate-fade-in"
           />
 
           <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none">
             <div className="w-screen max-w-xl bg-white shadow-2xl border border-gray-200/90 rounded-3xl flex flex-col animate-slide-left overflow-hidden ring-1 ring-black/10 pointer-events-auto">
-              {/* Drawer Header (Ref: Modern SaaS Floating Drawer) */}
-              <div className="px-8 pt-7 pb-7.5 border-b border-gray-200/80 flex items-center justify-between bg-white/95 backdrop-blur-md shrink-0 sticky top-0 z-20 shadow-2xs">
-                <div className="flex items-center gap-4 min-w-0">
-                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-pink-500/15 to-[#DE5795]/20 border border-[#DE5795]/30 flex items-center justify-center text-[#9D174D] shadow-xs shrink-0">
-                    <Banknote className="w-5 h-5 text-[#DE5795]" />
+              <div className="px-8 pt-7 pb-7.5 border-b border-gray-200/80 flex items-start justify-between bg-white">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
+                    <Building2 className="w-5 h-5" />
                   </div>
-                  <div className="min-w-0 pr-2">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="text-base font-bold text-gray-900 leading-tight">Catat Pembayaran Kasir Manual</h3>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs">
-                        Manual POS
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1.5 truncate">
-                      Entri transaksi tunai kasir, debit kartu EDC, atau transfer darurat
-                    </p>
+                  <div>
+                    <h2 className="text-base font-bold text-gray-900">Atur Skema Bagi Hasil Mall</h2>
+                    <p className="text-xs text-gray-500 mt-0.5">Konfigurasi kontrak sewa kiosk atau bagi hasil persentase.</p>
                   </div>
                 </div>
                 <button
-                  type="button"
-                  onClick={() => setIsManualModalOpen(false)}
-                  className="w-9 h-9 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 border border-gray-200/80 transition-all flex items-center justify-center shrink-0 ml-4 shadow-2xs"
-                  title="Tutup (Esc)"
+                  onClick={() => setIsConfigMallOpen(false)}
+                  className="p-2 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-100 transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Form Body */}
+              <form id="mall-scheme-form" onSubmit={handleSaveMallScheme} className="px-8 py-6 overflow-y-auto flex-1 space-y-4 text-xs">
+                {/* Mall Name & Branch */}
+                <div className="space-y-1.5">
+                  <label className="font-bold text-gray-800">Nama Gedung Mall / Pusat Perbelanjaan *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Contoh: Senayan City Shopping Mall"
+                    value={newMallName}
+                    onChange={(e) => setNewMallName(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:bg-white focus:border-blue-600 focus:outline-hidden"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-bold text-gray-800">Lokasi Penempatan Booth Kiosk</label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: Lantai 3 Depan Cinema XXI #K-12"
+                    value={newMallBranch}
+                    onChange={(e) => setNewMallBranch(e.target.value)}
+                    className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:bg-white focus:border-blue-600 focus:outline-hidden"
+                  />
+                </div>
+
+                {/* Booth Selector */}
+                <div className="space-y-1.5">
+                  <label className="font-bold text-gray-800">Unit Booth yang Dialokasikan *</label>
+                  <select
+                    value={newMallBoothId}
+                    onChange={(e) => setNewMallBoothId(e.target.value)}
+                    className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-medium focus:bg-white focus:border-blue-600 focus:outline-hidden"
+                  >
+                    {BOOTHS_LIST.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Contract Scheme Selection */}
+                <div className="space-y-1.5">
+                  <label className="font-bold text-gray-800">Model Skema Kontrak Kemitraan *</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setNewContractType('PERCENTAGE_REVENUE_SHARE')}
+                      className={`p-3 rounded-xl border text-left transition-all ${
+                        newContractType === 'PERCENTAGE_REVENUE_SHARE'
+                          ? 'border-blue-600 bg-blue-50 text-blue-900 font-bold shadow-2xs'
+                          : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      <Percent className="w-4 h-4 mb-1 text-blue-600" />
+                      <div>Bagi Hasil Omzet (%)</div>
+                      <span className="text-[10px] text-gray-500 font-normal">Persentase dari gross revenue</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setNewContractType('FLAT_RENT')}
+                      className={`p-3 rounded-xl border text-left transition-all ${
+                        newContractType === 'FLAT_RENT'
+                          ? 'border-blue-600 bg-blue-50 text-blue-900 font-bold shadow-2xs'
+                          : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      <Landmark className="w-4 h-4 mb-1 text-blue-600" />
+                      <div>Sewa Tetap (Flat Rent)</div>
+                      <span className="text-[10px] text-gray-500 font-normal">Nominal tetap bulanan</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Rate Details */}
+                {newContractType === 'PERCENTAGE_REVENUE_SHARE' ? (
+                  <div className="space-y-1.5">
+                    <label className="font-bold text-gray-800">Persentase Bagi Hasil Mall (%) *</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        min={5}
+                        max={50}
+                        value={newSharePercent}
+                        onChange={(e) => setNewSharePercent(parseInt(e.target.value) || 20)}
+                        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-bold focus:bg-white focus:border-blue-600 focus:outline-hidden"
+                      />
+                      <div className="flex gap-1.5">
+                        {[15, 18, 20, 25].map((pct) => (
+                          <button
+                            key={pct}
+                            type="button"
+                            onClick={() => setNewSharePercent(pct)}
+                            className="px-2.5 py-2 text-[11px] font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg"
+                          >
+                            {pct}%
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    <label className="font-bold text-gray-800">Biaya Sewa Tetap Per Bulan (Rp) *</label>
+                    <input
+                      type="number"
+                      step={500000}
+                      value={newFlatRent}
+                      onChange={(e) => setNewFlatRent(parseInt(e.target.value) || 0)}
+                      className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-bold focus:bg-white focus:border-blue-600 focus:outline-hidden"
+                    />
+                  </div>
+                )}
+
+                {/* Bank Account Details */}
+                <div className="p-3.5 rounded-xl border border-gray-200 bg-gray-50/70 space-y-3">
+                  <span className="text-[11px] font-bold text-gray-700 uppercase tracking-wider block">
+                    Informasi Rekening & PIC Mall
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div className="space-y-1">
+                      <label className="text-gray-600">Bank Pengelola</label>
+                      <input
+                        type="text"
+                        placeholder="BCA / Mandiri / CIMB"
+                        value={newBankName}
+                        onChange={(e) => setNewBankName(e.target.value)}
+                        className="w-full px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-gray-900 focus:outline-hidden"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-gray-600">Nomor Rekening</label>
+                      <input
+                        type="text"
+                        placeholder="Contoh: 008-992-1829"
+                        value={newAccountNo}
+                        onChange={(e) => setNewAccountNo(e.target.value)}
+                        className="w-full px-3 py-1.5 bg-white border border-gray-200 rounded-lg font-mono text-gray-900 focus:outline-hidden"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-gray-600">Nama Pemilik Rekening (A/N)</label>
+                    <input
+                      type="text"
+                      placeholder="Contoh: PT Metropolitan Retail Mall"
+                      value={newAccountHolder}
+                      onChange={(e) => setNewAccountHolder(e.target.value)}
+                      className="w-full px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-gray-900 focus:outline-hidden"
+                    />
+                  </div>
+                </div>
+              </form>
+
+              <div className="px-8 pt-5.5 pb-7 border-t border-gray-200/80 bg-white/95 backdrop-blur-md flex items-center justify-between">
+                <span className="text-[11px] text-gray-400">Tekan ESC untuk membatalkan</span>
+                <div className="flex items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setIsConfigMallOpen(false)}
+                    className="px-4 py-2.5 text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    form="mall-scheme-form"
+                    className="px-5 py-2.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all shadow-xs"
+                  >
+                    Simpan Skema Kemitraan
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* DRAWER 3: CATAT PEMBAYARAN KASIR MANUAL (Floating Slide-Over)             */}
+      {/* ========================================================================= */}
+      {isManualModalOpen && (
+        <div className="fixed inset-0 z-50 overflow-hidden font-sora">
+          <div
+            onClick={() => setIsManualModalOpen(false)}
+            className="absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity animate-fade-in"
+          />
+
+          <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none">
+            <div className="w-screen max-w-xl bg-white shadow-2xl border border-gray-200/90 rounded-3xl flex flex-col animate-slide-left overflow-hidden ring-1 ring-black/10 pointer-events-auto">
+              <div className="px-8 pt-7 pb-7.5 border-b border-gray-200/80 flex items-start justify-between bg-white">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-pink-500/15 to-[#DE5795]/20 border border-[#DE5795]/30 flex items-center justify-center text-[#9D174D] shadow-xs shrink-0">
+                    <Banknote className="w-5 h-5 text-[#DE5795]" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-bold text-gray-900 leading-tight">Catat Pembayaran Kasir Manual</h2>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Entri transaksi tunai kasir, debit kartu EDC, atau transfer darurat.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsManualModalOpen(false)}
+                  className="p-2 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-100 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
               <form onSubmit={handleSaveManualPayment} className="flex-1 flex flex-col min-h-0">
                 <div className="px-8 py-6 overflow-y-auto flex-1 space-y-5 text-xs">
                   {/* Metode Pembayaran Segmented Buttons */}
@@ -1125,7 +1488,6 @@ export default function PaymentsPage() {
                   </div>
                 </div>
 
-                {/* Drawer Sticky Footer */}
                 <div className="px-8 pt-5.5 pb-7 border-t border-gray-200/80 bg-white/95 backdrop-blur-md flex items-center justify-between gap-3 shrink-0 sticky bottom-0 z-20 shadow-xs">
                   <span className="text-[11px] text-gray-400 hidden sm:inline">
                     Tekan <kbd className="px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200 font-mono text-[10px] text-gray-500">ESC</kbd> untuk membatalkan
@@ -1140,7 +1502,7 @@ export default function PaymentsPage() {
                     </button>
                     <button
                       type="submit"
-                      className="px-5 py-2.5 rounded-xl bg-[#DE5795] text-white text-xs font-bold hover:bg-[#c93d7e] transition-all border border-[#DE5795] shadow-xs flex items-center gap-2 active:scale-98"
+                      className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-pink-600 to-[#DE5795] text-white text-xs font-bold hover:opacity-95 transition-all shadow-xs flex items-center gap-2 active:scale-98"
                     >
                       <Check className="w-4 h-4 text-white" />
                       <span>Validasi & Simpan Transaksi</span>
@@ -1148,6 +1510,134 @@ export default function PaymentsPage() {
                   </div>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* DRAWER 4: BUKTI TRANSAKSI RESMI E-STRUK (Floating Slide-Over)             */}
+      {/* ========================================================================= */}
+      {activeReceipt && (
+        <div className="fixed inset-0 z-50 overflow-hidden font-sora">
+          <div
+            className="fixed inset-0 bg-gray-950/45 backdrop-blur-xs transition-opacity animate-fade-in"
+            onClick={() => setActiveReceipt(null)}
+          />
+
+          <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none">
+            <div className="w-screen max-w-md bg-white shadow-2xl border border-gray-200/90 rounded-3xl flex flex-col animate-slide-left overflow-hidden ring-1 ring-black/10 pointer-events-auto">
+              <div className="px-8 pt-7 pb-7.5 border-b border-gray-200/80 flex items-center justify-between bg-white shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-pink-500/15 to-[#DE5795]/20 border border-[#DE5795]/30 flex items-center justify-center text-[#9D174D] shadow-xs shrink-0">
+                    <Receipt className="w-5 h-5 text-[#DE5795]" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-gray-900 leading-tight">Bukti Pembayaran</h3>
+                    <p className="text-xs text-gray-500 font-mono mt-0.5">{activeReceipt.invoiceNumber}</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveReceipt(null)}
+                  className="p-2 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-100 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="px-8 py-6 overflow-y-auto flex-1 space-y-4 text-xs">
+                <div className="p-5 rounded-2xl bg-gray-50 border border-gray-200 space-y-4">
+                  <div className="flex items-start justify-between border-b border-dashed border-gray-200 pb-3">
+                    <div>
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-gray-400">Bukti Transaksi Resmi</span>
+                      <h4 className="text-sm font-bold text-gray-900">PhotoBooth OS</h4>
+                      <p className="text-xs text-gray-500">{activeReceipt.boothName}</p>
+                    </div>
+                    <div className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-semibold flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3" />
+                      <span>LUNAS</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5 text-xs text-gray-600 font-mono">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">No. Invoice:</span>
+                      <strong className="text-gray-900">{activeReceipt.invoiceNumber}</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Kode Sesi:</span>
+                      <strong className="text-gray-900">{activeReceipt.sessionCode}</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Pelanggan:</span>
+                      <span className="text-gray-800 font-sans">{activeReceipt.customerName}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Waktu Bayar:</span>
+                      <span>{new Date(activeReceipt.paidAt).toLocaleString('id-ID')}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 py-3 border-y border-dashed border-gray-200 text-xs">
+                    <div className="flex justify-between font-medium">
+                      <span>{activeReceipt.packageName}</span>
+                      <span className="font-mono">Rp {activeReceipt.amount.toLocaleString('id-ID')}</span>
+                    </div>
+                    <div className="flex justify-between text-gray-500 text-[11px]">
+                      <span>Cetak Fisik: {activeReceipt.printCopies} Lembar</span>
+                      <span>Termasuk</span>
+                    </div>
+                    <div className="flex justify-between text-gray-500 text-[11px]">
+                      <span>File Digital QR Code HD</span>
+                      <span>Gratis</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5 pt-1">
+                    <div className="flex justify-between text-xs text-gray-500">
+                      <span>Metode Pembayaran:</span>
+                      <span className="font-semibold text-gray-800">{activeReceipt.paymentProvider}</span>
+                    </div>
+                    <div className="flex justify-between text-sm font-bold text-gray-900 pt-1">
+                      <span>Total Bayar:</span>
+                      <span className="font-mono text-base text-[#9D174D]">
+                        Rp {activeReceipt.amount.toLocaleString('id-ID')}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="text-center pt-3 border-t border-dashed border-gray-200">
+                    <img
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://photobooth.local/receipt/${activeReceipt.invoiceNumber}`}
+                      alt="Receipt QR"
+                      className="w-24 h-24 mx-auto rounded-lg border border-gray-200 p-1 bg-white"
+                    />
+                    <p className="text-[10px] text-gray-400 mt-1 font-mono">Pindai untuk unduh e-Struk digital</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-8 pt-5.5 pb-7 border-t border-gray-100 bg-gray-50/80 backdrop-blur-sm flex items-center justify-end gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setActiveReceipt(null)}
+                  className="px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
+                >
+                  Tutup
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.print();
+                    showToast('Perintah cetak struk dikirim');
+                  }}
+                  className="px-5 py-2.5 rounded-xl bg-[#DE5795] text-white font-bold text-xs hover:bg-[#c93d7e] transition-colors shadow-xs flex items-center gap-1.5"
+                >
+                  <Printer className="w-4 h-4 text-white" />
+                  <span>Cetak Struk Fisik</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

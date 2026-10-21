@@ -18,6 +18,7 @@ import {
   Radio,
   SlidersHorizontal,
   Images,
+  Boxes,
 } from 'lucide-react';
 
 interface NavGroup {
@@ -48,6 +49,7 @@ export function Sidebar() {
       items: [
         { label: 'Daftar Unit Booth', href: '/booths', icon: Store, count: '3 Unit', badgeVariant: 'emerald' },
         { label: 'Jadwal Acara & Event', href: '/events', icon: CalendarDays, count: '8 Acara', badgeVariant: 'pink' },
+        { label: 'Stok & Inventaris', href: '/inventory', icon: Boxes, count: 'Kritis', badgeVariant: 'pink' },
       ],
     },
     {
@@ -60,7 +62,7 @@ export function Sidebar() {
     {
       category: 'FINANSIAL & KASIR',
       items: [
-        { label: 'Laporan Pembayaran', href: '/payments', icon: CreditCard, count: 'Baru', badgeVariant: 'pink' },
+        { label: 'Finansial & Bagi Hasil Mall', href: '/payments', icon: CreditCard, count: 'Mall', badgeVariant: 'pink' },
       ],
     },
   ];
