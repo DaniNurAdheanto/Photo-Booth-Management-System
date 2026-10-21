@@ -821,7 +821,7 @@ export default function PaymentsPage() {
           <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none">
             <div className="w-screen max-w-md bg-white shadow-2xl border border-gray-200/90 rounded-3xl flex flex-col animate-slide-left overflow-hidden ring-1 ring-black/10 pointer-events-auto">
               {/* Drawer Header (Ref: Modern SaaS Floating Drawer) */}
-              <div className="px-7 pt-6 pb-5.5 border-b border-gray-200/80 flex items-center justify-between bg-white/95 backdrop-blur-md shrink-0 sticky top-0 z-20 shadow-2xs">
+              <div className="px-8 pt-7 pb-7.5 border-b border-gray-200/80 flex items-center justify-between bg-white/95 backdrop-blur-md shrink-0 sticky top-0 z-20 shadow-2xs">
                 <div className="flex items-center gap-4 min-w-0">
                   <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-pink-500/15 to-[#DE5795]/20 border border-[#DE5795]/30 flex items-center justify-center text-[#9D174D] shadow-xs shrink-0">
                     <Receipt className="w-5 h-5 text-[#DE5795]" />
@@ -833,7 +833,7 @@ export default function PaymentsPage() {
                         LUNAS
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1 truncate font-mono">Invoice: {activeReceipt.invoiceNumber}</p>
+                    <p className="text-xs text-gray-500 mt-1.5 truncate font-mono">Invoice: {activeReceipt.invoiceNumber}</p>
                   </div>
                 </div>
                 <button
@@ -847,7 +847,7 @@ export default function PaymentsPage() {
               </div>
 
               {/* Drawer Body */}
-              <div className="px-7 py-6 overflow-y-auto flex-1 space-y-4 text-xs">
+              <div className="px-8 py-6 overflow-y-auto flex-1 space-y-4 text-xs">
                 {/* Receipt Card */}
                 <div className="p-5 rounded-2xl bg-gray-50 border border-gray-200 space-y-4">
                   <div className="flex items-start justify-between border-b border-dashed border-gray-200 pb-3">
@@ -925,7 +925,7 @@ export default function PaymentsPage() {
               </div>
 
               {/* Drawer Sticky Footer */}
-              <div className="px-7 py-4.5 border-t border-gray-100 bg-gray-50/80 backdrop-blur-sm flex items-center justify-end gap-3 shrink-0 sticky bottom-0 z-10">
+              <div className="px-8 pt-5.5 pb-7 border-t border-gray-100 bg-gray-50/80 backdrop-blur-sm flex items-center justify-end gap-3 shrink-0 sticky bottom-0 z-10">
                 <button
                   type="button"
                   onClick={() => setActiveReceipt(null)}
@@ -964,7 +964,7 @@ export default function PaymentsPage() {
           <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none">
             <div className="w-screen max-w-xl bg-white shadow-2xl border border-gray-200/90 rounded-3xl flex flex-col animate-slide-left overflow-hidden ring-1 ring-black/10 pointer-events-auto">
               {/* Drawer Header (Ref: Modern SaaS Floating Drawer) */}
-              <div className="px-7 pt-6 pb-5.5 border-b border-gray-200/80 flex items-center justify-between bg-white/95 backdrop-blur-md shrink-0 sticky top-0 z-20 shadow-2xs">
+              <div className="px-8 pt-7 pb-7.5 border-b border-gray-200/80 flex items-center justify-between bg-white/95 backdrop-blur-md shrink-0 sticky top-0 z-20 shadow-2xs">
                 <div className="flex items-center gap-4 min-w-0">
                   <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-pink-500/15 to-[#DE5795]/20 border border-[#DE5795]/30 flex items-center justify-center text-[#9D174D] shadow-xs shrink-0">
                     <Banknote className="w-5 h-5 text-[#DE5795]" />
@@ -976,7 +976,7 @@ export default function PaymentsPage() {
                         Manual POS
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1 truncate">
+                    <p className="text-xs text-gray-500 mt-1.5 truncate">
                       Entri transaksi tunai kasir, debit kartu EDC, atau transfer darurat
                     </p>
                   </div>
@@ -993,7 +993,7 @@ export default function PaymentsPage() {
 
               {/* Form Body */}
               <form onSubmit={handleSaveManualPayment} className="flex-1 flex flex-col min-h-0">
-                <div className="px-7 py-6 overflow-y-auto flex-1 space-y-5 text-xs">
+                <div className="px-8 py-6 overflow-y-auto flex-1 space-y-5 text-xs">
                   {/* Metode Pembayaran Segmented Buttons */}
                   <div className="space-y-2">
                     <label className="text-[11px] font-semibold text-gray-600 block">Pilih Jalur Pembayaran:</label>
@@ -1126,7 +1126,7 @@ export default function PaymentsPage() {
                 </div>
 
                 {/* Drawer Sticky Footer */}
-                <div className="px-7 py-4.5 border-t border-gray-200/80 bg-white/95 backdrop-blur-md flex items-center justify-between gap-3 shrink-0 sticky bottom-0 z-20 shadow-xs">
+                <div className="px-8 pt-5.5 pb-7 border-t border-gray-200/80 bg-white/95 backdrop-blur-md flex items-center justify-between gap-3 shrink-0 sticky bottom-0 z-20 shadow-xs">
                   <span className="text-[11px] text-gray-400 hidden sm:inline">
                     Tekan <kbd className="px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200 font-mono text-[10px] text-gray-500">ESC</kbd> untuk membatalkan
                   </span>

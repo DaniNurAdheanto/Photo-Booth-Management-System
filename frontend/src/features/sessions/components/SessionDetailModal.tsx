@@ -54,7 +54,7 @@ export function SessionDetailModal({
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none">
         <div className="w-screen max-w-2xl bg-white shadow-2xl border border-gray-200/90 rounded-3xl flex flex-col animate-slide-left overflow-hidden ring-1 ring-black/10 pointer-events-auto">
           {/* Drawer Header (Ref: Modern SaaS Floating Drawer) */}
-          <div className="px-7 pt-6 pb-5.5 border-b border-gray-200/80 flex items-center justify-between bg-white/95 backdrop-blur-md shrink-0 sticky top-0 z-20 shadow-2xs">
+          <div className="px-8 pt-7 pb-7.5 border-b border-gray-200/80 flex items-center justify-between bg-white/95 backdrop-blur-md shrink-0 sticky top-0 z-20 shadow-2xs">
             <div className="flex items-center gap-4 min-w-0">
               <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-pink-500/15 to-[#DE5795]/20 border border-[#DE5795]/30 flex items-center justify-center text-[#9D174D] shadow-xs shrink-0">
                 <Camera className="w-5 h-5 text-[#DE5795]" />
@@ -76,7 +76,7 @@ export function SessionDetailModal({
                     {session.status}
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 mt-1 truncate">ID: {session.id} • Booth: {boothId}</p>
+                <p className="text-xs text-gray-500 mt-1.5 truncate">ID: {session.id} • Booth: {boothId}</p>
               </div>
             </div>
             <button
@@ -89,7 +89,7 @@ export function SessionDetailModal({
           </div>
 
           {/* Drawer Body */}
-          <div className="px-7 py-6 overflow-y-auto flex-1 space-y-6 text-xs">
+          <div className="px-8 py-6 overflow-y-auto flex-1 space-y-6 text-xs">
           {/* Key Metrics Strip */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
@@ -187,7 +187,7 @@ export function SessionDetailModal({
         </div>
 
           {/* Drawer Sticky Footer */}
-          <div className="px-7 py-4.5 border-t border-gray-200/80 bg-white/95 backdrop-blur-md flex items-center justify-between gap-3 shrink-0 sticky bottom-0 z-20 shadow-xs">
+          <div className="px-8 pt-5.5 pb-7 border-t border-gray-200/80 bg-white/95 backdrop-blur-md flex items-center justify-between gap-3 shrink-0 sticky bottom-0 z-20 shadow-xs">
             <div>
               {session.status !== 'COMPLETED' && session.status !== 'CANCELLED' && onCancelSession && (
                 <button

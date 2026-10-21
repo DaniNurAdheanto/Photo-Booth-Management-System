@@ -569,7 +569,7 @@ export default function TemplatesPage() {
           <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none">
             <div className="w-screen max-w-2xl bg-white shadow-2xl border border-gray-200/90 rounded-3xl flex flex-col animate-slide-left overflow-hidden ring-1 ring-black/10 pointer-events-auto">
               {/* Drawer Header */}
-              <div className="px-7 pt-6 pb-5.5 border-b border-gray-200/80 flex items-center justify-between bg-white/95 backdrop-blur-md shrink-0 sticky top-0 z-20 shadow-2xs">
+              <div className="px-8 pt-7 pb-7.5 border-b border-gray-200/80 flex items-center justify-between bg-white/95 backdrop-blur-md shrink-0 sticky top-0 z-20 shadow-2xs">
                 <div className="flex items-center gap-4 min-w-0">
                   <div className="w-11 h-11 rounded-2xl bg-[#DE5795]/15 border border-[#DE5795]/30 flex items-center justify-center text-[#9D174D] shadow-xs shrink-0">
                     <BookOpen className="w-5 h-5 text-[#DE5795]" />
@@ -581,7 +581,7 @@ export default function TemplatesPage() {
                         Preset Hub
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1 truncate">
+                    <p className="text-xs text-gray-500 mt-1.5 truncate">
                       Pilih preset profesional siap pakai untuk langsung ditambahkan ke sistem booth
                     </p>
                   </div>
@@ -597,7 +597,7 @@ export default function TemplatesPage() {
               </div>
 
               {/* Drawer Body */}
-              <div className="px-7 py-6 overflow-y-auto flex-1 space-y-4">
+              <div className="px-8 py-6 overflow-y-auto flex-1 space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {CURATED_LIBRARY_PRESETS.map((preset, idx) => (
                     <div
@@ -629,7 +629,7 @@ export default function TemplatesPage() {
               </div>
 
               {/* Drawer Sticky Footer */}
-              <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/80 backdrop-blur-sm flex items-center justify-end gap-3 shrink-0 sticky bottom-0 z-10">
+              <div className="px-8 pt-5.5 pb-7 border-t border-gray-100 bg-gray-50/80 backdrop-blur-sm flex items-center justify-end gap-3 shrink-0 sticky bottom-0 z-10">
                 <button
                   type="button"
                   onClick={() => setIsLibraryOpen(false)}
