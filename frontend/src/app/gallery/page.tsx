@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import {
   Images,
@@ -40,6 +41,7 @@ import {
   Film
 } from 'lucide-react';
 import { GalleryMediaItem, CloudAlbum, DownloadAccessLog, MediaType } from '@/features/gallery/types/gallery.types';
+import { useLanguage } from '@/context/language-context';
 
 // Sample Albums
 const INITIAL_ALBUMS: CloudAlbum[] = [
@@ -289,6 +291,7 @@ const SAMPLE_LOGS: DownloadAccessLog[] = [
 ];
 
 export default function GalleryPage() {
+  const { t, language } = useLanguage();
   const [albums, setAlbums] = useState<CloudAlbum[]>(INITIAL_ALBUMS);
   const [mediaList, setMediaList] = useState<GalleryMediaItem[]>(INITIAL_MEDIA_ITEMS);
 
@@ -319,6 +322,39 @@ export default function GalleryPage() {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
   };
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const hasOpenOverlay = !!(activeMediaDetail || isNewAlbumDrawerOpen || mobilePreviewItem || qrModalItem);
+
+  // Close modals on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (mobilePreviewItem) setMobilePreviewItem(null);
+        else if (qrModalItem) setQrModalItem(null);
+        else if (activeMediaDetail) setActiveMediaDetail(null);
+        else if (isNewAlbumDrawerOpen) setIsNewAlbumDrawerOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mobilePreviewItem, qrModalItem, activeMediaDetail, isNewAlbumDrawerOpen]);
+
+  // Lock background scroll when modal/drawer is open
+  useEffect(() => {
+    if (hasOpenOverlay) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [hasOpenOverlay]);
 
   // Filter media logic
   const filteredMedia = mediaList.filter((item) => {
@@ -404,13 +440,13 @@ export default function GalleryPage() {
           <div className="flex items-center gap-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
             <span>PhotoBooth OS</span>
             <span>•</span>
-            <span className="text-[#DE5795]">Konten & Media</span>
+            <span className="text-[#DE5795]">{language === 'en' ? 'Content & Media' : 'Konten & Media'}</span>
             <span>•</span>
-            <span>Galeri Cloud</span>
+            <span>{language === 'en' ? 'Cloud Gallery' : 'Galeri Cloud'}</span>
           </div>
           <div className="flex items-center gap-2.5">
             <h1 className="text-2xl font-bold tracking-tight text-gray-900 font-sora">
-              Galeri Tamu & Cloud Delivery
+              {t('gallery.title', undefined, 'Galeri Tamu & Cloud Delivery')}
             </h1>
             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-pink-50 text-[#9D174D] border border-pink-200">
               <Cloud className="w-3 h-3 text-[#DE5795]" />
@@ -418,7 +454,7 @@ export default function GalleryPage() {
             </span>
           </div>
           <p className="text-xs text-gray-500 mt-1">
-            Penyimpanan media cloud resolusi tinggi, portal download QR code tamu, dan arsip album foto event.
+            {t('gallery.subtitle', undefined, 'Penyimpanan media cloud resolusi tinggi, portal download QR code tamu, dan arsip album foto event.')}
           </p>
         </div>
 
@@ -426,11 +462,11 @@ export default function GalleryPage() {
         <div className="flex items-center gap-2.5">
           <button
             type="button"
-            onClick={() => showToast('Mengompres arsip event... Unduhan ZIP 142 foto segera dimulai!')}
+            onClick={() => showToast(language === 'en' ? 'Compressing event archive... ZIP download starting!' : 'Mengompres arsip event... Unduhan ZIP 142 foto segera dimulai!')}
             className="px-4 py-2.5 rounded-xl border border-gray-200/90 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-2xs flex items-center gap-2"
           >
             <FileArchive className="w-4 h-4 text-gray-500" />
-            <span>Unduh Semua ZIP Event</span>
+            <span>{language === 'en' ? 'Download All Event ZIP' : 'Unduh Semua ZIP Event'}</span>
           </button>
 
           <button
@@ -439,7 +475,7 @@ export default function GalleryPage() {
             className="px-4.5 py-2.5 rounded-xl bg-[#DE5795] text-white text-xs font-bold hover:bg-[#c93d7e] transition-all border border-[#DE5795] shadow-xs flex items-center gap-2 active:scale-98"
           >
             <FolderPlus className="w-4 h-4 text-white" />
-            <span>+ Buat Album Event Baru</span>
+            <span>{language === 'en' ? '+ Create New Event Album' : '+ Buat Album Event Baru'}</span>
           </button>
         </div>
       </div>
@@ -449,61 +485,61 @@ export default function GalleryPage() {
         {/* Card 1: Total Media Cloud */}
         <div className="p-5 rounded-2xl bg-white border border-gray-200/90 shadow-2xs space-y-2 hover:border-gray-300 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-500">Total Media Cloud</span>
+            <span className="text-xs font-semibold text-gray-500">{language === 'en' ? 'Total Cloud Media' : 'Total Media Cloud'}</span>
             <div className="w-8 h-8 rounded-xl bg-pink-50 text-[#DE5795] flex items-center justify-center">
               <Images className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-extrabold text-gray-900 tracking-tight">2.840</span>
-            <span className="text-xs font-medium text-gray-500">File Tersimpan</span>
+            <span className="text-xs font-medium text-gray-500">{language === 'en' ? 'Files Stored' : 'File Tersimpan'}</span>
           </div>
           <div className="flex items-center gap-1.5 text-[11px] text-gray-500 pt-1 border-t border-gray-100">
             <HardDrive className="w-3.5 h-3.5 text-[#DE5795]" />
-            <span>14.2 GB / 50 GB Kuota Cloud</span>
+            <span>{language === 'en' ? '14.2 GB / 50 GB Cloud Quota' : '14.2 GB / 50 GB Kuota Cloud'}</span>
           </div>
         </div>
 
         {/* Card 2: Download Sesi Tamu */}
         <div className="p-5 rounded-2xl bg-white border border-gray-200/90 shadow-2xs space-y-2 hover:border-gray-300 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-500">Download oleh Tamu</span>
+            <span className="text-xs font-semibold text-gray-500">{language === 'en' ? 'Guest Downloads' : 'Download oleh Tamu'}</span>
             <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <Download className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-extrabold text-gray-900 tracking-tight">1.928</span>
-            <span className="text-xs font-bold text-emerald-600">+18% vs mgg lalu</span>
+            <span className="text-xs font-bold text-emerald-600">{language === 'en' ? '+18% vs last week' : '+18% vs mgg lalu'}</span>
           </div>
           <div className="flex items-center gap-1.5 text-[11px] text-gray-500 pt-1 border-t border-gray-100">
             <QrCode className="w-3.5 h-3.5 text-emerald-600" />
-            <span>68% tamu langsung scan QR di struk</span>
+            <span>{language === 'en' ? '68% guests scanned receipt QR' : '68% tamu langsung scan QR di struk'}</span>
           </div>
         </div>
 
         {/* Card 3: Album Event Aktif */}
         <div className="p-5 rounded-2xl bg-white border border-gray-200/90 shadow-2xs space-y-2 hover:border-gray-300 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-500">Album Event Terarsip</span>
+            <span className="text-xs font-semibold text-gray-500">{language === 'en' ? 'Archived Event Albums' : 'Album Event Terarsip'}</span>
             <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
               <Calendar className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-extrabold text-gray-900 tracking-tight">{albums.length}</span>
-            <span className="text-xs font-medium text-gray-500">Album Aktif</span>
+            <span className="text-xs font-medium text-gray-500">{language === 'en' ? 'Active Albums' : 'Album Aktif'}</span>
           </div>
           <div className="flex items-center gap-1.5 text-[11px] text-gray-500 pt-1 border-t border-gray-100">
             <Flame className="w-3.5 h-3.5 text-amber-500" />
-            <span>3 Event berlangsung minggu ini</span>
+            <span>{language === 'en' ? '3 Events taking place this week' : '3 Event berlangsung minggu ini'}</span>
           </div>
         </div>
 
         {/* Card 4: Status CDN & Link Tamu */}
         <div className="p-5 rounded-2xl bg-white border border-gray-200/90 shadow-2xs space-y-2 hover:border-gray-300 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-500">Portal Tamu & CDN</span>
+            <span className="text-xs font-semibold text-gray-500">{language === 'en' ? 'Guest Portal & CDN' : 'Portal Tamu & CDN'}</span>
             <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
               <Globe className="w-4 h-4" />
             </div>
@@ -525,28 +561,28 @@ export default function GalleryPage() {
           <div className="flex items-center justify-between text-xs font-semibold">
             <span className="text-gray-700 flex items-center gap-1.5">
               <Cloud className="w-4 h-4 text-[#DE5795]" />
-              Kapasitas Penyimpanan Cloudflare R2 / AWS S3
+              {language === 'en' ? 'Cloudflare R2 / AWS S3 Cloud Storage Capacity' : 'Kapasitas Penyimpanan Cloudflare R2 / AWS S3'}
             </span>
-            <span className="text-gray-900 font-mono">14.2 GB / 50.0 GB (28.4% Terpakai)</span>
+            <span className="text-gray-900 font-mono">14.2 GB / 50.0 GB ({language === 'en' ? '28.4% Used' : '28.4% Terpakai'})</span>
           </div>
           {/* Multi-segmented Progress Bar */}
           <div className="w-full h-2.5 rounded-full bg-gray-100 overflow-hidden flex">
-            <div className="bg-[#DE5795] h-full" style={{ width: '18.8%' }} title="Foto Cetak Asli HD (9.4 GB)" />
-            <div className="bg-pink-300 h-full" style={{ width: '6.4%' }} title="Animasi GIF & Video (3.2 GB)" />
-            <div className="bg-emerald-400 h-full" style={{ width: '3.2%' }} title="Thumbnail & QR Struk (1.6 GB)" />
+            <div className="bg-[#DE5795] h-full" style={{ width: '18.8%' }} title={language === 'en' ? 'Original HD Prints (9.4 GB)' : 'Foto Cetak Asli HD (9.4 GB)'} />
+            <div className="bg-pink-300 h-full" style={{ width: '6.4%' }} title={language === 'en' ? 'Animated GIFs & Video (3.2 GB)' : 'Animasi GIF & Video (3.2 GB)'} />
+            <div className="bg-emerald-400 h-full" style={{ width: '3.2%' }} title={language === 'en' ? 'Thumbnails & Receipt QRs (1.6 GB)' : 'Thumbnail & QR Struk (1.6 GB)'} />
           </div>
           <div className="flex items-center gap-4 text-[11px] text-gray-500 pt-0.5">
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-[#DE5795]" />
-              Foto HD (9.4 GB)
+              {language === 'en' ? 'HD Photos (9.4 GB)' : 'Foto HD (9.4 GB)'}
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-pink-300" />
-              GIF Animasi (3.2 GB)
+              {language === 'en' ? 'Animated GIF (3.2 GB)' : 'GIF Animasi (3.2 GB)'}
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-400" />
-              Thumbnail & QR (1.6 GB)
+              {language === 'en' ? 'Thumbnails & QR (1.6 GB)' : 'Thumbnail & QR (1.6 GB)'}
             </span>
           </div>
         </div>
@@ -554,7 +590,7 @@ export default function GalleryPage() {
         <div className="flex items-center gap-2 shrink-0">
           <button
             type="button"
-            onClick={() => showToast('Sinkronisasi CDN Cloudflare R2 selesai!')}
+            onClick={() => showToast(language === 'en' ? 'Cloudflare R2 CDN synchronization complete!' : 'Sinkronisasi CDN Cloudflare R2 selesai!')}
             className="px-3.5 py-2 rounded-xl border border-gray-200/90 bg-gray-50 text-xs font-semibold text-gray-700 hover:bg-gray-100 transition-colors shadow-2xs flex items-center gap-1.5"
           >
             <RefreshCw className="w-3.5 h-3.5 text-gray-500" />
@@ -567,9 +603,9 @@ export default function GalleryPage() {
       <div className="p-4 rounded-2xl bg-white border border-gray-200/90 shadow-2xs space-y-2.5">
         <div className="flex items-center justify-between">
           <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
-            Pilih Album Acara / Kios:
+            {language === 'en' ? 'Select Event / Kiosk Album:' : 'Pilih Album Acara / Kios:'}
           </label>
-          <span className="text-xs text-gray-400 font-medium">{albums.length} Album Terdaftar</span>
+          <span className="text-xs text-gray-400 font-medium">{albums.length} {language === 'en' ? 'Registered Albums' : 'Album Terdaftar'}</span>
         </div>
 
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
@@ -582,7 +618,7 @@ export default function GalleryPage() {
                 : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
             }`}
           >
-            Semua Album ({mediaList.length})
+            {language === 'en' ? 'All Albums' : 'Semua Album'} ({mediaList.length})
           </button>
 
           {albums.map((album) => {
@@ -617,7 +653,7 @@ export default function GalleryPage() {
           <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
-            placeholder="Cari kode sesi (mis: PB-SES-8821), nama tamu, atau email..."
+            placeholder={language === 'en' ? 'Search session code (e.g. PB-SES-8821), guest name, or email...' : 'Cari kode sesi (mis: PB-SES-8821), nama tamu, atau email...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-4 py-2.5 text-xs bg-gray-50/70 border border-gray-200 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-hidden focus:bg-white focus:border-[#DE5795] focus:ring-3 focus:ring-[#DE5795]/10 transition-all"
@@ -632,11 +668,11 @@ export default function GalleryPage() {
             onChange={(e) => setSelectedMediaType(e.target.value)}
             className="px-3 py-2 text-xs rounded-xl border border-gray-200 bg-white font-medium text-gray-700 focus:outline-hidden focus:border-[#DE5795]"
           >
-            <option value="ALL">Semua Format Media</option>
-            <option value="STRIP_2X6">Strip Foto 2x6 (HD)</option>
-            <option value="POSTCARD_4X6">Postcard 4x6 (HD)</option>
-            <option value="GIF_ANIMATED">Animasi GIF Loop</option>
-            <option value="BOOMERANG_MP4">Video Boomerang MP4</option>
+            <option value="ALL">{language === 'en' ? 'All Media Formats' : 'Semua Format Media'}</option>
+            <option value="STRIP_2X6">{language === 'en' ? 'Photo Strip 2x6 (HD)' : 'Strip Foto 2x6 (HD)'}</option>
+            <option value="POSTCARD_4X6">{language === 'en' ? 'Postcard 4x6 (HD)' : 'Postcard 4x6 (HD)'}</option>
+            <option value="GIF_ANIMATED">{language === 'en' ? 'Loop GIF Animation' : 'Animasi GIF Loop'}</option>
+            <option value="BOOMERANG_MP4">{language === 'en' ? 'Boomerang MP4 Video' : 'Video Boomerang MP4'}</option>
           </select>
 
           {/* Download Status Filter */}
@@ -645,10 +681,10 @@ export default function GalleryPage() {
             onChange={(e) => setDownloadFilter(e.target.value)}
             className="px-3 py-2 text-xs rounded-xl border border-gray-200 bg-white font-medium text-gray-700 focus:outline-hidden focus:border-[#DE5795]"
           >
-            <option value="ALL">Semua Status Unduh</option>
-            <option value="DOWNLOADED">Sudah Diunduh Tamu</option>
-            <option value="NOT_DOWNLOADED">Belum Diunduh Tamu</option>
-            <option value="PIN">Diproteksi PIN Akses</option>
+            <option value="ALL">{language === 'en' ? 'All Download Status' : 'Semua Status Unduh'}</option>
+            <option value="DOWNLOADED">{language === 'en' ? 'Downloaded by Guest' : 'Sudah Diunduh Tamu'}</option>
+            <option value="NOT_DOWNLOADED">{language === 'en' ? 'Pending Download' : 'Belum Diunduh Tamu'}</option>
+            <option value="PIN">{language === 'en' ? 'PIN Protected' : 'Diproteksi PIN Akses'}</option>
           </select>
 
           {/* Sort By */}
@@ -657,9 +693,9 @@ export default function GalleryPage() {
             onChange={(e) => setSortBy(e.target.value as any)}
             className="px-3 py-2 text-xs rounded-xl border border-gray-200 bg-white font-medium text-gray-700 focus:outline-hidden focus:border-[#DE5795]"
           >
-            <option value="NEWEST">Waktu Terbaru</option>
-            <option value="DOWNLOADS">Paling Sering Diunduh</option>
-            <option value="SIZE">Ukuran File Terbesar</option>
+            <option value="NEWEST">{language === 'en' ? 'Sort: Newest' : 'Waktu Terbaru'}</option>
+            <option value="DOWNLOADS">{language === 'en' ? 'Sort: Most Downloaded' : 'Paling Sering Diunduh'}</option>
+            <option value="SIZE">{language === 'en' ? 'Sort: Largest File Size' : 'Ukuran File Terbesar'}</option>
           </select>
         </div>
       </div>
@@ -669,91 +705,116 @@ export default function GalleryPage() {
         {filteredMedia.map((item) => (
           <div
             key={item.id}
-            className="bg-white rounded-3xl border border-gray-200/90 shadow-2xs hover:shadow-md hover:border-gray-300 transition-all overflow-hidden flex flex-col group"
+            className="bg-white rounded-3xl border border-gray-200/80 hover:border-pink-300 shadow-2xs hover:shadow-xl hover:shadow-pink-500/5 transition-all duration-300 overflow-hidden flex flex-col group"
           >
             {/* Media Image Thumbnail Container */}
-            <div className="relative aspect-4/3 bg-gray-100 overflow-hidden cursor-pointer" onClick={() => setMobilePreviewItem(item)}>
+            <div
+              className="relative aspect-[16/10] bg-gray-950 overflow-hidden cursor-pointer"
+              onClick={() => setMobilePreviewItem(item)}
+            >
               <img
                 src={item.previewUrl}
                 alt={item.customerName}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
               />
 
-              {/* Format Badge Overlay */}
-              <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                <span className="px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md text-white font-mono font-bold text-[10px] tracking-wider shadow-sm">
-                  {item.mediaType.replace('_', ' ')}
+              {/* Format & Protection Badges (Top Left) */}
+              <div className="absolute top-3 left-3 flex items-center gap-1.5 pointer-events-none">
+                <span className="px-2.5 py-1 rounded-full bg-black/65 backdrop-blur-md text-white border border-white/15 font-mono font-bold text-[10px] tracking-wider shadow-xs flex items-center gap-1.5">
+                  {item.mediaType === 'STRIP_2X6' && <Film className="w-3 h-3 text-pink-400" />}
+                  {item.mediaType === 'POSTCARD_4X6' && <FileImage className="w-3 h-3 text-sky-400" />}
+                  {item.mediaType === 'GIF_ANIMATED' && <Sparkles className="w-3 h-3 text-amber-400" />}
+                  {item.mediaType === 'BOOMERANG_MP4' && <Sparkles className="w-3 h-3 text-purple-400" />}
+                  <span>{item.mediaType.replace('_', ' ')}</span>
                 </span>
                 {item.isPinProtected && (
-                  <span className="px-2 py-1 rounded-full bg-amber-500/90 backdrop-blur-md text-white text-[10px] font-bold flex items-center gap-1 shadow-sm">
+                  <span className="px-2 py-1 rounded-full bg-amber-500/90 backdrop-blur-md text-white text-[10px] font-bold flex items-center gap-1 shadow-xs border border-amber-400/40">
                     <Lock className="w-2.5 h-2.5" />
-                    PIN
+                    <span>PIN</span>
                   </span>
                 )}
               </div>
 
-              {/* Download Count Pill */}
-              <div className="absolute top-3 right-3">
-                <span className="px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-gray-800 font-semibold text-[10px] shadow-sm flex items-center gap-1">
+              {/* Download Count Pill (Top Right) */}
+              <div className="absolute top-3 right-3 pointer-events-none">
+                <span className="px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-gray-800 font-semibold text-[10px] shadow-xs flex items-center gap-1 border border-white/50">
                   <Download className="w-3 h-3 text-[#DE5795]" />
-                  {item.downloadCount}x Diunduh
+                  <span>{item.downloadCount}x Unduh</span>
                 </span>
               </div>
 
               {/* Hover Quick Action Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-4">
-                <span className="text-white text-xs font-semibold flex items-center gap-1.5">
-                  <Eye className="w-4 h-4 text-pink-300" />
-                  Buka Portal Tamu
+              <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center p-4">
+                <span className="px-4 py-2 rounded-full bg-white/95 text-gray-900 font-bold text-xs shadow-xl backdrop-blur-md flex items-center gap-2 transform group-hover:scale-100 scale-95 transition-transform duration-200">
+                  <Eye className="w-3.5 h-3.5 text-[#DE5795]" />
+                  <span>Buka Portal Tamu</span>
                 </span>
-                <span className="text-white/80 text-[10px] font-mono">{item.fileSizeMb} MB</span>
               </div>
             </div>
 
             {/* Media Card Content */}
-            <div className="p-4.5 space-y-3.5 flex-1 flex flex-col justify-between">
-              <div>
+            <div className="p-5 space-y-4 flex-1 flex flex-col justify-between">
+              <div className="space-y-3">
+                {/* Session ID & Time Header */}
                 <div className="flex items-center justify-between">
-                  <span className="px-2 py-0.5 rounded-md bg-gray-100 text-gray-700 font-mono font-bold text-[11px] border border-gray-200">
+                  <span className="px-2.5 py-0.5 rounded-lg bg-pink-50 text-[#9D174D] border border-pink-200/80 font-mono font-bold text-[11px] shadow-2xs">
                     {item.sessionCode}
                   </span>
-                  <span className="text-[11px] text-gray-400 font-medium">
-                    {item.createdAt.split('•')[1] || item.createdAt}
+                  <span className="text-[11px] text-gray-400 font-medium flex items-center gap-1">
+                    <Clock className="w-3 h-3 text-gray-300" />
+                    <span>{item.createdAt.includes('•') ? item.createdAt.split('•')[1].trim() : item.createdAt}</span>
                   </span>
                 </div>
 
-                <h3 className="font-bold text-gray-900 text-sm mt-2 truncate">
-                  {item.customerName}
-                </h3>
-                <p className="text-xs text-gray-500 truncate mt-0.5 flex items-center gap-1">
-                  <Store className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                  <span>{item.eventName}</span>
-                </p>
+                {/* Customer Name & Event */}
+                <div>
+                  <h3 className="font-bold text-gray-900 text-sm leading-snug truncate group-hover:text-[#DE5795] transition-colors">
+                    {item.customerName}
+                  </h3>
+                  <p className="text-xs text-gray-500 truncate mt-1 flex items-center gap-1.5">
+                    <Store className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                    <span className="truncate">{item.eventName}</span>
+                  </p>
+                </div>
+
+                {/* Key Metrics Chips (Cetak Fisik, Ukuran Cloud, Masa Aktif) */}
+                <div className="grid grid-cols-3 gap-2 pt-1">
+                  <div className="px-2.5 py-2 rounded-xl bg-gray-50/80 border border-gray-100 text-center">
+                    <div className="text-[10px] text-gray-400 font-medium">{language === 'en' ? 'Print Copies' : 'Cetak Fisik'}</div>
+                    <div className="text-xs font-bold text-gray-800 mt-0.5">{item.printCopies} {language === 'en' ? 'Sheets' : 'Lbr'}</div>
+                  </div>
+                  <div className="px-2.5 py-2 rounded-xl bg-gray-50/80 border border-gray-100 text-center">
+                    <div className="text-[10px] text-gray-400 font-medium">{language === 'en' ? 'Cloud Size' : 'Ukuran Cloud'}</div>
+                    <div className="text-xs font-bold text-gray-800 mt-0.5 font-mono">{item.fileSizeMb} MB</div>
+                  </div>
+                  <div className="px-2.5 py-2 rounded-xl bg-gray-50/80 border border-gray-100 text-center">
+                    <div className="text-[10px] text-gray-400 font-medium">{language === 'en' ? 'Expiry' : 'Masa Aktif'}</div>
+                    <div className="text-xs font-bold text-emerald-600 mt-0.5 flex items-center justify-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      <span>{item.expiryDays} {language === 'en' ? 'Days' : 'Hari'}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {/* File details strip */}
-              <div className="p-2.5 rounded-xl bg-gray-50/80 border border-gray-100 flex items-center justify-between text-[11px] text-gray-500">
-                <span>{item.printCopies} Lembar Cetak</span>
-                <span>Masa Aktif: {item.expiryDays} Hari</span>
-              </div>
-
-              {/* Card Action Buttons Bar */}
-              <div className="grid grid-cols-4 gap-1.5 pt-1">
-                {/* 1. Mobile Phone Simulation */}
+              {/* Refined Action Buttons Bar */}
+              <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+                {/* 1. Primary Button: Layar HP Tamu */}
                 <button
                   type="button"
                   onClick={() => setMobilePreviewItem(item)}
-                  className="py-2 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 font-semibold text-xs flex items-center justify-center transition-colors shadow-2xs"
-                  title="Simulasi Portal Tamu (Layar HP)"
+                  className="flex-1 py-2 px-3 rounded-xl bg-pink-50 hover:bg-[#DE5795] text-[#9D174D] hover:text-white font-bold text-xs flex items-center justify-center gap-1.5 border border-pink-200/90 hover:border-[#DE5795] transition-all shadow-2xs group/btn active:scale-98"
+                  title={language === 'en' ? 'Guest Mobile Portal Simulation' : 'Simulasi Portal Tamu (Layar HP)'}
                 >
-                  <Smartphone className="w-4 h-4 text-[#DE5795]" />
+                  <Smartphone className="w-3.5 h-3.5 text-[#DE5795] group-hover/btn:text-white transition-colors" />
+                  <span>{language === 'en' ? 'Mobile View' : 'Layar HP'}</span>
                 </button>
 
                 {/* 2. QR Code Popover */}
                 <button
                   type="button"
                   onClick={() => setQrModalItem(item)}
-                  className="py-2 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 font-semibold text-xs flex items-center justify-center transition-colors shadow-2xs"
+                  className="p-2 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 hover:text-gray-900 transition-colors shadow-2xs active:scale-95"
                   title="Tampilkan QR Code Tamu"
                 >
                   <QrCode className="w-4 h-4 text-gray-600" />
@@ -763,7 +824,7 @@ export default function GalleryPage() {
                 <button
                   type="button"
                   onClick={() => handleCopyLink(item.portalUrl)}
-                  className="py-2 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 font-semibold text-xs flex items-center justify-center transition-colors shadow-2xs"
+                  className="p-2 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 hover:text-gray-900 transition-colors shadow-2xs active:scale-95"
                   title="Salin Link Download Tamu"
                 >
                   <Copy className="w-4 h-4 text-gray-600" />
@@ -773,10 +834,10 @@ export default function GalleryPage() {
                 <button
                   type="button"
                   onClick={() => setActiveMediaDetail(item)}
-                  className="py-2 rounded-xl bg-[#DE5795]/10 hover:bg-[#DE5795]/20 border border-[#DE5795]/30 text-[#9D174D] font-bold text-xs flex items-center justify-center transition-colors shadow-2xs"
+                  className="p-2 rounded-xl bg-gray-50 hover:bg-[#DE5795]/15 border border-gray-200 hover:border-pink-300 text-gray-700 hover:text-[#9D174D] transition-colors shadow-2xs active:scale-95"
                   title="Konfigurasi Media & Log Download"
                 >
-                  <Sliders className="w-4 h-4 text-[#DE5795]" />
+                  <Sliders className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -787,19 +848,19 @@ export default function GalleryPage() {
       {/* ============================================================ */}
       {/* DRAWER 1: FLOATING SLIDE-OVER MEDIA DETAIL & CLOUD SETTINGS  */}
       {/* ============================================================ */}
-      {activeMediaDetail && (
-        <div className="fixed inset-0 z-50 overflow-hidden font-sora">
-          {/* Backdrop with smooth blur */}
+      {mounted && activeMediaDetail && createPortal(
+        <div className="fixed inset-0 z-[999] overflow-hidden font-sora">
+          {/* Backdrop with smooth blur covering full viewport */}
           <div
-            className="fixed inset-0 bg-gray-950/45 backdrop-blur-xs transition-opacity animate-fade-in"
+            className="fixed inset-0 bg-gray-950/60 backdrop-blur-xs transition-opacity animate-fade-in"
             onClick={() => setActiveMediaDetail(null)}
           />
 
-          <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none">
-            <div className="w-screen max-w-2xl bg-white shadow-2xl border border-gray-200/90 rounded-3xl flex flex-col animate-slide-left overflow-hidden ring-1 ring-black/10 pointer-events-auto">
-              {/* Drawer Header (With generous padding pb-7.5) */}
-              <div className="px-8 pt-7 pb-7.5 border-b border-gray-200/80 flex items-center justify-between bg-white/95 backdrop-blur-md shrink-0 sticky top-0 z-20 shadow-2xs">
-                <div className="flex items-center gap-4 min-w-0">
+          <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none z-[1000]">
+            <div className="w-screen max-w-2xl bg-white shadow-2xl border border-gray-100 rounded-3xl flex flex-col animate-slide-left overflow-hidden ring-1 ring-black/10 pointer-events-auto h-full">
+              {/* Drawer Header */}
+              <div className="px-7 sm:px-8 py-5 sm:py-6 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">
+                <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
                   <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-pink-500/15 to-[#DE5795]/20 border border-[#DE5795]/30 flex items-center justify-center text-[#9D174D] shadow-xs shrink-0">
                     <Images className="w-5 h-5 text-[#DE5795]" />
                   </div>
@@ -995,16 +1056,16 @@ export default function GalleryPage() {
                 </div>
               </div>
 
-              {/* Drawer Footer (px-8 pt-5.5 pb-7) */}
-              <div className="px-8 pt-5.5 pb-7 border-t border-gray-200/80 bg-white/95 backdrop-blur-md flex items-center justify-between gap-3 shrink-0 sticky bottom-0 z-20 shadow-xs">
+              {/* Drawer Footer (Clean, dedicated flex item, shrink-0, not sticky) */}
+              <div className="px-7 sm:px-8 py-4 sm:py-5 border-t border-gray-100 bg-gray-50/90 flex items-center justify-between gap-3 shrink-0">
                 <span className="text-[11px] text-gray-400 hidden sm:inline">
-                  Tekan <kbd className="px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200 font-mono text-[10px] text-gray-500">ESC</kbd> untuk menutup
+                  Tekan <kbd className="px-1.5 py-0.5 rounded bg-white border border-gray-200 font-mono text-[10px] text-gray-500 shadow-2xs">ESC</kbd> untuk menutup
                 </span>
                 <div className="flex items-center gap-2.5">
                   <button
                     type="button"
                     onClick={() => setActiveMediaDetail(null)}
-                    className="px-4 py-2.5 rounded-xl border border-gray-200/90 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-2xs"
+                    className="px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-100 transition-colors shadow-2xs"
                   >
                     Tutup
                   </button>
@@ -1023,25 +1084,26 @@ export default function GalleryPage() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ============================================================ */}
       {/* DRAWER 2: FLOATING SLIDE-OVER BUAT ALBUM EVENT BARU          */}
       {/* ============================================================ */}
-      {isNewAlbumDrawerOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden font-sora">
-          {/* Backdrop with smooth blur */}
+      {mounted && isNewAlbumDrawerOpen && createPortal(
+        <div className="fixed inset-0 z-[999] overflow-hidden font-sora">
+          {/* Backdrop with smooth blur covering full viewport */}
           <div
-            className="fixed inset-0 bg-gray-950/45 backdrop-blur-xs transition-opacity animate-fade-in"
+            className="fixed inset-0 bg-gray-950/60 backdrop-blur-xs transition-opacity animate-fade-in"
             onClick={() => setIsNewAlbumDrawerOpen(false)}
           />
 
-          <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none">
-            <div className="w-screen max-w-xl bg-white shadow-2xl border border-gray-200/90 rounded-3xl flex flex-col animate-slide-left overflow-hidden ring-1 ring-black/10 pointer-events-auto">
-              {/* Drawer Header (px-8 pt-7 pb-7.5) */}
-              <div className="px-8 pt-7 pb-7.5 border-b border-gray-200/80 flex items-center justify-between bg-white/95 backdrop-blur-md shrink-0 sticky top-0 z-20 shadow-2xs">
-                <div className="flex items-center gap-4 min-w-0">
+          <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none z-[1000]">
+            <div className="w-screen max-w-xl bg-white shadow-2xl border border-gray-100 rounded-3xl flex flex-col animate-slide-left overflow-hidden ring-1 ring-black/10 pointer-events-auto h-full">
+              {/* Drawer Header */}
+              <div className="px-7 sm:px-8 py-5 sm:py-6 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">
+                <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
                   <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-pink-500/15 to-[#DE5795]/20 border border-[#DE5795]/30 flex items-center justify-center text-[#9D174D] shadow-xs shrink-0">
                     <FolderPlus className="w-5 h-5 text-[#DE5795]" />
                   </div>
@@ -1050,11 +1112,11 @@ export default function GalleryPage() {
                       <h3 className="text-base font-bold text-gray-900 leading-tight">
                         Buat Album Event Baru
                       </h3>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-pink-50 text-[#9D174D] border border-pink-200 shadow-2xs">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-pink-50 text-[#9D174D] border border-pink-200 shadow-2xs font-mono">
                         Album Cloud
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1.5 truncate">
+                    <p className="text-xs text-gray-500 mt-1 truncate">
                       Buat wadah galeri khusus untuk event pernikahan, gathering, atau booth mall
                     </p>
                   </div>
@@ -1161,16 +1223,16 @@ export default function GalleryPage() {
                   </div>
                 </div>
 
-                {/* Drawer Footer (px-8 pt-5.5 pb-7) */}
-                <div className="px-8 pt-5.5 pb-7 border-t border-gray-200/80 bg-white/95 backdrop-blur-md flex items-center justify-between gap-3 shrink-0 sticky bottom-0 z-20 shadow-xs">
+                {/* Drawer Footer */}
+                <div className="px-7 sm:px-8 py-4 sm:py-5 border-t border-gray-100 bg-gray-50/90 flex items-center justify-between gap-3 shrink-0">
                   <span className="text-[11px] text-gray-400 hidden sm:inline">
-                    Tekan <kbd className="px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200 font-mono text-[10px] text-gray-500">ESC</kbd> untuk membatalkan
+                    Tekan <kbd className="px-1.5 py-0.5 rounded bg-white border border-gray-200 font-mono text-[10px] text-gray-500 shadow-2xs">ESC</kbd> untuk membatalkan
                   </span>
-                  <div className="flex items-center gap-2.5">
+                  <div className="flex items-center gap-2.5 ml-auto">
                     <button
                       type="button"
                       onClick={() => setIsNewAlbumDrawerOpen(false)}
-                      className="px-4 py-2.5 rounded-xl border border-gray-200/90 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-2xs"
+                      className="px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-100 transition-colors shadow-2xs"
                     >
                       Batal
                     </button>
@@ -1186,15 +1248,20 @@ export default function GalleryPage() {
               </form>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ============================================================ */}
       {/* MODAL 3: SIMULASI PORTAL LAYAR HP TAMU (GUEST SMARTPHONE UI) */}
       {/* ============================================================ */}
-      {mobilePreviewItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/70 backdrop-blur-sm animate-fade-in font-sora">
-          <div className="relative w-full max-w-sm rounded-[40px] bg-gray-900 p-3 shadow-2xl border-4 border-gray-800 text-white flex flex-col overflow-hidden max-h-[92vh]">
+      {mounted && mobilePreviewItem && createPortal(
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 font-sora">
+          <div
+            className="fixed inset-0 bg-gray-950/60 backdrop-blur-xs transition-opacity animate-fade-in"
+            onClick={() => setMobilePreviewItem(null)}
+          />
+          <div className="relative z-[1000] w-full max-w-sm rounded-[40px] bg-gray-900 p-3 shadow-2xl border-4 border-gray-800 text-white flex flex-col overflow-hidden max-h-[92vh] animate-slide-up">
             {/* Top Phone Speaker / Dynamic Island Mockup */}
             <div className="h-6 w-full flex items-center justify-between px-6 pt-1 select-none">
               <span className="text-[10px] font-semibold text-gray-400">09:41</span>
@@ -1285,15 +1352,20 @@ export default function GalleryPage() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ============================================================ */}
       {/* MODAL 4: QR CODE POPUP MODAL UNTUK DI-SCAN TAMU             */}
       {/* ============================================================ */}
-      {qrModalItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/70 backdrop-blur-sm animate-fade-in font-sora">
-          <div className="relative w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl border border-gray-200 text-center space-y-4">
+      {mounted && qrModalItem && createPortal(
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 font-sora">
+          <div
+            className="fixed inset-0 bg-gray-950/60 backdrop-blur-xs transition-opacity animate-fade-in"
+            onClick={() => setQrModalItem(null)}
+          />
+          <div className="relative z-[1000] w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl border border-gray-100 text-center space-y-4">
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
               <div className="flex items-center gap-2">
                 <QrCode className="w-5 h-5 text-[#DE5795]" />
@@ -1341,7 +1413,8 @@ export default function GalleryPage() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

@@ -1,8 +1,13 @@
+'use client';
+
 import React from 'react';
-import { Camera, Server, Database, Activity, Search, Bell, Sparkles } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Camera, Search, Bell } from 'lucide-react';
+import { useLanguage } from '@/context/language-context';
+import { LanguageSelector } from '@/components/ui/language-selector';
 
 export function Header() {
+  const { t } = useLanguage();
+
   return (
     <header className="sticky top-0 z-30 border-b border-gray-200 bg-white/95 backdrop-blur-md">
       <div className="flex h-16 items-center justify-between px-6 lg:px-8">
@@ -14,22 +19,24 @@ export function Header() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-sm font-bold tracking-tight text-gray-900 font-sora">
-                PhotoBooth OS
+                {t('header.brandTitle', undefined, 'PhotoBooth OS')}
               </h1>
               <span className="hidden sm:inline-block px-2 py-0.5 text-[10px] font-semibold bg-[#DE5795]/15 text-[#9D174D] rounded-full border border-[#DE5795]/30">
-                Operasional
+                {t('header.operationalBadge', undefined, 'Operasional')}
               </span>
             </div>
-            <p className="text-xs text-gray-500 font-medium">Sistem Manajemen & Kiosk Foto</p>
+            <p className="text-xs text-gray-500 font-medium">
+              {t('header.subtitle', undefined, 'Sistem Manajemen & Kiosk Foto')}
+            </p>
           </div>
         </div>
 
-        {/* Search Bar - User Friendly */}
+        {/* Search Bar */}
         <div className="hidden md:flex items-center relative w-72">
           <Search className="absolute left-3 h-4 w-4 text-gray-400 pointer-events-none" />
           <input
             type="text"
-            placeholder="Cari booth, sesi foto, template..."
+            placeholder={t('header.searchPlaceholder', undefined, 'Cari booth, sesi foto, template...')}
             className="w-full pl-9 pr-12 py-2 text-xs bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-[#DE5795]/20 focus:border-[#DE5795] transition-all shadow-xs"
             readOnly
           />
@@ -40,23 +47,29 @@ export function Header() {
           </div>
         </div>
 
-        {/* Status Indicators & Profile */}
-        <div className="flex items-center gap-4">
+        {/* Status Indicators, Language Switcher & Profile */}
+        <div className="flex items-center gap-3 sm:gap-4">
           <div className="hidden lg:flex items-center gap-2.5">
             <div className="flex items-center gap-2 px-3 py-1 bg-pink-50/60 text-[#9D174D] text-xs font-semibold rounded-lg border border-[#DE5795]/30 shadow-xs">
               <span className="h-2 w-2 rounded-full bg-[#DE5795] animate-pulse" />
-              <span>Semua Sistem Normal</span>
+              <span>{t('header.allSystemsNormal', undefined, 'Semua Sistem Normal')}</span>
             </div>
             <div className="flex items-center gap-1.5 px-3 py-1 bg-gray-50 text-gray-700 text-xs font-medium rounded-lg border border-gray-200">
               <Camera className="h-3.5 w-3.5 text-gray-500" />
-              <span>3 Booth Siaga</span>
+              <span>{t('header.boothsReady', { count: 3 }, '3 Booth Siaga')}</span>
             </div>
           </div>
 
           <div className="h-6 w-px bg-gray-200 hidden sm:block" />
 
+          {/* Language Selector */}
+          <LanguageSelector />
+
           {/* Action Bell */}
-          <button className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+          <button
+            className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            title={t('header.notifications', undefined, 'Notifikasi')}
+          >
             <Bell className="h-4 w-4" />
             <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[#DE5795] ring-2 ring-white" />
           </button>

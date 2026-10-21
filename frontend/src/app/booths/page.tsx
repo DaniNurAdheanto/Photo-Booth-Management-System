@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import {
   Store,
@@ -28,6 +29,7 @@ import {
   Server,
   Layers,
 } from 'lucide-react';
+import { useLanguage } from '@/context/language-context';
 
 export interface BoothUnit {
   id: string;
@@ -164,6 +166,7 @@ const CAMERA_OPTIONS = [
 ];
 
 export default function BoothsPage() {
+  const { t, language } = useLanguage();
   const [booths, setBooths] = useState<BoothUnit[]>(INITIAL_BOOTHS);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'ONLINE' | 'IN_SESSION' | 'OFFLINE' | 'MAINTENANCE'>('ALL');
@@ -183,6 +186,37 @@ export default function BoothsPage() {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
   };
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Handle ESC key to close drawer/modal and prevent body scrolling
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (deleteConfirmId) {
+          setDeleteConfirmId(null);
+        } else if (isDrawerOpen) {
+          setIsDrawerOpen(false);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isDrawerOpen, deleteConfirmId]);
+
+  useEffect(() => {
+    if (isDrawerOpen || deleteConfirmId) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isDrawerOpen, deleteConfirmId]);
 
   // Drawer Form fields
   const [formCode, setFormCode] = useState('');
@@ -389,14 +423,14 @@ export default function BoothsPage() {
           <div className="flex items-center gap-2 mb-1">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-50 text-[#9D174D] border border-pink-200">
               <span className="w-1.5 h-1.5 rounded-full bg-[#DE5795]" />
-              {totalCount} Unit Terdaftar
+              {totalCount} {language === 'en' ? 'Units Registered' : 'Unit Terdaftar'}
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">
-            Daftar Unit Booth
+            {t('booths.title', undefined, 'Daftar Unit Booth')}
           </h1>
           <p className="text-sm text-gray-600 mt-1">
-            Pantau status operasional mesin photo booth, sisa roll kertas printer, status kamera DSLR, dan remote control.
+            {t('booths.subtitle', undefined, 'Pantau status operasional mesin photo booth, sisa roll kertas printer, status kamera DSLR, dan remote control.')}
           </p>
         </div>
 
@@ -408,7 +442,7 @@ export default function BoothsPage() {
             className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 shadow-xs transition-colors flex items-center gap-2"
           >
             <ExternalLink className="w-4 h-4 text-gray-500" />
-            <span>Kiosk Booth Tamu</span>
+            <span>{language === 'en' ? 'Guest Booth Kiosk' : 'Kiosk Booth Tamu'}</span>
           </Link>
 
           <button
@@ -416,7 +450,7 @@ export default function BoothsPage() {
             className="px-4 py-2 text-sm font-semibold text-white bg-[#DE5795] hover:bg-[#c93d7e] rounded-lg shadow-xs transition-colors flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
-            <span>Tambah Unit Booth</span>
+            <span>{t('booths.addBooth', undefined, 'Tambah Unit Booth')}</span>
           </button>
         </div>
       </div>
@@ -808,19 +842,19 @@ export default function BoothsPage() {
       {/* ============================================================ */}
       {/* DRAWER: TAMBAH / EDIT UNIT BOOTH                             */}
       {/* ============================================================ */}
-      {isDrawerOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden font-sora">
-          {/* Backdrop with smooth blur */}
+      {mounted && isDrawerOpen && createPortal(
+        <div className="fixed inset-0 z-[999] overflow-hidden font-sora">
+          {/* Backdrop with smooth blur covering entire screen (including header & sidebar) */}
           <div
-            className="fixed inset-0 bg-gray-950/45 backdrop-blur-xs transition-opacity animate-fade-in"
+            className="fixed inset-0 bg-gray-950/60 backdrop-blur-xs transition-opacity animate-fade-in"
             onClick={() => setIsDrawerOpen(false)}
           />
 
-          <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none">
-            <div className="w-screen max-w-xl bg-white shadow-2xl border border-gray-200/90 rounded-3xl flex flex-col animate-slide-left overflow-hidden ring-1 ring-black/10 pointer-events-auto">
-              {/* Drawer Header (Ref: Modern SaaS Floating Drawer) */}
-              <div className="px-8 pt-7 pb-7.5 border-b border-gray-200/80 flex items-center justify-between bg-white/95 backdrop-blur-md shrink-0 sticky top-0 z-20 shadow-2xs">
-                <div className="flex items-center gap-4 min-w-0">
+          <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none z-[1000]">
+            <div className="w-screen max-w-xl bg-white shadow-2xl border border-gray-100 rounded-3xl flex flex-col animate-slide-left overflow-hidden ring-1 ring-black/10 pointer-events-auto h-full">
+              {/* Drawer Header (Clean flex item, shrink-0, not sticky) */}
+              <div className="px-7 sm:px-8 py-5 sm:py-6 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">
+                <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
                   <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-pink-500/15 to-[#DE5795]/20 border border-[#DE5795]/30 flex items-center justify-center text-[#9D174D] shadow-xs shrink-0">
                     <Store className="w-5 h-5 text-[#DE5795]" />
                   </div>
@@ -835,7 +869,7 @@ export default function BoothsPage() {
                         {editingBooth ? formCode : 'Unit Baru'}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1.5 truncate">
+                    <p className="text-xs text-gray-500 mt-1 truncate">
                       Konfigurasi printer thermal, kamera DSLR, IP address, dan lokasi booth
                     </p>
                   </div>
@@ -843,7 +877,7 @@ export default function BoothsPage() {
                 <button
                   type="button"
                   onClick={() => setIsDrawerOpen(false)}
-                  className="w-9 h-9 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 border border-gray-200/80 transition-all flex items-center justify-center shrink-0 ml-4 shadow-2xs"
+                  className="w-9 h-9 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 border border-gray-200 transition-all flex items-center justify-center shrink-0 ml-3 shadow-2xs"
                   title="Tutup (Esc)"
                 >
                   <X className="w-5 h-5" />
@@ -851,7 +885,7 @@ export default function BoothsPage() {
               </div>
 
               {/* Drawer Form Body */}
-              <form onSubmit={handleSaveBooth} className="flex-1 flex flex-col min-h-0">
+              <form onSubmit={handleSaveBooth} className="flex-1 flex flex-col min-h-0 overflow-hidden">
                 <div className="px-8 py-6 overflow-y-auto flex-1 space-y-6 text-xs">
 
                   {/* SECTION 1: IDENTITAS & STATUS OPERASIONAL */}
@@ -1123,16 +1157,16 @@ export default function BoothsPage() {
                   </div>
                 </div>
 
-                {/* Drawer Sticky Footer */}
-                <div className="px-8 pt-5.5 pb-7 border-t border-gray-200/80 bg-white/95 backdrop-blur-md flex items-center justify-between gap-3 shrink-0 sticky bottom-0 z-20 shadow-xs">
+                {/* Drawer Footer (Clean, dedicated flex item, shrink-0, not sticky) */}
+                <div className="px-7 sm:px-8 py-4 sm:py-5 border-t border-gray-100 bg-gray-50/90 flex items-center justify-between gap-3 shrink-0">
                   <span className="text-[11px] text-gray-400 hidden sm:inline">
-                    Tekan <kbd className="px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200 font-mono text-[10px] text-gray-500">ESC</kbd> untuk membatalkan
+                    Tekan <kbd className="px-1.5 py-0.5 rounded bg-white border border-gray-200 font-mono text-[10px] text-gray-500 shadow-2xs">ESC</kbd> untuk membatalkan
                   </span>
-                  <div className="flex items-center gap-2.5">
+                  <div className="flex items-center gap-2.5 ml-auto">
                     <button
                       type="button"
                       onClick={() => setIsDrawerOpen(false)}
-                      className="px-4 py-2.5 rounded-xl border border-gray-200/90 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-2xs"
+                      className="px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-100 transition-colors shadow-2xs"
                     >
                       Batal
                     </button>
@@ -1148,15 +1182,20 @@ export default function BoothsPage() {
               </form>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ============================================================ */}
       {/* DELETE CONFIRMATION MODAL                                    */}
       {/* ============================================================ */}
-      {deleteConfirmId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/70 backdrop-blur-sm animate-fade-in font-sora">
-          <div className="relative w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl border border-gray-200 text-center space-y-4">
+      {mounted && deleteConfirmId && createPortal(
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 font-sora">
+          <div
+            className="fixed inset-0 bg-gray-950/60 backdrop-blur-xs transition-opacity animate-fade-in"
+            onClick={() => setDeleteConfirmId(null)}
+          />
+          <div className="relative z-[1000] w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl border border-gray-100 text-center space-y-4">
             <div className="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center mx-auto">
               <Trash2 className="w-6 h-6" />
             </div>
@@ -1183,7 +1222,8 @@ export default function BoothsPage() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
