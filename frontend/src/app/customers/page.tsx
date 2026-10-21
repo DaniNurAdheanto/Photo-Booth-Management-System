@@ -13,6 +13,7 @@ import {
   Mail,
   Crown,
   ChevronRight,
+  ChevronLeft,
   X,
   Send,
   Store,
@@ -66,6 +67,10 @@ export default function CustomersPage() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
+  // Pagination state (Compact view)
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -117,6 +122,18 @@ export default function CustomersPage() {
         return 0; // Default NEWEST
       });
   }, [customersList, searchQuery, selectedSegmentFilter, selectedBoothFilter, sortBy]);
+
+  // Reset page when search or filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedSegmentFilter, selectedBoothFilter, sortBy]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredCustomers.length / pageSize) || 1;
+  const paginatedCustomers = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredCustomers.slice(start, start + pageSize);
+  }, [filteredCustomers, currentPage, pageSize]);
 
   // Segment Counts
   const segmentCounts = useMemo(() => {
@@ -515,53 +532,54 @@ export default function CustomersPage() {
         </div>
       </div>
 
-      {/* CUSTOMER DIRECTORY TABLE */}
+      {/* CUSTOMER DIRECTORY TABLE (COMPACT & CLEAN) */}
       <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50/80 border-b border-gray-200 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
                 <th className="py-3.5 px-3.5 text-center w-12 font-mono text-gray-400 font-bold uppercase tracking-wider">No.</th>
-                <th className="py-3.5 px-5">Tamu / Profil</th>
-                <th className="py-3.5 px-4">Kontak & Domisili</th>
-                <th className="py-3.5 px-4 text-center">Segmentasi</th>
+                <th className="py-3.5 px-5">Tamu / Kontak</th>
+                <th className="py-3.5 px-4">No. WhatsApp</th>
+                <th className="py-3.5 px-4 text-center">Status Kunjungan</th>
                 <th className="py-3.5 px-4">Total Sesi & Belanja</th>
-                <th className="py-3.5 px-4">Booth Favorit</th>
-                <th className="py-3.5 px-4">Kunjungan Terakhir</th>
                 <th className="py-3.5 px-5 text-right">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-sm">
-              {filteredCustomers.length === 0 ? (
+              {paginatedCustomers.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-12 text-center text-gray-400">
+                  <td colSpan={6} className="py-12 text-center text-gray-400">
                     <Users className="w-12 h-12 mx-auto text-gray-300 mb-3" />
                     <p className="text-base font-semibold text-gray-600">Tidak ada data tamu yang cocok</p>
                     <p className="text-xs text-gray-400 mt-1">Coba ubah kata kunci pencarian atau filter segmen</p>
                   </td>
                 </tr>
               ) : (
-                filteredCustomers.map((cust, index) => {
+                paginatedCustomers.map((cust, index) => {
+                  const rowNumber = (currentPage - 1) * pageSize + index + 1;
                   return (
                     <tr
                       key={cust.id}
                       onClick={() => handleOpenDetail(cust)}
                       className="hover:bg-pink-50/20 cursor-pointer transition-colors group"
                     >
-                      <td className="py-4 px-3.5 text-center font-mono font-bold text-gray-400">
-                        {index + 1}
+                      {/* No. */}
+                      <td className="py-3.5 px-3.5 text-center font-mono font-bold text-gray-400">
+                        {rowNumber}
                       </td>
-                      {/* Name & Avatar */}
-                      <td className="py-4 px-5">
+
+                      {/* Name & Avatar & Email (Compact) */}
+                      <td className="py-3.5 px-5">
                         <div className="flex items-center gap-3">
                           {cust.avatarUrl ? (
                             <img
                               src={cust.avatarUrl}
                               alt={cust.name}
-                              className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-xs shrink-0"
+                              className="w-9 h-9 rounded-full object-cover border-2 border-white shadow-xs shrink-0"
                             />
                           ) : (
-                            <div className="w-10 h-10 rounded-full bg-pink-100 text-[#DE5795] font-bold flex items-center justify-center text-sm border-2 border-white shadow-xs shrink-0">
+                            <div className="w-9 h-9 rounded-full bg-pink-100 text-[#DE5795] font-bold flex items-center justify-center text-xs border-2 border-white shadow-xs shrink-0">
                               {cust.name.slice(0, 2).toUpperCase()}
                             </div>
                           )}
@@ -569,31 +587,23 @@ export default function CustomersPage() {
                             <div className="font-bold text-gray-900 group-hover:text-[#DE5795] transition-colors truncate">
                               {cust.name}
                             </div>
-                            <div className="text-xs text-gray-400 flex items-center gap-2 mt-0.5">
-                              <span>{cust.id}</span>
-                              <span>•</span>
-                              <span>Bergabung {cust.registeredAt}</span>
+                            <div className="text-xs text-gray-400 truncate">
+                              {cust.email}
                             </div>
                           </div>
                         </div>
                       </td>
 
-                      {/* Contact & City */}
-                      <td className="py-4 px-4">
-                        <div className="space-y-0.5">
-                          <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-800">
-                            <Phone className="w-3.5 h-3.5 text-gray-400" />
-                            <span>{cust.phone}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                            <MapPin className="w-3.5 h-3.5 text-gray-400" />
-                            <span>{cust.city || 'Jabodetabek'}</span>
-                          </div>
+                      {/* WhatsApp Phone */}
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                          <Phone className="w-3.5 h-3.5 text-gray-400" />
+                          <span className="font-mono">{cust.phone}</span>
                         </div>
                       </td>
 
-                      {/* Segment Badge */}
-                      <td className="py-4 px-4 text-center">
+                      {/* Status Kunjungan */}
+                      <td className="py-3.5 px-4 text-center whitespace-nowrap">
                         {cust.segment === 'RETURNING' ? (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
                             <History className="w-3.5 h-3.5 text-blue-600" />
@@ -607,42 +617,20 @@ export default function CustomersPage() {
                         )}
                       </td>
 
-                      {/* Sessions & Spent */}
-                      <td className="py-4 px-4">
+                      {/* Total Sesi & Belanja (Compact) */}
+                      <td className="py-3.5 px-4 whitespace-nowrap">
                         <div>
-                          <div className="font-extrabold text-gray-900 text-sm">
+                          <div className="font-bold text-gray-900 text-xs">
                             {formatRupiah(cust.totalSpent)}
                           </div>
-                          <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
-                            <span className="font-medium text-gray-700">{cust.totalSessions} sesi foto</span>
-                            <span>•</span>
-                            <span>avg {formatRupiah(cust.averageSpent)}</span>
+                          <div className="text-[11px] text-gray-400 font-medium">
+                            {cust.totalSessions} sesi foto
                           </div>
-                        </div>
-                      </td>
-
-                      {/* Favorite Booth */}
-                      <td className="py-4 px-4">
-                        <div className="space-y-1">
-                          <div className="text-xs font-semibold text-gray-800 truncate max-w-[180px] flex items-center gap-1.5">
-                            <Store className="w-3.5 h-3.5 text-pink-500 shrink-0" />
-                            <span className="truncate">{cust.favoriteBooth}</span>
-                          </div>
-                          <div className="text-[11px] text-gray-400 truncate max-w-[180px]">
-                            {cust.favoriteTemplate}
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* Last Visit */}
-                      <td className="py-4 px-4">
-                        <div className="text-xs text-gray-700 font-medium">
-                          {cust.lastVisitAt}
                         </div>
                       </td>
 
                       {/* Actions */}
-                      <td className="py-4 px-5 text-right">
+                      <td className="py-3.5 px-5 text-right whitespace-nowrap">
                         <div
                           className="flex items-center justify-end gap-2"
                           onClick={(e) => e.stopPropagation()}
@@ -655,7 +643,7 @@ export default function CustomersPage() {
                               handleOpenQuickWA(cust, e);
                             }}
                             title="Chat WhatsApp Tamu"
-                            className="p-2 rounded-xl text-emerald-600 hover:bg-emerald-50 border border-emerald-100/60 hover:border-emerald-200 transition-all"
+                            className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 border border-emerald-100 hover:border-emerald-200 transition-all"
                           >
                             <MessageCircle className="w-4 h-4" />
                           </button>
@@ -666,7 +654,7 @@ export default function CustomersPage() {
                               e.stopPropagation();
                               handleOpenDetail(cust);
                             }}
-                            className="px-3 py-1.5 rounded-xl text-xs font-semibold text-[#DE5795] bg-pink-50 hover:bg-pink-100 border border-pink-200 transition-all flex items-center gap-1"
+                            className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#DE5795] bg-pink-50 hover:bg-pink-100 border border-pink-200 transition-all flex items-center gap-1"
                           >
                             <span>Detail</span>
                             <ChevronRight className="w-3.5 h-3.5" />
@@ -681,19 +669,77 @@ export default function CustomersPage() {
           </table>
         </div>
 
-        {/* Table Footer / Summary */}
-        <div className="py-3 px-5 bg-gray-50/70 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
-          <div>
-            Menampilkan <span className="font-semibold text-gray-800">{filteredCustomers.length}</span> dari{' '}
-            <span className="font-semibold text-gray-800">{customersList.length}</span> total tamu terdata
+        {/* COMPACT PAGINATION CONTROLS */}
+        {filteredCustomers.length > 0 && (
+          <div className="px-5 py-3.5 bg-gray-50/70 border-t border-gray-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+            <div className="text-gray-500 font-medium">
+              Menampilkan{' '}
+              <span className="font-bold text-gray-900">
+                {Math.min((currentPage - 1) * pageSize + 1, filteredCustomers.length)}
+              </span>{' '}
+              -{' '}
+              <span className="font-bold text-gray-900">
+                {Math.min(currentPage * pageSize, filteredCustomers.length)}
+              </span>{' '}
+              dari <span className="font-bold text-gray-900">{filteredCustomers.length}</span> tamu walk-in
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <span className="text-gray-400 text-[11px]">Baris:</span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                  className="px-2 py-1 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 focus:outline-none focus:border-[#DE5795]"
+                >
+                  <option value={5}>5 baris</option>
+                  <option value={8}>8 baris</option>
+                  <option value={10}>10 baris</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  className="p-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                  title="Halaman Sebelumnya"
+                >
+                  <ChevronLeft className="w-4 h-4 text-gray-600" />
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pg) => (
+                  <button
+                    key={pg}
+                    type="button"
+                    onClick={() => setCurrentPage(pg)}
+                    className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
+                      currentPage === pg
+                        ? 'bg-[#DE5795] text-white shadow-xs'
+                        : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    {pg}
+                  </button>
+                ))}
+
+                <button
+                  type="button"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  className="p-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                  title="Halaman Berikutnya"
+                >
+                  <ChevronRight className="w-4 h-4 text-gray-600" />
+                </button>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
-            <span>
-              Total Akumulasi Belanja:{' '}
-              <strong className="text-gray-900">{formatRupiah(totalSpentAll)}</strong>
-            </span>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* FLOATING SLIDE-OVER DRAWER: CUSTOMER DETAIL & RIWAYAT SESI */}
