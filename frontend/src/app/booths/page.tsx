@@ -810,18 +810,18 @@ export default function BoothsPage() {
       {/* ============================================================ */}
       {isDrawerOpen && (
         <div className="fixed inset-0 z-50 overflow-hidden font-sora">
-          {/* Backdrop */}
+          {/* Backdrop with smooth blur */}
           <div
-            className="fixed inset-0 bg-gray-950/60 backdrop-blur-xs transition-opacity animate-fade-in"
+            className="fixed inset-0 bg-gray-950/45 backdrop-blur-xs transition-opacity animate-fade-in"
             onClick={() => setIsDrawerOpen(false)}
           />
 
-          <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-            <div className="w-screen max-w-xl bg-white shadow-2xl border-l border-gray-100 flex flex-col animate-slide-left">
-              {/* Drawer Header */}
-              <div className="px-6 py-5 border-b border-gray-200/80 flex items-center justify-between bg-white shrink-0 sticky top-0 z-20 shadow-2xs">
+          <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none">
+            <div className="w-screen max-w-xl bg-white shadow-2xl border border-gray-200/90 rounded-3xl flex flex-col animate-slide-left overflow-hidden ring-1 ring-black/10 pointer-events-auto">
+              {/* Drawer Header (Ref: Modern SaaS Floating Drawer) */}
+              <div className="px-6 py-4.5 border-b border-gray-200/80 flex items-center justify-between bg-white/95 backdrop-blur-md shrink-0 sticky top-0 z-20 shadow-2xs">
                 <div className="flex items-center gap-3.5 min-w-0">
-                  <div className="w-11 h-11 rounded-2xl bg-[#DE5795]/15 border border-[#DE5795]/30 flex items-center justify-center text-[#9D174D] shadow-xs shrink-0">
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-pink-500/15 to-[#DE5795]/20 border border-[#DE5795]/30 flex items-center justify-center text-[#9D174D] shadow-xs shrink-0">
                     <Store className="w-5 h-5 text-[#DE5795]" />
                   </div>
                   <div className="min-w-0">
@@ -829,8 +829,8 @@ export default function BoothsPage() {
                       <h3 className="text-base font-bold text-gray-900 leading-tight">
                         {editingBooth ? 'Edit Konfigurasi Unit Booth' : 'Tambah Unit Booth Baru'}
                       </h3>
-                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono border ${
-                        editingBooth ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-[#DE5795]/15 text-[#9D174D] border-[#DE5795]/30'
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono border shadow-2xs ${
+                        editingBooth ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-pink-50 text-[#9D174D] border-pink-200'
                       }`}>
                         {editingBooth ? formCode : 'Unit Baru'}
                       </span>
@@ -843,7 +843,7 @@ export default function BoothsPage() {
                 <button
                   type="button"
                   onClick={() => setIsDrawerOpen(false)}
-                  className="w-9 h-9 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 border border-transparent hover:border-gray-200 transition-all flex items-center justify-center shrink-0 ml-3"
+                  className="w-9 h-9 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 border border-gray-200/80 transition-all flex items-center justify-center shrink-0 ml-3 shadow-2xs"
                   title="Tutup (Esc)"
                 >
                   <X className="w-5 h-5" />
@@ -1124,21 +1124,21 @@ export default function BoothsPage() {
                 </div>
 
                 {/* Drawer Sticky Footer */}
-                <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/90 backdrop-blur-sm flex items-center justify-between gap-3 shrink-0 sticky bottom-0 z-10">
+                <div className="px-6 py-4 border-t border-gray-200/80 bg-white/95 backdrop-blur-md flex items-center justify-between gap-3 shrink-0 sticky bottom-0 z-20 shadow-xs">
                   <span className="text-[11px] text-gray-400 hidden sm:inline">
-                    Tekan <kbd className="px-1.5 py-0.5 rounded bg-gray-200 font-mono text-[10px]">ESC</kbd> untuk keluar
+                    Tekan <kbd className="px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200 font-mono text-[10px] text-gray-500">ESC</kbd> untuk membatalkan
                   </span>
                   <div className="flex items-center gap-2.5">
                     <button
                       type="button"
                       onClick={() => setIsDrawerOpen(false)}
-                      className="px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
+                      className="px-4 py-2.5 rounded-xl border border-gray-200/90 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-2xs"
                     >
                       Batal
                     </button>
                     <button
                       type="submit"
-                      className="px-5 py-2.5 rounded-xl bg-[#DE5795] text-white text-xs font-bold hover:bg-[#c93d7e] transition-colors border border-[#DE5795] shadow-xs flex items-center gap-2"
+                      className="px-5 py-2.5 rounded-xl bg-[#DE5795] text-white text-xs font-bold hover:bg-[#c93d7e] transition-all border border-[#DE5795] shadow-xs flex items-center gap-2 active:scale-98"
                     >
                       <Check className="w-4 h-4 text-white" />
                       <span>{editingBooth ? 'Simpan Konfigurasi Booth' : 'Tambahkan Unit Booth'}</span>

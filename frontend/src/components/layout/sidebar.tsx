@@ -1,82 +1,196 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Store, Film, CalendarDays, Layers, CreditCard, LogOut, ExternalLink } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Store,
+  Film,
+  CalendarDays,
+  Layers,
+  CreditCard,
+  LogOut,
+  ExternalLink,
+  Search,
+  ChevronsUpDown,
+  Sparkles,
+  Radio,
+  SlidersHorizontal,
+} from 'lucide-react';
+
+interface NavGroup {
+  category: string;
+  items: {
+    label: string;
+    href: string;
+    icon: React.ComponentType<{ className?: string }>;
+    count?: string | null;
+    badgeVariant?: 'pink' | 'emerald' | 'gray';
+  }[];
+}
 
 export function Sidebar() {
   const pathname = usePathname();
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const navItems = [
-    { label: 'Ringkasan Utama', href: '/', icon: LayoutDashboard, count: null },
-    { label: 'Manajemen Sesi Foto', href: '/sessions', icon: Film, count: 'Live' },
-    { label: 'Template & Desain', href: '/templates', icon: Layers, count: '5' },
-    { label: 'Laporan Pembayaran', href: '/payments', icon: CreditCard, count: 'Baru' },
-    { label: 'Daftar Unit Booth', href: '/booths', icon: Store, count: '3' },
-    { label: 'Jadwal Acara & Event', href: '/events', icon: CalendarDays, count: '8' },
+  const navGroups: NavGroup[] = [
+    {
+      category: 'WORKSPACE UTAMA',
+      items: [
+        { label: 'Ringkasan Utama', href: '/', icon: LayoutDashboard },
+        { label: 'Manajemen Sesi Foto', href: '/sessions', icon: Film, count: 'Live', badgeVariant: 'pink' },
+      ],
+    },
+    {
+      category: 'OPERASIONAL KIOSK',
+      items: [
+        { label: 'Daftar Unit Booth', href: '/booths', icon: Store, count: '3 Unit', badgeVariant: 'emerald' },
+        { label: 'Jadwal Acara & Event', href: '/events', icon: CalendarDays, count: '8 Acara', badgeVariant: 'pink' },
+      ],
+    },
+    {
+      category: 'KONTEN & ASSET',
+      items: [
+        { label: 'Template & Desain', href: '/templates', icon: Layers, count: '5', badgeVariant: 'gray' },
+      ],
+    },
+    {
+      category: 'FINANSIAL & KASIR',
+      items: [
+        { label: 'Laporan Pembayaran', href: '/payments', icon: CreditCard, count: 'Baru', badgeVariant: 'pink' },
+      ],
+    },
   ];
 
   return (
-    <aside className="w-64 border-r border-gray-200 bg-white p-4 flex flex-col justify-between shrink-0 font-sora">
-      <div className="space-y-6">
-        {/* Navigation Section */}
-        <div>
-          <p className="px-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
-            Menu Navigasi
-          </p>
-          <nav className="mt-3 space-y-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
-
-              return (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className={`group flex w-full items-center justify-between rounded-lg px-3.5 py-2.5 text-sm transition-all ${
-                    isActive
-                      ? 'bg-pink-50/80 text-[#9D174D] font-semibold border-l-3 border-[#DE5795]'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-medium'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon className={`h-5 w-5 transition-colors ${
-                      isActive ? 'text-[#DE5795]' : 'text-gray-400 group-hover:text-gray-600'
-                    }`} />
-                    <span>{item.label}</span>
-                  </div>
-                  {item.count && (
-                    <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                      isActive
-                        ? 'bg-[#DE5795] text-white'
-                        : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
-                    }`}>
-                      {item.count}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
+    <aside className="w-[264px] min-w-[264px] max-w-[264px] border-r border-gray-200/90 bg-white flex flex-col justify-between shrink-0 font-sora z-30 select-none">
+      {/* Top Header & Searchable Nav Section */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
+        {/* 1. Location / Branch Switcher Card (Ref: PWT Location & Zendenta Clinic) */}
+        <div className="p-2.5 rounded-2xl border border-gray-200/90 bg-gray-50/70 hover:bg-gray-100/70 hover:border-gray-300 transition-all cursor-pointer group shadow-2xs">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-pink-500 to-[#DE5795] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                <Store className="w-4 h-4 text-white" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-gray-900 truncate">PhotoBooth Central</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" title="Online" />
+                </div>
+                <p className="text-[11px] text-gray-500 truncate">Grand Indonesia • 3 Booth</p>
+              </div>
+            </div>
+            <ChevronsUpDown className="w-4 h-4 text-gray-400 group-hover:text-gray-600 shrink-0 ml-1" />
+          </div>
         </div>
 
-        {/* Kiosk Quick Launch Card - Untitled UI Feature Card */}
-        <div className="rounded-xl border border-gray-200 bg-gray-50/80 p-4 space-y-3 font-sora shadow-2xs">
+        {/* 2. Quick Search Menu Box (Ref: PWT Search ⌘K) */}
+        <div className="relative">
+          <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Cari menu & fitur..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-8 pr-11 py-2 text-xs bg-gray-50/70 border border-gray-200/90 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-hidden focus:bg-white focus:border-[#DE5795] focus:ring-3 focus:ring-[#DE5795]/10 transition-all"
+          />
+          <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[9px] font-mono text-gray-400 bg-white border border-gray-200 rounded shadow-2xs">
+            ⌘K
+          </kbd>
+        </div>
+
+        {/* 3. Grouped Navigation with Uppercase Category Labels (Ref: PWT & Zendenta) */}
+        <nav className="space-y-4">
+          {navGroups.map((group) => {
+            const filteredItems = group.items.filter((item) =>
+              item.label.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+
+            if (filteredItems.length === 0) return null;
+
+            return (
+              <div key={group.category} className="space-y-1">
+                <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                  {group.category}
+                </p>
+                <div className="space-y-0.5 mt-1">
+                  {filteredItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive =
+                      item.href === '/'
+                        ? pathname === '/'
+                        : pathname.startsWith(item.href);
+
+                    return (
+                      <Link
+                        key={item.label}
+                        href={item.href}
+                        className={`group relative flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs transition-all ${
+                          isActive
+                            ? 'bg-pink-50 text-[#9D174D] font-semibold shadow-2xs border border-pink-200/80'
+                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium'
+                        }`}
+                      >
+                        {/* Left Active Indicator Bar (Untitled UI / Zendenta Style) */}
+                        {isActive && (
+                          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r-full bg-[#DE5795]" />
+                        )}
+
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <Icon
+                            className={`h-4 w-4 shrink-0 transition-colors ${
+                              isActive
+                                ? 'text-[#DE5795]'
+                                : 'text-gray-400 group-hover:text-gray-600'
+                            }`}
+                          />
+                          <span className="truncate">{item.label}</span>
+                        </div>
+
+                        {item.count && (
+                          <span
+                            className={`px-2 py-0.5 text-[10px] font-semibold rounded-full shrink-0 transition-colors ${
+                              isActive
+                                ? 'bg-[#DE5795] text-white shadow-2xs'
+                                : item.badgeVariant === 'emerald'
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                : item.badgeVariant === 'pink'
+                                ? 'bg-pink-50 text-[#9D174D] border border-pink-200'
+                                : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
+                            }`}
+                          >
+                            {item.count}
+                          </span>
+                        )}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </nav>
+
+        {/* 4. Interactive Kiosk Quick Launch Card */}
+        <div className="rounded-2xl border border-gray-200/90 bg-gradient-to-b from-gray-50 to-pink-50/30 p-3.5 space-y-2.5 shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-900">Layar Kios Booth</span>
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-pink-50 text-[#9D174D] border border-pink-200">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#DE5795] animate-pulse" />
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-[#DE5795] animate-ping" />
+              <span className="text-xs font-bold text-gray-900">Layar Kios Tamu</span>
+            </div>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
               Siaga
             </span>
           </div>
-          <p className="text-xs text-gray-600 leading-relaxed">
+          <p className="text-[11px] text-gray-500 leading-snug">
             Buka tampilan layar sentuh interaktif untuk pengunjung photo booth.
           </p>
           <Link
             href="/sessions/booth"
             target="_blank"
-            className="flex items-center justify-center gap-1.5 w-full py-2 px-3 text-xs font-semibold rounded-lg bg-[#DE5795] hover:bg-[#c93d7e] text-white shadow-xs transition-colors"
+            className="flex items-center justify-center gap-1.5 w-full py-2 px-3 text-xs font-semibold rounded-xl bg-[#DE5795] hover:bg-[#c93d7e] text-white shadow-xs transition-colors"
           >
             <span>Buka Layar Kios</span>
             <ExternalLink className="h-3.5 w-3.5 text-white" />
@@ -84,22 +198,25 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* User Profile Widget - Untitled UI Standard */}
-      <div className="pt-4 border-t border-gray-200">
-        <div className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors">
-          <div className="flex items-center gap-3 min-w-0">
+      {/* 5. User Profile Footer (Ref: Zendenta / Untitled UI standard) */}
+      <div className="p-3 border-t border-gray-200/90 bg-white">
+        <div className="flex items-center justify-between p-2 rounded-xl hover:bg-gray-50 transition-colors">
+          <div className="flex items-center gap-2.5 min-w-0">
             <div className="relative">
-              <div className="h-10 w-10 rounded-full bg-[#DE5795] text-white font-bold text-xs flex items-center justify-center shrink-0 border border-[#DE5795] shadow-xs">
+              <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-[#DE5795] to-pink-400 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
                 DA
               </div>
-              <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-white" />
+              <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-white" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">Dani Adheanto</p>
-              <p className="text-xs text-gray-500 truncate">admin@photobooth.local</p>
+              <p className="text-xs font-bold text-gray-900 truncate">Dani Adheanto</p>
+              <p className="text-[10px] text-gray-500 truncate">Super Admin Operasional</p>
             </div>
           </div>
-          <button className="text-gray-400 hover:text-gray-600 p-1.5 rounded-lg hover:bg-gray-100 transition-colors" title="Logout">
+          <button
+            className="text-gray-400 hover:text-gray-600 p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+            title="Keluar / Ganti Akun"
+          >
             <LogOut className="h-4 w-4" />
           </button>
         </div>
@@ -107,3 +224,4 @@ export function Sidebar() {
     </aside>
   );
 }
+

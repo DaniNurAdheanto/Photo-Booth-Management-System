@@ -566,8 +566,8 @@ export default function TemplatesPage() {
             onClick={() => setIsLibraryOpen(false)}
           />
 
-          <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-            <div className="w-screen max-w-2xl bg-white shadow-2xl border-l border-gray-100 flex flex-col animate-slide-left">
+          <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none">
+            <div className="w-screen max-w-2xl bg-white shadow-2xl border border-gray-200/90 rounded-3xl flex flex-col animate-slide-left overflow-hidden ring-1 ring-black/10 pointer-events-auto">
               {/* Drawer Header */}
               <div className="px-6 py-5 border-b border-gray-200/80 flex items-center justify-between bg-white shrink-0 sticky top-0 z-20 shadow-2xs">
                 <div className="flex items-center gap-3.5 min-w-0">
