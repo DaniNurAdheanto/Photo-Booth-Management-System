@@ -17,6 +17,7 @@ import {
   Sparkles,
   Radio,
   SlidersHorizontal,
+  Images,
 } from 'lucide-react';
 
 interface NavGroup {
@@ -53,6 +54,7 @@ export function Sidebar() {
       category: 'KONTEN & ASSET',
       items: [
         { label: 'Template & Desain', href: '/templates', icon: Layers, count: '5', badgeVariant: 'gray' },
+        { label: 'Galeri Tamu & Cloud', href: '/gallery', icon: Images, count: 'Cloud', badgeVariant: 'pink' },
       ],
     },
     {
