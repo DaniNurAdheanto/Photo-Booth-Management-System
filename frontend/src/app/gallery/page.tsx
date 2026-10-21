@@ -399,8 +399,15 @@ export default function GalleryPage() {
       )}
 
       {/* TOP HEADER SECTION (Untitled UI Pattern) */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200/90 pb-5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 pb-5">
         <div>
+          <div className="flex items-center gap-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+            <span>PhotoBooth OS</span>
+            <span>•</span>
+            <span className="text-[#DE5795]">Konten & Media</span>
+            <span>•</span>
+            <span>Galeri Cloud</span>
+          </div>
           <div className="flex items-center gap-2.5">
             <h1 className="text-2xl font-bold tracking-tight text-gray-900 font-sora">
               Galeri Tamu & Cloud Delivery
@@ -557,12 +564,12 @@ export default function GalleryPage() {
       </div>
 
       {/* HORIZONTAL ALBUM SELECTOR TABS (Zendenta Style) */}
-      <div className="space-y-2">
+      <div className="p-4 rounded-2xl bg-white border border-gray-200/90 shadow-2xs space-y-2.5">
         <div className="flex items-center justify-between">
           <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
             Pilih Album Acara / Kios:
           </label>
-          <span className="text-xs text-gray-400">{albums.length} Album Terdaftar</span>
+          <span className="text-xs text-gray-400 font-medium">{albums.length} Album Terdaftar</span>
         </div>
 
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
@@ -604,7 +611,7 @@ export default function GalleryPage() {
       </div>
 
       {/* SEARCH & FILTERS BAR */}
-      <div className="p-3.5 rounded-2xl bg-white border border-gray-200/90 shadow-2xs flex flex-col md:flex-row items-center justify-between gap-3">
+      <div className="p-4 rounded-2xl bg-white border border-gray-200/90 shadow-2xs flex flex-col md:flex-row items-center justify-between gap-3">
         {/* Search Input */}
         <div className="relative w-full md:w-96">
           <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -613,7 +620,7 @@ export default function GalleryPage() {
             placeholder="Cari kode sesi (mis: PB-SES-8821), nama tamu, atau email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-xs bg-gray-50/70 border border-gray-200 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-hidden focus:bg-white focus:border-[#DE5795] focus:ring-3 focus:ring-[#DE5795]/10 transition-all"
+            className="w-full pl-9 pr-4 py-2.5 text-xs bg-gray-50/70 border border-gray-200 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-hidden focus:bg-white focus:border-[#DE5795] focus:ring-3 focus:ring-[#DE5795]/10 transition-all"
           />
         </div>
 

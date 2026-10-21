@@ -1,11 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Users,
-  Ticket,
-  Sparkles,
-  Gift,
   Search,
   Filter,
   Plus,
@@ -14,80 +12,75 @@ import {
   Phone,
   Mail,
   Crown,
-  Share2,
-  ExternalLink,
-  CheckCircle2,
-  Clock,
   ChevronRight,
   X,
-  Copy,
-  Check,
   Send,
   Store,
   Film,
   Camera,
-  Percent,
   TrendingUp,
   Award,
   AlertCircle,
-  QrCode,
-  Tag,
   Download,
+  MapPin,
+  Sparkles,
+  MessageCircle,
+  Clock,
+  Heart,
+  CheckCircle2,
+  FileSpreadsheet,
+  UserCheck,
+  History,
+  ShoppingBag,
 } from 'lucide-react';
-import {
-  mockCustomers,
-  mockPromoVouchers,
-  mockLoyaltyTiers,
-  mockBroadcastCampaigns,
-} from '@/features/customers/data/customer.mock';
+import { mockCustomers } from '@/features/customers/data/customer.mock';
 import {
   Customer,
-  PromoVoucher,
-  LoyaltyTier,
+  CustomerSegment,
+  CustomerSessionHistory,
 } from '@/features/customers/types/customer.types';
 
-import { usePathname } from 'next/navigation';
+// Helper to format currency
+const formatRupiah = (val: number) => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    maximumFractionDigits: 0,
+  }).format(val);
+};
 
 export default function CustomersPage() {
-  const pathname = usePathname();
-  const [activeTab, setActiveTab] = useState<'customers' | 'vouchers' | 'broadcast' | 'tiers'>(
-    pathname?.includes('/vouchers') ? 'vouchers' : 'customers'
-  );
+  const [customersList, setCustomersList] = useState<Customer[]>(mockCustomers);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTierFilter, setSelectedTierFilter] = useState<string>('ALL');
+  const [selectedSegmentFilter, setSelectedSegmentFilter] = useState<string>('ALL');
   const [selectedBoothFilter, setSelectedBoothFilter] = useState<string>('ALL');
+  const [sortBy, setSortBy] = useState<'NEWEST' | 'SPENT_DESC' | 'SESSIONS_DESC' | 'NAME_ASC'>('NEWEST');
 
   // Drawers state
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [isCustomerDrawerOpen, setIsCustomerDrawerOpen] = useState(false);
   const [isAddCustomerOpen, setIsAddCustomerOpen] = useState(false);
-  const [isAddVoucherOpen, setIsAddVoucherOpen] = useState(false);
   const [isQuickWADrawerOpen, setIsQuickWADrawerOpen] = useState(false);
   const [quickWACustomer, setQuickWACustomer] = useState<Customer | null>(null);
-  const [copiedVoucherCode, setCopiedVoucherCode] = useState<string | null>(null);
+  const [waCustomMessage, setWaCustomMessage] = useState<string>('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
-  // Form states
-  const [newCustomer, setNewCustomer] = useState({
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Add Customer Form state
+  const [newCustomerForm, setNewCustomerForm] = useState({
     name: '',
     phone: '',
     email: '',
+    city: 'Jakarta Selatan',
     birthDate: '',
-    tier: 'BRONZE' as LoyaltyTier,
+    segment: 'NEW' as CustomerSegment,
     favoriteBooth: 'Grand Indonesia (Booth Alpha)',
-  });
-
-  const [newVoucher, setNewVoucher] = useState({
-    code: '',
-    title: '',
-    description: '',
-    discountType: 'PERCENTAGE' as 'PERCENTAGE' | 'FIXED_AMOUNT' | 'FREE_PRINT',
-    discountValue: 20,
-    minSpend: 50000,
-    maxDiscount: 15000,
-    totalQuota: 200,
-    validUntil: '2026-11-30',
-    applicableBooths: 'ALL',
+    favoriteTemplate: 'Y2K Retro Cyber Hologram',
+    notes: '',
   });
 
   const showToast = (msg: string) => {
@@ -95,1323 +88,1150 @@ export default function CustomersPage() {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  const handleCopyCode = (code: string) => {
-    navigator.clipboard?.writeText(code);
-    setCopiedVoucherCode(code);
-    showToast(`Kode "${code}" berhasil disalin ke clipboard!`);
-    setTimeout(() => setCopiedVoucherCode(null), 2000);
+  // Filtered & Sorted Customers
+  const filteredCustomers = useMemo(() => {
+    return customersList
+      .filter((cust) => {
+        // Search
+        const query = searchQuery.toLowerCase();
+        const matchesSearch =
+          cust.name.toLowerCase().includes(query) ||
+          cust.phone.toLowerCase().includes(query) ||
+          cust.email.toLowerCase().includes(query) ||
+          (cust.city && cust.city.toLowerCase().includes(query));
+
+        // Segment filter
+        const matchesSegment =
+          selectedSegmentFilter === 'ALL' || cust.segment === selectedSegmentFilter;
+
+        // Booth filter
+        const matchesBooth =
+          selectedBoothFilter === 'ALL' || cust.favoriteBooth.includes(selectedBoothFilter);
+
+        return matchesSearch && matchesSegment && matchesBooth;
+      })
+      .sort((a, b) => {
+        if (sortBy === 'SPENT_DESC') return b.totalSpent - a.totalSpent;
+        if (sortBy === 'SESSIONS_DESC') return b.totalSessions - a.totalSessions;
+        if (sortBy === 'NAME_ASC') return a.name.localeCompare(b.name);
+        return 0; // Default NEWEST
+      });
+  }, [customersList, searchQuery, selectedSegmentFilter, selectedBoothFilter, sortBy]);
+
+  // Segment Counts
+  const segmentCounts = useMemo(() => {
+    return {
+      ALL: customersList.length,
+      VIP: customersList.filter((c) => c.segment === 'VIP').length,
+      REGULAR: customersList.filter((c) => c.segment === 'REGULAR').length,
+      NEW: customersList.filter((c) => c.segment === 'NEW').length,
+      INACTIVE: customersList.filter((c) => c.segment === 'INACTIVE').length,
+    };
+  }, [customersList]);
+
+  // KPI Calculations
+  const totalSpentAll = useMemo(() => {
+    return customersList.reduce((acc, c) => acc + c.totalSpent, 0);
+  }, [customersList]);
+
+  const avgSessions = useMemo(() => {
+    if (customersList.length === 0) return 0;
+    const total = customersList.reduce((acc, c) => acc + c.totalSessions, 0);
+    return (total / customersList.length).toFixed(1);
+  }, [customersList]);
+
+  // Open Customer Detail Drawer
+  const handleOpenDetail = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setIsCustomerDrawerOpen(true);
   };
 
-  const filteredCustomers = mockCustomers.filter((cust) => {
-    const matchesSearch =
-      cust.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      cust.phone.includes(searchQuery) ||
-      cust.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      cust.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
-
-    const matchesTier = selectedTierFilter === 'ALL' || cust.tier === selectedTierFilter;
-    const matchesBooth = selectedBoothFilter === 'ALL' || cust.favoriteBooth.includes(selectedBoothFilter);
-
-    return matchesSearch && matchesTier && matchesBooth;
-  });
-
-  const formatRupiah = (val: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      maximumFractionDigits: 0,
-    }).format(val);
+  // Open Quick WhatsApp Modal
+  const handleOpenQuickWA = (customer: Customer, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setQuickWACustomer(customer);
+    setWaCustomMessage(
+      `Halo Kak ${customer.name}! Terima kasih telah berfoto di Booth ${customer.favoriteBooth}. Kami memiliki koleksi frame & template aesthetic terbaru minggu ini. Yuk abadikan momen seru lagi bersama teman & pasangan! 📸✨`
+    );
+    setIsQuickWADrawerOpen(true);
   };
 
-  const getTierBadgeStyle = (tier: LoyaltyTier) => {
-    switch (tier) {
-      case 'VIP':
-        return 'bg-pink-50 text-[#9D174D] border-pink-200';
-      case 'GOLD':
-        return 'bg-amber-50 text-amber-800 border-amber-200';
-      case 'SILVER':
-        return 'bg-slate-100 text-slate-700 border-slate-200';
-      case 'BRONZE':
-      default:
-        return 'bg-orange-50 text-orange-800 border-orange-200';
+  const handleSendWA = () => {
+    if (!quickWACustomer) return;
+    const cleanPhone = quickWACustomer.phone.replace(/[^0-9]/g, '');
+    const intlPhone = cleanPhone.startsWith('0') ? '62' + cleanPhone.slice(1) : cleanPhone;
+    const encodedMsg = encodeURIComponent(waCustomMessage);
+    window.open(`https://wa.me/${intlPhone}?text=${encodedMsg}`, '_blank');
+    setIsQuickWADrawerOpen(false);
+    showToast(`WhatsApp terbuka untuk ${quickWACustomer.name}`);
+  };
+
+  // Add Customer Submit
+  const handleAddCustomerSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCustomerForm.name || !newCustomerForm.phone) {
+      showToast('Mohon lengkapi Nama dan No WhatsApp!');
+      return;
     }
+
+    const created: Customer = {
+      id: `CUST-${String(customersList.length + 1).padStart(3, '0')}`,
+      name: newCustomerForm.name,
+      phone: newCustomerForm.phone,
+      email: newCustomerForm.email || `${newCustomerForm.name.toLowerCase().replace(/\s+/g, '.')}@gmail.com`,
+      city: newCustomerForm.city,
+      birthDate: newCustomerForm.birthDate,
+      segment: newCustomerForm.segment,
+      totalSpent: newCustomerForm.segment === 'VIP' ? 1200000 : 50000,
+      totalSessions: newCustomerForm.segment === 'VIP' ? 24 : 1,
+      averageSpent: 50000,
+      favoriteBooth: newCustomerForm.favoriteBooth,
+      favoriteTemplate: newCustomerForm.favoriteTemplate,
+      registeredAt: new Date().toISOString().split('T')[0],
+      lastVisitAt: 'Baru Saja',
+      tags: ['Tamu Baru', 'Registrasi Manual'],
+      notes: newCustomerForm.notes || 'Pelanggan baru didaftarkan oleh kasir/admin.',
+      sessionHistory: [
+        {
+          sessionId: `SES-${Math.floor(1000 + Math.random() * 9000)}`,
+          sessionCode: `SES-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-01`,
+          date: 'Hari ini',
+          boothName: newCustomerForm.favoriteBooth,
+          templateName: newCustomerForm.favoriteTemplate,
+          packagePrice: 50000,
+          paymentMethod: 'QRIS',
+          photosCount: 6,
+          printCopies: 2,
+        },
+      ],
+    };
+
+    setCustomersList([created, ...customersList]);
+    setIsAddCustomerOpen(false);
+    setNewCustomerForm({
+      name: '',
+      phone: '',
+      email: '',
+      city: 'Jakarta Selatan',
+      birthDate: '',
+      segment: 'NEW',
+      favoriteBooth: 'Grand Indonesia (Booth Alpha)',
+      favoriteTemplate: 'Y2K Retro Cyber Hologram',
+      notes: '',
+    });
+    showToast(`Data tamu ${created.name} berhasil disimpan!`);
+  };
+
+  // Export CSV
+  const handleExportCSV = () => {
+    const headers = [
+      'ID Pelanggan',
+      'Nama Tamu',
+      'No WhatsApp',
+      'Email',
+      'Kota',
+      'Segment',
+      'Total Sesi',
+      'Total Belanja (IDR)',
+      'Booth Favorit',
+      'Template Favorit',
+      'Kunjungan Terakhir',
+    ];
+
+    const rows = filteredCustomers.map((c) => [
+      c.id,
+      `"${c.name}"`,
+      `"${c.phone}"`,
+      `"${c.email}"`,
+      `"${c.city || '-'}"`,
+      c.segment,
+      c.totalSessions,
+      c.totalSpent,
+      `"${c.favoriteBooth}"`,
+      `"${c.favoriteTemplate}"`,
+      `"${c.lastVisitAt}"`,
+    ]);
+
+    const csvContent =
+      'data:text/csv;charset=utf-8,' +
+      [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `data_pelanggan_crm_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showToast('Data pelanggan berhasil diekspor ke CSV!');
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF9] font-sora p-6 sm:p-8 space-y-8">
+    <div className="space-y-6 font-sora animate-fade-in text-gray-900 pb-16">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-6 right-6 z-50 flex items-center gap-3 bg-gray-900 text-white px-5 py-3.5 rounded-2xl shadow-xl border border-gray-800 text-xs font-semibold animate-in fade-in slide-in-from-top-3">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>{toastMessage}</span>
+        <div className="fixed top-6 right-6 z-[9999] bg-gray-900 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-gray-700 animate-slide-in">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+          <span className="text-sm font-medium">{toastMessage}</span>
         </div>
       )}
 
-      {/* Top Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      {/* HEADER SECTION */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-5">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
-            <span>PhotoBooth OS</span>
-            <span>•</span>
-            <span className="text-[#DE5795]">Pelanggan & Loyalty</span>
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-pink-100 text-[#9D174D] border border-pink-200">
+              CRM & Directory
+            </span>
+            <span className="text-xs text-gray-500 font-medium">Photo Booth Management</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
-            CRM Pelanggan & Loyalty Voucher
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight mt-1">
+            CRM & Database Pelanggan
           </h1>
           <p className="text-sm text-gray-500 mt-1">
-            Kelola data 1.482 tamu foto booth, tingkatan member loyalty, voucher promo, dan broadcast WhatsApp otomatis.
+            Kelola profil kontak, riwayat sesi foto, preferensi booth, segmentasi tamu, serta jalin relasi langsung via WhatsApp.
           </p>
         </div>
 
-        {/* Action Header Buttons */}
-        <div className="flex items-center gap-2.5 flex-wrap">
+        {/* Top Header Actions */}
+        <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap">
           <button
-            onClick={() => {
-              setActiveTab('broadcast');
-            }}
-            className="inline-flex items-center gap-2 px-3.5 py-2.5 bg-white border border-gray-200/90 rounded-xl text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:text-gray-900 shadow-2xs transition-all"
+            onClick={handleExportCSV}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold shadow-xs transition-all hover:border-gray-300"
           >
-            <Send className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Kirim Broadcast Promo</span>
-          </button>
-
-          <button
-            onClick={() => setIsAddVoucherOpen(true)}
-            className="inline-flex items-center gap-2 px-3.5 py-2.5 bg-white border border-gray-200/90 rounded-xl text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:text-gray-900 shadow-2xs transition-all"
-          >
-            <Ticket className="w-3.5 h-3.5 text-[#DE5795]" />
-            <span>+ Buat Voucher Baru</span>
+            <Download className="w-4 h-4 text-gray-500" />
+            <span>Ekspor Kontak (CSV)</span>
           </button>
 
           <button
             onClick={() => setIsAddCustomerOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#DE5795] text-white rounded-xl text-xs font-bold hover:bg-[#c94982] shadow-xs hover:shadow-md transition-all"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#DE5795] hover:bg-[#c94982] text-white text-sm font-semibold shadow-sm transition-all transform active:scale-95"
           >
             <Plus className="w-4 h-4" />
-            <span>Daftar Pelanggan</span>
+            <span>+ Tambah Tamu Baru</span>
           </button>
         </div>
       </div>
 
-      {/* 4 Top KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* TOP 4 CRM KPI CARDS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Card 1: Total Pelanggan */}
-        <div className="p-5 rounded-2xl bg-white border border-gray-200/90 shadow-2xs hover:shadow-md transition-all">
+        <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Pelanggan</span>
-            <div className="w-9 h-9 rounded-xl bg-pink-50 text-[#DE5795] flex items-center justify-center">
-              <Users className="w-4 h-4" />
+            <div className="w-10 h-10 rounded-xl bg-pink-50 flex items-center justify-center text-[#DE5795]">
+              <Users className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-3">
-            <h3 className="text-2xl font-black text-gray-900">1.482</h3>
-            <div className="flex items-center gap-1.5 mt-1 text-xs">
-              <span className="text-emerald-600 font-bold flex items-center gap-0.5">
-                <ArrowUpRight className="w-3.5 h-3.5" /> +18.4%
-              </span>
-              <span className="text-gray-400">vs bulan lalu</span>
+            <div className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+              1.482
             </div>
-          </div>
-          <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-500">
-            <span>WhatsApp Terverifikasi</span>
-            <span className="font-bold text-gray-800">98.2%</span>
+            <div className="flex items-center gap-1.5 mt-2 text-xs text-emerald-600 font-semibold">
+              <TrendingUp className="w-3.5 h-3.5" />
+              <span>+14.2%</span>
+              <span className="text-gray-400 font-normal">pertumbuhan bln ini</span>
+            </div>
           </div>
         </div>
 
-        {/* Card 2: Member Aktif Loyalty */}
-        <div className="p-5 rounded-2xl bg-white border border-gray-200/90 shadow-2xs hover:shadow-md transition-all">
+        {/* Card 2: Tamu VIP & Loyal */}
+        <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Member Loyalty</span>
-            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-              <Crown className="w-4 h-4" />
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tamu VIP & Loyal</span>
+            <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
+              <Crown className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-3">
-            <h3 className="text-2xl font-black text-gray-900">428</h3>
-            <div className="flex items-center gap-1.5 mt-1 text-xs">
-              <span className="text-[#DE5795] font-bold">28.8%</span>
-              <span className="text-gray-400">dari total pelanggan</span>
+            <div className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+              428
             </div>
-          </div>
-          <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-500">
-            <span>VIP Diamond & Gold</span>
-            <span className="font-bold text-[#DE5795]">142 Member</span>
+            <div className="flex items-center gap-1.5 mt-2 text-xs text-amber-600 font-semibold">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>28.9%</span>
+              <span className="text-gray-400 font-normal">kontributor omset booth</span>
+            </div>
           </div>
         </div>
 
-        {/* Card 3: Voucher Terpakai */}
-        <div className="p-5 rounded-2xl bg-white border border-gray-200/90 shadow-2xs hover:shadow-md transition-all">
+        {/* Card 3: Rata-Rata Sesi */}
+        <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Voucher Digunakan</span>
-            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <Ticket className="w-4 h-4" />
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Rata-Rata Kunjungan</span>
+            <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
+              <Camera className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-3">
-            <h3 className="text-2xl font-black text-gray-900">892 <span className="text-xs text-gray-400 font-normal">Klaim</span></h3>
-            <div className="flex items-center gap-1.5 mt-1 text-xs">
-              <span className="text-emerald-600 font-bold">64.1%</span>
-              <span className="text-gray-400">conversion rate klaim</span>
+            <div className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+              {avgSessions}x / Tamu
             </div>
-          </div>
-          <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-500">
-            <span>Total Potongan Terberikan</span>
-            <span className="font-bold text-gray-800">Rp 12.840.000</span>
+            <div className="flex items-center gap-1.5 mt-2 text-xs text-purple-600 font-semibold">
+              <History className="w-3.5 h-3.5" />
+              <span>{customersList.reduce((acc, c) => acc + c.totalSessions, 0)} Total Sesi</span>
+              <span className="text-gray-400 font-normal">tercatat</span>
+            </div>
           </div>
         </div>
 
-        {/* Card 4: Saldo Poin Reward */}
-        <div className="p-5 rounded-2xl bg-white border border-gray-200/90 shadow-2xs hover:shadow-md transition-all">
+        {/* Card 4: Retensi Tamu */}
+        <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Saldo Poin Beredar</span>
-            <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
-              <Sparkles className="w-4 h-4" />
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tingkat Retensi</span>
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+              <UserCheck className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-3">
-            <h3 className="text-2xl font-black text-gray-900">24.850 <span className="text-xs text-gray-400 font-normal">Pts</span></h3>
-            <div className="flex items-center gap-1.5 mt-1 text-xs">
-              <span className="text-purple-600 font-bold">Setara Rp 2.48jt</span>
-              <span className="text-gray-400">nilai reward kasir</span>
+            <div className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+              68.4%
             </div>
-          </div>
-          <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-500">
-            <span>Poin Ditukar Bulan Ini</span>
-            <span className="font-bold text-gray-800">6.120 Pts</span>
+            <div className="flex items-center gap-1.5 mt-2 text-xs text-emerald-600 font-semibold">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>Sangat Baik</span>
+              <span className="text-gray-400 font-normal">kembali dlm 60 hari</span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Segmented Navigation Tabs */}
-      <div className="flex items-center border-b border-gray-200 gap-6">
-        <button
-          onClick={() => setActiveTab('customers')}
-          className={`pb-3.5 text-xs font-bold transition-all border-b-2 flex items-center gap-2 ${
-            activeTab === 'customers'
-              ? 'border-[#DE5795] text-[#9D174D]'
-              : 'border-transparent text-gray-500 hover:text-gray-800'
-          }`}
-        >
-          <Users className="w-4 h-4" />
-          <span>Direktori Pelanggan & Member</span>
-          <span className="px-2 py-0.5 rounded-full text-[10px] bg-pink-100 text-[#9D174D] font-bold">
-            {mockCustomers.length} Tamu
-          </span>
-        </button>
+      {/* FILTER & SEGMENTATION TABS */}
+      <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xs p-4 sm:p-5 space-y-4">
+        {/* Segment Tabs */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <button
+            onClick={() => setSelectedSegmentFilter('ALL')}
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
+              selectedSegmentFilter === 'ALL'
+                ? 'bg-[#DE5795] text-white shadow-xs'
+                : 'bg-gray-100 hover:bg-gray-200/70 text-gray-700'
+            }`}
+          >
+            <span>Semua Tamu</span>
+            <span
+              className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                selectedSegmentFilter === 'ALL'
+                  ? 'bg-white/20 text-white'
+                  : 'bg-gray-200 text-gray-600'
+              }`}
+            >
+              {segmentCounts.ALL}
+            </span>
+          </button>
 
-        <button
-          onClick={() => setActiveTab('vouchers')}
-          className={`pb-3.5 text-xs font-bold transition-all border-b-2 flex items-center gap-2 ${
-            activeTab === 'vouchers'
-              ? 'border-[#DE5795] text-[#9D174D]'
-              : 'border-transparent text-gray-500 hover:text-gray-800'
-          }`}
-        >
-          <Ticket className="w-4 h-4" />
-          <span>Voucher Promo & Diskon Kiosk</span>
-          <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-700 font-bold">
-            {mockPromoVouchers.filter((v) => v.status === 'ACTIVE').length} Aktif
-          </span>
-        </button>
+          <button
+            onClick={() => setSelectedSegmentFilter('VIP')}
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
+              selectedSegmentFilter === 'VIP'
+                ? 'bg-[#DE5795] text-white shadow-xs'
+                : 'bg-gray-100 hover:bg-gray-200/70 text-gray-700'
+            }`}
+          >
+            <Crown className="w-3.5 h-3.5" />
+            <span>VIP & Loyal</span>
+            <span
+              className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                selectedSegmentFilter === 'VIP'
+                  ? 'bg-white/20 text-white'
+                  : 'bg-amber-100 text-amber-800'
+              }`}
+            >
+              {segmentCounts.VIP}
+            </span>
+          </button>
 
-        <button
-          onClick={() => setActiveTab('broadcast')}
-          className={`pb-3.5 text-xs font-bold transition-all border-b-2 flex items-center gap-2 ${
-            activeTab === 'broadcast'
-              ? 'border-[#DE5795] text-[#9D174D]'
-              : 'border-transparent text-gray-500 hover:text-gray-800'
-          }`}
-        >
-          <Send className="w-4 h-4" />
-          <span>Otomasi Broadcast WA & Ulang Tahun</span>
-          <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-700 font-bold">
-            3 Kampanye
-          </span>
-        </button>
+          <button
+            onClick={() => setSelectedSegmentFilter('REGULAR')}
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
+              selectedSegmentFilter === 'REGULAR'
+                ? 'bg-[#DE5795] text-white shadow-xs'
+                : 'bg-gray-100 hover:bg-gray-200/70 text-gray-700'
+            }`}
+          >
+            <span>Regular</span>
+            <span
+              className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                selectedSegmentFilter === 'REGULAR'
+                  ? 'bg-white/20 text-white'
+                  : 'bg-blue-100 text-blue-800'
+              }`}
+            >
+              {segmentCounts.REGULAR}
+            </span>
+          </button>
 
-        <button
-          onClick={() => setActiveTab('tiers')}
-          className={`pb-3.5 text-xs font-bold transition-all border-b-2 flex items-center gap-2 ${
-            activeTab === 'tiers'
-              ? 'border-[#DE5795] text-[#9D174D]'
-              : 'border-transparent text-gray-500 hover:text-gray-800'
-          }`}
-        >
-          <Crown className="w-4 h-4" />
-          <span>Skema Tingkatan Member (Loyalty Tiers)</span>
-        </button>
-      </div>
+          <button
+            onClick={() => setSelectedSegmentFilter('NEW')}
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
+              selectedSegmentFilter === 'NEW'
+                ? 'bg-[#DE5795] text-white shadow-xs'
+                : 'bg-gray-100 hover:bg-gray-200/70 text-gray-700'
+            }`}
+          >
+            <span>Pengunjung Baru (New)</span>
+            <span
+              className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                selectedSegmentFilter === 'NEW'
+                  ? 'bg-white/20 text-white'
+                  : 'bg-emerald-100 text-emerald-800'
+              }`}
+            >
+              {segmentCounts.NEW}
+            </span>
+          </button>
 
-      {/* TAB 1: Direktori Pelanggan */}
-      {activeTab === 'customers' && (
-        <div className="space-y-4">
-          {/* Filter and Search Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-gray-200/90 shadow-2xs">
-            <div className="relative flex-1 max-w-md">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Cari nama tamu, WhatsApp, email, atau tag..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 text-xs bg-gray-50/70 border border-gray-200 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-hidden focus:bg-white focus:border-[#DE5795]"
-              />
-            </div>
+          <button
+            onClick={() => setSelectedSegmentFilter('INACTIVE')}
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
+              selectedSegmentFilter === 'INACTIVE'
+                ? 'bg-[#DE5795] text-white shadow-xs'
+                : 'bg-gray-100 hover:bg-gray-200/70 text-gray-700'
+            }`}
+          >
+            <span>Inactive (&gt; 60 Hari)</span>
+            <span
+              className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                selectedSegmentFilter === 'INACTIVE'
+                  ? 'bg-white/20 text-white'
+                  : 'bg-gray-200 text-gray-700'
+              }`}
+            >
+              {segmentCounts.INACTIVE}
+            </span>
+          </button>
+        </div>
 
-            <div className="flex items-center gap-2.5 flex-wrap">
-              {/* Filter Tier */}
-              <select
-                value={selectedTierFilter}
-                onChange={(e) => setSelectedTierFilter(e.target.value)}
-                className="px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-700 font-medium focus:outline-hidden focus:border-[#DE5795]"
-              >
-                <option value="ALL">Semua Tier Member</option>
-                <option value="VIP">VIP Diamond</option>
-                <option value="GOLD">Gold Enthusiast</option>
-                <option value="SILVER">Silver Explorer</option>
-                <option value="BRONZE">Bronze Member</option>
-              </select>
-
-              {/* Filter Booth */}
-              <select
-                value={selectedBoothFilter}
-                onChange={(e) => setSelectedBoothFilter(e.target.value)}
-                className="px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-700 font-medium focus:outline-hidden focus:border-[#DE5795]"
-              >
-                <option value="ALL">Semua Lokasi Booth</option>
-                <option value="Grand Indonesia">Grand Indonesia</option>
-                <option value="Central Park">Central Park</option>
-                <option value="Paris Van Java">PVJ Bandung</option>
-                <option value="Senayan City">Senayan City</option>
-              </select>
-
+        {/* Search, Location, and Sort Controls */}
+        <div className="flex flex-col md:flex-row gap-3 pt-2 border-t border-gray-100">
+          {/* Search Input */}
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Cari nama tamu, WhatsApp, email, atau domisili kota..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#DE5795] focus:border-transparent transition-all placeholder:text-gray-400"
+            />
+            {searchQuery && (
               <button
-                onClick={() => {
-                  setSearchQuery('');
-                  setSelectedTierFilter('ALL');
-                  setSelectedBoothFilter('ALL');
-                }}
-                className="px-3 py-2 text-xs text-gray-500 hover:text-gray-800 font-medium"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
-                Reset Filter
+                <X className="w-4 h-4" />
               </button>
-            </div>
+            )}
           </div>
 
-          {/* Customers Table */}
-          <div className="rounded-2xl border border-gray-200/90 bg-white shadow-2xs overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-gray-50/75 border-b border-gray-200/90 text-gray-500 font-bold uppercase tracking-wider text-[10px]">
-                  <tr>
-                    <th className="px-5 py-3.5">Pelanggan & Kontak</th>
-                    <th className="px-4 py-3.5">Tier & Saldo Poin</th>
-                    <th className="px-4 py-3.5">Total Belanja & Sesi</th>
-                    <th className="px-4 py-3.5">Booth Favorit</th>
-                    <th className="px-4 py-3.5">Kunjungan Terakhir</th>
-                    <th className="px-4 py-3.5 text-right">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {filteredCustomers.map((cust) => (
-                    <tr key={cust.id} className="hover:bg-pink-50/20 transition-colors group">
-                      {/* Name & Contact */}
-                      <td className="px-5 py-4">
+          {/* Booth Location Filter */}
+          <div className="w-full md:w-60">
+            <select
+              value={selectedBoothFilter}
+              onChange={(e) => setSelectedBoothFilter(e.target.value)}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#DE5795] focus:border-transparent transition-all text-gray-700"
+            >
+              <option value="ALL">Semua Lokasi Booth</option>
+              <option value="Grand Indonesia">Grand Indonesia (Alpha)</option>
+              <option value="Central Park">Central Park (Beta)</option>
+              <option value="Paris Van Java">PVJ Bandung (Gamma)</option>
+              <option value="Senayan City">Senayan City (Epsilon)</option>
+            </select>
+          </div>
+
+          {/* Sort By Dropdown */}
+          <div className="w-full md:w-52">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#DE5795] focus:border-transparent transition-all text-gray-700"
+            >
+              <option value="NEWEST">Urutkan: Tamu Terbaru</option>
+              <option value="SPENT_DESC">Belanja Tertinggi</option>
+              <option value="SESSIONS_DESC">Sesi Terbanyak</option>
+              <option value="NAME_ASC">Nama (A - Z)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* CUSTOMER DIRECTORY TABLE */}
+      <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xs overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-50/80 border-b border-gray-200 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                <th className="py-3.5 px-5">Tamu / Profil</th>
+                <th className="py-3.5 px-4">Kontak & Domisili</th>
+                <th className="py-3.5 px-4 text-center">Segmentasi</th>
+                <th className="py-3.5 px-4">Total Sesi & Belanja</th>
+                <th className="py-3.5 px-4">Booth Favorit</th>
+                <th className="py-3.5 px-4">Kunjungan Terakhir</th>
+                <th className="py-3.5 px-5 text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100 text-sm">
+              {filteredCustomers.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-12 text-center text-gray-400">
+                    <Users className="w-12 h-12 mx-auto text-gray-300 mb-3" />
+                    <p className="text-base font-semibold text-gray-600">Tidak ada data tamu yang cocok</p>
+                    <p className="text-xs text-gray-400 mt-1">Coba ubah kata kunci pencarian atau filter segmen</p>
+                  </td>
+                </tr>
+              ) : (
+                filteredCustomers.map((cust) => {
+                  return (
+                    <tr
+                      key={cust.id}
+                      onClick={() => handleOpenDetail(cust)}
+                      className="hover:bg-pink-50/20 cursor-pointer transition-colors group"
+                    >
+                      {/* Name & Avatar */}
+                      <td className="py-4 px-5">
                         <div className="flex items-center gap-3">
-                          <img
-                            src={cust.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}
-                            alt={cust.name}
-                            className="w-10 h-10 rounded-full object-cover border border-gray-200 shrink-0 shadow-2xs"
-                          />
+                          {cust.avatarUrl ? (
+                            <img
+                              src={cust.avatarUrl}
+                              alt={cust.name}
+                              className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-xs shrink-0"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-pink-100 text-[#DE5795] font-bold flex items-center justify-center text-sm border-2 border-white shadow-xs shrink-0">
+                              {cust.name.slice(0, 2).toUpperCase()}
+                            </div>
+                          )}
                           <div className="min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold text-gray-900 group-hover:text-[#DE5795] transition-colors">
-                                {cust.name}
-                              </span>
+                            <div className="font-bold text-gray-900 group-hover:text-[#DE5795] transition-colors truncate">
+                              {cust.name}
                             </div>
-                            <div className="flex items-center gap-2 text-gray-500 text-[11px] mt-0.5">
-                              <span className="flex items-center gap-1">
-                                <Phone className="w-3 h-3 text-emerald-600" />
-                                {cust.phone}
-                              </span>
+                            <div className="text-xs text-gray-400 flex items-center gap-2 mt-0.5">
+                              <span>{cust.id}</span>
                               <span>•</span>
-                              <span>{cust.email}</span>
-                            </div>
-                            {/* Tags */}
-                            <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                              {cust.tags.map((tag) => (
-                                <span
-                                  key={tag}
-                                  className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-gray-100 text-gray-600 border border-gray-200"
-                                >
-                                  {tag}
-                                </span>
-                              ))}
+                              <span>Bergabung {cust.registeredAt}</span>
                             </div>
                           </div>
                         </div>
                       </td>
 
-                      {/* Tier & Points */}
-                      <td className="px-4 py-4">
-                        <div className="space-y-1">
-                          <span
-                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${getTierBadgeStyle(
-                              cust.tier
-                            )}`}
-                          >
-                            <Crown className="w-3 h-3" />
-                            {cust.tier} Member
-                          </span>
-                          <div className="text-[11px] text-gray-500 flex items-center gap-1">
-                            <Sparkles className="w-3 h-3 text-purple-500" />
-                            <span className="font-bold text-purple-700">{cust.pointsBalance} Pts</span>
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* Total Spent & Sessions */}
-                      <td className="px-4 py-4">
+                      {/* Contact & City */}
+                      <td className="py-4 px-4">
                         <div className="space-y-0.5">
-                          <span className="font-bold text-gray-900 block">
+                          <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-800">
+                            <Phone className="w-3.5 h-3.5 text-gray-400" />
+                            <span>{cust.phone}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                            <MapPin className="w-3.5 h-3.5 text-gray-400" />
+                            <span>{cust.city || 'Jabodetabek'}</span>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Segment Badge */}
+                      <td className="py-4 px-4 text-center">
+                        {cust.segment === 'VIP' && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                            <Crown className="w-3 h-3 text-amber-600" />
+                            VIP Tamu
+                          </span>
+                        )}
+                        {cust.segment === 'REGULAR' && (
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 border border-blue-200">
+                            Regular
+                          </span>
+                        )}
+                        {cust.segment === 'NEW' && (
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            Pengunjung Baru
+                          </span>
+                        )}
+                        {cust.segment === 'INACTIVE' && (
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-200">
+                            Inactive &gt;60h
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Sessions & Spent */}
+                      <td className="py-4 px-4">
+                        <div>
+                          <div className="font-extrabold text-gray-900 text-sm">
                             {formatRupiah(cust.totalSpent)}
-                          </span>
-                          <span className="text-[11px] text-gray-500 flex items-center gap-1">
-                            <Camera className="w-3 h-3 text-[#DE5795]" />
-                            {cust.totalSessions} sesi foto
-                          </span>
+                          </div>
+                          <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+                            <span className="font-medium text-gray-700">{cust.totalSessions} sesi foto</span>
+                            <span>•</span>
+                            <span>avg {formatRupiah(cust.averageSpent)}</span>
+                          </div>
                         </div>
                       </td>
 
                       {/* Favorite Booth */}
-                      <td className="px-4 py-4">
-                        <div className="space-y-0.5">
-                          <span className="font-semibold text-gray-800 text-[11px] block">
-                            {cust.favoriteBooth}
-                          </span>
-                          <span className="text-[10px] text-gray-400">
-                            Fav: {cust.favoriteTemplate}
-                          </span>
+                      <td className="py-4 px-4">
+                        <div className="space-y-1">
+                          <div className="text-xs font-semibold text-gray-800 truncate max-w-[180px] flex items-center gap-1.5">
+                            <Store className="w-3.5 h-3.5 text-pink-500 shrink-0" />
+                            <span className="truncate">{cust.favoriteBooth}</span>
+                          </div>
+                          <div className="text-[11px] text-gray-400 truncate max-w-[180px]">
+                            {cust.favoriteTemplate}
+                          </div>
                         </div>
                       </td>
 
                       {/* Last Visit */}
-                      <td className="px-4 py-4">
-                        <div className="space-y-0.5 text-[11px]">
-                          <span className="text-gray-700 font-medium block">
-                            {cust.lastVisitAt}
-                          </span>
-                          <span className="text-[10px] text-gray-400">
-                            Sejak {cust.registeredAt}
-                          </span>
+                      <td className="py-4 px-4">
+                        <div className="text-xs text-gray-700 font-medium">
+                          {cust.lastVisitAt}
                         </div>
                       </td>
 
                       {/* Actions */}
-                      <td className="px-4 py-4 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
+                      <td className="py-4 px-5 text-right">
+                        <div
+                          className="flex items-center justify-end gap-2"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <button
-                            onClick={() => {
-                              setQuickWACustomer(cust);
-                              setIsQuickWADrawerOpen(true);
+                            id={`wa-btn-${cust.id}`}
+                            data-action="chat-wa"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenQuickWA(cust, e);
                             }}
-                            title="Kirim Voucher via WhatsApp"
-                            className="p-1.5 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors"
+                            title="Chat WhatsApp Tamu"
+                            className="p-2 rounded-xl text-emerald-600 hover:bg-emerald-50 border border-emerald-100/60 hover:border-emerald-200 transition-all"
                           >
-                            <Send className="w-3.5 h-3.5" />
+                            <MessageCircle className="w-4 h-4" />
                           </button>
 
                           <button
-                            onClick={() => {
-                              setSelectedCustomer(cust);
-                              setIsCustomerDrawerOpen(true);
+                            id={`detail-btn-${cust.id}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenDetail(cust);
                             }}
-                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-[#DE5795] text-[11px] font-semibold transition-colors"
+                            className="px-3 py-1.5 rounded-xl text-xs font-semibold text-[#DE5795] bg-pink-50 hover:bg-pink-100 border border-pink-200 transition-all flex items-center gap-1"
                           >
-                            <span>Detail Sesi</span>
+                            <span>Detail</span>
                             <ChevronRight className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Table Footer / Summary */}
+        <div className="py-3 px-5 bg-gray-50/70 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
+          <div>
+            Menampilkan <span className="font-semibold text-gray-800">{filteredCustomers.length}</span> dari{' '}
+            <span className="font-semibold text-gray-800">{customersList.length}</span> total tamu terdata
+          </div>
+          <div className="flex items-center gap-4">
+            <span>
+              Total Akumulasi Belanja:{' '}
+              <strong className="text-gray-900">{formatRupiah(totalSpentAll)}</strong>
+            </span>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* TAB 2: Voucher Promo & Diskon Kiosk */}
-      {activeTab === 'vouchers' && (
-        <div className="space-y-6">
-          {/* Header Action Card */}
-          <div className="p-5 rounded-2xl bg-gradient-to-r from-pink-500 to-[#DE5795] text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
-            <div>
-              <span className="px-2.5 py-1 rounded-full bg-white/20 text-white text-[10px] font-bold tracking-wider uppercase">
-                Loyalty & Promotion Engine
-              </span>
-              <h2 className="text-xl font-bold mt-2">Kupon & Voucher Promo Terintegrasi Kiosk</h2>
-              <p className="text-xs text-pink-100 mt-1 max-w-xl">
-                Kode voucher langsung dapat diinput pengunjung pada layar sentuh booth atau dipindai otomatis via QR Code sebelum pembayaran kasir/QRIS.
-              </p>
-            </div>
-            <button
-              onClick={() => setIsAddVoucherOpen(true)}
-              className="px-4 py-2.5 bg-white text-[#9D174D] rounded-xl text-xs font-bold hover:bg-pink-50 transition-all shrink-0 shadow-xs"
-            >
-              + Tambah Voucher Baru
-            </button>
-          </div>
+      {/* FLOATING SLIDE-OVER DRAWER: CUSTOMER DETAIL & RIWAYAT SESI */}
+      {mounted &&
+        isCustomerDrawerOpen &&
+        selectedCustomer &&
+        createPortal(
+          <div className="fixed inset-0 z-[999] overflow-hidden animate-fade-in">
+            {/* Backdrop covering whole viewport including sidebar and header */}
+            <div
+              onClick={() => setIsCustomerDrawerOpen(false)}
+              className="fixed inset-0 bg-gray-900/50 backdrop-blur-xs transition-opacity"
+            />
 
-          {/* Grid of Vouchers */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {mockPromoVouchers.map((voucher) => {
-              const quotaPercent = Math.round((voucher.usedCount / voucher.totalQuota) * 100);
-              const isDepleted = voucher.status === 'DEPLETED';
-
-              return (
-                <div
-                  key={voucher.id}
-                  className={`rounded-2xl border bg-white p-5 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden ${
-                    isDepleted ? 'border-gray-200 opacity-75' : 'border-pink-200/90'
-                  }`}
-                >
-                  {/* Decorative background circle */}
-                  <div className="absolute -top-10 -right-10 w-28 h-28 bg-pink-50/50 rounded-full pointer-events-none" />
-
-                  <div className="space-y-3">
-                    {/* Top status & type */}
-                    <div className="flex items-center justify-between">
-                      <span
-                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
-                          voucher.status === 'ACTIVE'
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                            : 'bg-gray-100 text-gray-500 border-gray-200'
-                        }`}
-                      >
-                        {voucher.status === 'ACTIVE' ? '● Aktif Digunakan' : '● Kuota Habis'}
-                      </span>
-
-                      <span className="text-[11px] font-bold text-gray-400">
-                        {voucher.applicableBooths.includes('ALL') ? 'Semua Booth' : 'Khusus Mall'}
-                      </span>
-                    </div>
-
-                    {/* Voucher Code Box */}
-                    <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-dashed border-gray-300 group">
-                      <div className="flex items-center gap-2">
-                        <Tag className="w-4 h-4 text-[#DE5795]" />
-                        <span className="font-mono text-sm font-black text-gray-900 tracking-wider">
-                          {voucher.code}
-                        </span>
-                      </div>
-                      <button
-                        onClick={() => handleCopyCode(voucher.code)}
-                        className="p-1 rounded-md text-gray-400 hover:text-[#DE5795] transition-colors"
-                        title="Salin Kode Kupon"
-                      >
-                        {copiedVoucherCode === voucher.code ? (
-                          <Check className="w-4 h-4 text-emerald-600" />
-                        ) : (
-                          <Copy className="w-4 h-4" />
-                        )}
-                      </button>
-                    </div>
-
-                    {/* Title & Description */}
-                    <div>
-                      <h4 className="font-bold text-gray-900 text-sm">{voucher.title}</h4>
-                      <p className="text-xs text-gray-500 mt-1 line-clamp-2">{voucher.description}</p>
-                    </div>
-
-                    {/* Discount Value Highlight */}
-                    <div className="p-2.5 rounded-xl bg-pink-50/70 border border-pink-100 flex items-center justify-between">
-                      <span className="text-[11px] font-semibold text-[#9D174D]">Nilai Manfaat:</span>
-                      <span className="text-xs font-black text-[#9D174D]">
-                        {voucher.discountType === 'PERCENTAGE' && `Diskon ${voucher.discountValue}%`}
-                        {voucher.discountType === 'FIXED_AMOUNT' && `Potongan ${formatRupiah(voucher.discountValue)}`}
-                        {voucher.discountType === 'FREE_PRINT' && `Free 1 Strip Cetak`}
-                      </span>
-                    </div>
-
-                    {/* Quota Progress Bar */}
-                    <div className="space-y-1.5 pt-1">
-                      <div className="flex items-center justify-between text-[11px] font-medium text-gray-500">
-                        <span>Penggunaan Kuota:</span>
-                        <span className="font-bold text-gray-800">
-                          {voucher.usedCount} / {voucher.totalQuota} ({quotaPercent}%)
-                        </span>
-                      </div>
-                      <div className="w-full h-2 rounded-full bg-gray-100 overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-all ${
-                            quotaPercent >= 90
-                              ? 'bg-rose-500'
-                              : quotaPercent >= 60
-                              ? 'bg-amber-500'
-                              : 'bg-[#DE5795]'
-                          }`}
-                          style={{ width: `${Math.min(quotaPercent, 100)}%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Expiry & Bottom actions */}
-                  <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-gray-400" />
-                      s/d {voucher.validUntil}
-                    </span>
-
-                    <button
-                      onClick={() => handleCopyCode(voucher.code)}
-                      className="font-bold text-[#DE5795] hover:text-[#9D174D] flex items-center gap-1"
-                    >
-                      <span>Pakai Kupon</span>
-                      <ArrowUpRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* TAB 3: Otomasi Broadcast WA & Ulang Tahun */}
-      {activeTab === 'broadcast' && (
-        <div className="space-y-6">
-          {/* Automation Overview Card */}
-          <div className="p-5 rounded-2xl bg-white border border-gray-200/90 shadow-2xs">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold tracking-wider uppercase">
-                  WhatsApp Cloud API Engine
-                </span>
-                <h3 className="text-lg font-bold text-gray-900 mt-2">
-                  Otomasi Kirim Voucher & Pengingat Tamu
-                </h3>
-                <p className="text-xs text-gray-500 mt-1 max-w-2xl">
-                  Sistem otomatis mendeteksi hari ulang tahun pelanggan dan tamu yang tidak berkunjung dalam 30 hari untuk mengirimkan voucher khusus via WhatsApp Resmi.
-                </p>
-              </div>
-
-              <div className="text-right shrink-0">
-                <span className="text-[11px] text-gray-400 block">Status WhatsApp Gateway</span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 mt-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Terhubung (Official WABA)
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Campaign List */}
-          <div className="space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400">
-              Daftar Kampanye Broadcast Aktif & Terjadwal
-            </h4>
-
-            <div className="grid grid-cols-1 gap-4">
-              {mockBroadcastCampaigns.map((camp) => (
-                <div
-                  key={camp.id}
-                  className="p-5 rounded-2xl bg-white border border-gray-200/90 shadow-2xs hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
-                >
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2.5 flex-wrap">
-                      <span className="font-bold text-gray-900 text-sm">{camp.title}</span>
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                          camp.status === 'SENT'
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : 'bg-blue-50 text-blue-700 border border-blue-200'
-                        }`}
-                      >
-                        {camp.status === 'SENT' ? '✓ Terkirim' : '🕒 Terjadwal'}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-4 text-xs text-gray-500 flex-wrap">
-                      <span className="flex items-center gap-1">
-                        <Users className="w-3.5 h-3.5 text-gray-400" />
-                        Target: <strong className="text-gray-700">{camp.targetAudience}</strong>
-                      </span>
-                      <span>•</span>
-                      <span className="flex items-center gap-1">
-                        <Ticket className="w-3.5 h-3.5 text-[#DE5795]" />
-                        Voucher: <strong className="text-[#DE5795]">{camp.voucherAttached}</strong>
-                      </span>
-                      <span>•</span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5 text-gray-400" />
-                        {camp.sentDate}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4 self-end md:self-center">
-                    <div className="text-right">
-                      <span className="text-[10px] text-gray-400 uppercase font-bold block">
-                        Tingkat Konversi
-                      </span>
-                      <span className="text-xs font-black text-emerald-700">
-                        {camp.conversionRate}
-                      </span>
-                    </div>
-
-                    <button
-                      onClick={() => showToast(`Simulasi pemicuan ulang kampanye "${camp.title}" dimulai!`)}
-                      className="px-3.5 py-2 bg-gray-50 hover:bg-pink-50 hover:text-[#9D174D] border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 transition-colors"
-                    >
-                      Kirim Sekarang
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 4: Skema Tingkatan Member (Loyalty Tiers) */}
-      {activeTab === 'tiers' && (
-        <div className="space-y-6">
-          <div className="p-5 rounded-2xl bg-white border border-gray-200/90 shadow-2xs">
-            <h3 className="text-base font-bold text-gray-900">
-              Struktur Keuntungan Tingkatan Member (Loyalty Rewards)
-            </h3>
-            <p className="text-xs text-gray-500 mt-1">
-              Member otomatis naik tingkatan ketika total akumulasi transaksi mencapai batas minimal. Keuntungan langsung dapat dinikmati di seluruh mesin photo booth.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {mockLoyaltyTiers.map((tier) => (
-              <div
-                key={tier.tier}
-                className="p-5 rounded-2xl bg-white border border-gray-200/90 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
-              >
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-black border ${tier.badgeBg}`}
-                    >
-                      {tier.name}
-                    </span>
-                    <Crown className="w-4 h-4" style={{ color: tier.colorHex }} />
-                  </div>
-
-                  <div>
-                    <span className="text-[10px] text-gray-400 uppercase font-bold block">
-                      Minimal Belanja
-                    </span>
-                    <span className="text-lg font-black text-gray-900">
-                      {tier.minSpendThreshold === 0 ? 'Gratis Daftar' : formatRupiah(tier.minSpendThreshold)}
-                    </span>
-                  </div>
-
-                  <div className="space-y-2.5 pt-2 border-t border-gray-100 text-xs">
-                    <div className="flex items-center justify-between text-gray-600">
-                      <span>Kelipatan Poin:</span>
-                      <strong className="text-gray-900">{tier.pointsMultiplier}</strong>
-                    </div>
-
-                    <div className="flex items-center justify-between text-gray-600">
-                      <span>Cashback Poin:</span>
-                      <strong className="text-[#DE5795]">{tier.cashbackPercent}%</strong>
-                    </div>
-
-                    <div className="flex items-center justify-between text-gray-600">
-                      <span>Gratis Extra Print:</span>
-                      <strong className="text-gray-900">
-                        {tier.freeExtraPrintPerSession > 0 ? `+${tier.freeExtraPrintPerSession} Strip / Sesi` : 'Tidak Ada'}
-                      </strong>
-                    </div>
-
-                    <div className="flex items-center justify-between text-gray-600">
-                      <span>Template Eksklusif:</span>
-                      <strong className={tier.exclusiveFrames ? 'text-emerald-600 font-bold' : 'text-gray-400'}>
-                        {tier.exclusiveFrames ? '✓ Terbuka' : 'Terkunci'}
-                      </strong>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-5 pt-3 border-t border-gray-100">
-                  <span className="text-[11px] text-gray-400 text-center block">
-                    Otomatis terhubung dengan nomor HP WhatsApp tamu
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ======================================================== */}
-      {/* DRAWER 1: Detail Profil Pelanggan & Riwayat Sesi Foto   */}
-      {/* ======================================================== */}
-      {isCustomerDrawerOpen && selectedCustomer && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
-          <div
-            className="absolute inset-0 bg-gray-900/40 backdrop-blur-xs transition-opacity animate-in fade-in"
-            onClick={() => setIsCustomerDrawerOpen(false)}
-          />
-
-          <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none">
-            <div className="w-screen max-w-md pointer-events-auto rounded-3xl bg-white shadow-2xl border border-gray-100 flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-300">
-              {/* Header */}
-              <div className="px-8 pt-7 pb-7.5 border-b border-gray-100 flex items-center justify-between bg-gradient-to-b from-gray-50/60 to-white">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-pink-50 text-[#DE5795] flex items-center justify-center font-bold">
-                    <Users className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-gray-900">Profil Tamu & Member</h3>
-                    <p className="text-xs text-gray-400">ID: {selectedCustomer.id}</p>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => setIsCustomerDrawerOpen(false)}
-                  className="p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Scrollable Content */}
-              <div className="flex-1 overflow-y-auto px-8 py-6 space-y-6">
-                {/* Profile Card */}
-                <div className="p-4 rounded-2xl bg-pink-50/40 border border-pink-100 flex items-center gap-4">
-                  <img
-                    src={selectedCustomer.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}
-                    alt={selectedCustomer.name}
-                    className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm shrink-0"
-                  />
-                  <div className="min-w-0">
-                    <h4 className="font-bold text-gray-900 text-base">{selectedCustomer.name}</h4>
-                    <span
-                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border mt-1 ${getTierBadgeStyle(
-                        selectedCustomer.tier
-                      )}`}
-                    >
-                      <Crown className="w-3 h-3" />
-                      {selectedCustomer.tier} Member
-                    </span>
-                    <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
-                      <Phone className="w-3 h-3 text-emerald-600" />
-                      {selectedCustomer.phone}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Metrics Summary */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-100">
-                    <span className="text-[10px] text-gray-400 font-bold uppercase block">Total Belanja</span>
-                    <span className="text-sm font-black text-gray-900 mt-0.5 block">
-                      {formatRupiah(selectedCustomer.totalSpent)}
-                    </span>
-                    <span className="text-[10px] text-gray-500">{selectedCustomer.totalSessions} sesi foto</span>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-purple-50/50 border border-purple-100">
-                    <span className="text-[10px] text-purple-600 font-bold uppercase block">Saldo Poin</span>
-                    <span className="text-sm font-black text-purple-800 mt-0.5 block">
-                      {selectedCustomer.pointsBalance} Pts
-                    </span>
-                    <span className="text-[10px] text-purple-600">Setara diskon Rp {selectedCustomer.pointsBalance * 100}</span>
-                  </div>
-                </div>
-
-                {/* Preferences */}
-                <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-100 space-y-1.5 text-xs">
-                  <div className="flex items-center justify-between text-gray-600">
-                    <span>Booth Favorit:</span>
-                    <strong className="text-gray-900">{selectedCustomer.favoriteBooth}</strong>
-                  </div>
-                  <div className="flex items-center justify-between text-gray-600">
-                    <span>Template Favorit:</span>
-                    <strong className="text-[#DE5795]">{selectedCustomer.favoriteTemplate}</strong>
-                  </div>
-                </div>
-
-                {/* Riwayat Sesi Foto */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h5 className="text-xs font-bold uppercase tracking-wider text-gray-700">
-                      Riwayat Sesi Foto Tamu
-                    </h5>
-                    <span className="text-[11px] text-gray-400">
-                      {selectedCustomer.sessionHistory?.length || 0} Sesi Tercatat
-                    </span>
-                  </div>
-
-                  <div className="space-y-2.5">
-                    {selectedCustomer.sessionHistory && selectedCustomer.sessionHistory.length > 0 ? (
-                      selectedCustomer.sessionHistory.map((ses) => (
-                        <div
-                          key={ses.sessionId}
-                          className="p-3.5 rounded-xl border border-gray-200/80 bg-white hover:border-[#DE5795]/50 transition-colors space-y-2"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="font-mono text-xs font-bold text-gray-900">
-                              {ses.sessionCode}
-                            </span>
-                            <span className="font-bold text-xs text-[#DE5795]">
-                              {formatRupiah(ses.packagePrice)}
-                            </span>
-                          </div>
-
-                          <div className="text-[11px] text-gray-500 space-y-0.5">
-                            <p className="font-medium text-gray-800">{ses.templateName}</p>
-                            <p>{ses.boothName} • {ses.date}</p>
-                          </div>
-
-                          <div className="flex items-center justify-between text-[10px] text-gray-400 pt-1 border-t border-gray-50">
-                            <span>{ses.photosCount} Foto Diambil • {ses.printCopies} Strip Cetak</span>
-                            <span className="font-semibold text-emerald-600">{ses.paymentMethod}</span>
-                          </div>
-                        </div>
-                      ))
+            <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none z-[1000]">
+              <div className="pointer-events-auto w-screen max-w-xl bg-white shadow-2xl rounded-3xl flex flex-col border border-gray-100 overflow-hidden animate-slide-in h-full">
+                {/* Drawer Header */}
+                <div className="px-8 pt-7 pb-6 border-b border-gray-100 flex items-start justify-between bg-gradient-to-r from-pink-50/40 via-white to-white shrink-0">
+                  <div className="flex items-center gap-4">
+                    {selectedCustomer.avatarUrl ? (
+                      <img
+                        src={selectedCustomer.avatarUrl}
+                        alt={selectedCustomer.name}
+                        className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-md shrink-0"
+                      />
                     ) : (
-                      <div className="p-4 rounded-xl bg-gray-50 text-center text-xs text-gray-400">
-                        Belum ada detail riwayat sesi foto sebelumnya.
+                      <div className="w-14 h-14 rounded-2xl bg-pink-100 text-[#DE5795] font-extrabold flex items-center justify-center text-lg border-2 border-white shadow-md shrink-0">
+                        {selectedCustomer.name.slice(0, 2).toUpperCase()}
+                      </div>
+                    )}
+
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-xl font-bold text-gray-900">{selectedCustomer.name}</h2>
+                        {selectedCustomer.segment === 'VIP' && (
+                          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1">
+                            <Crown className="w-3 h-3 text-amber-600" /> VIP
+                          </span>
+                        )}
+                        {selectedCustomer.segment === 'NEW' && (
+                          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            New
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                        <span className="font-semibold text-gray-700">{selectedCustomer.id}</span>
+                        <span>•</span>
+                        <span>Bergabung sejak {selectedCustomer.registeredAt}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => setIsCustomerDrawerOpen(false)}
+                    className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Drawer Content */}
+                <div className="flex-1 overflow-y-auto px-8 py-6 space-y-6">
+                  {/* 3 Metric Snapshot Cards */}
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100 text-center">
+                      <span className="text-[11px] text-gray-400 font-semibold uppercase">Total Belanja</span>
+                      <div className="text-sm font-extrabold text-gray-900 mt-1">
+                        {formatRupiah(selectedCustomer.totalSpent)}
+                      </div>
+                    </div>
+                    <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100 text-center">
+                      <span className="text-[11px] text-gray-400 font-semibold uppercase">Total Sesi</span>
+                      <div className="text-sm font-extrabold text-[#DE5795] mt-1">
+                        {selectedCustomer.totalSessions} Sesi
+                      </div>
+                    </div>
+                    <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-100 text-center">
+                      <span className="text-[11px] text-gray-400 font-semibold uppercase">Rata-rata/Sesi</span>
+                      <div className="text-sm font-extrabold text-gray-900 mt-1">
+                        {formatRupiah(selectedCustomer.averageSpent)}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Contact Information */}
+                  <div className="p-5 rounded-2xl border border-gray-200/80 bg-white space-y-3">
+                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                      Informasi Kontak & Domisili
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      <div className="flex items-center gap-2.5 text-gray-700">
+                        <Phone className="w-4 h-4 text-emerald-500 shrink-0" />
+                        <div>
+                          <div className="text-[10px] text-gray-400">WhatsApp</div>
+                          <div className="font-semibold">{selectedCustomer.phone}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2.5 text-gray-700">
+                        <Mail className="w-4 h-4 text-blue-500 shrink-0" />
+                        <div>
+                          <div className="text-[10px] text-gray-400">Email</div>
+                          <div className="font-semibold truncate">{selectedCustomer.email}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2.5 text-gray-700">
+                        <MapPin className="w-4 h-4 text-rose-500 shrink-0" />
+                        <div>
+                          <div className="text-[10px] text-gray-400">Kota Domisili</div>
+                          <div className="font-semibold">{selectedCustomer.city || 'Jabodetabek'}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2.5 text-gray-700">
+                        <Calendar className="w-4 h-4 text-purple-500 shrink-0" />
+                        <div>
+                          <div className="text-[10px] text-gray-400">Tanggal Lahir</div>
+                          <div className="font-semibold">{selectedCustomer.birthDate || '-'}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Preferences & Behavior */}
+                  <div className="p-5 rounded-2xl border border-gray-200/80 bg-white space-y-3">
+                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                      Preferensi & Kebiasaan Tamu
+                    </h4>
+                    <div className="space-y-2 text-xs">
+                      <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
+                        <span className="text-gray-500 flex items-center gap-1.5">
+                          <Store className="w-4 h-4 text-pink-500" /> Booth Favorit:
+                        </span>
+                        <span className="font-bold text-gray-800">{selectedCustomer.favoriteBooth}</span>
+                      </div>
+                      <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
+                        <span className="text-gray-500 flex items-center gap-1.5">
+                          <Film className="w-4 h-4 text-purple-500" /> Frame Favorit:
+                        </span>
+                        <span className="font-bold text-gray-800">{selectedCustomer.favoriteTemplate}</span>
+                      </div>
+                      <div className="flex items-center justify-between py-1.5">
+                        <span className="text-gray-500 flex items-center gap-1.5">
+                          <Clock className="w-4 h-4 text-amber-500" /> Kunjungan Terakhir:
+                        </span>
+                        <span className="font-bold text-gray-800">{selectedCustomer.lastVisitAt}</span>
+                      </div>
+                    </div>
+
+                    {/* Tags */}
+                    {selectedCustomer.tags && selectedCustomer.tags.length > 0 && (
+                      <div className="pt-2">
+                        <div className="text-[10px] text-gray-400 uppercase font-semibold mb-1.5">Label / Tags:</div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {selectedCustomer.tags.map((tag, idx) => (
+                            <span
+                              key={idx}
+                              className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-gray-100 text-gray-700"
+                            >
+                              #{tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Notes */}
+                    {selectedCustomer.notes && (
+                      <div className="pt-2">
+                        <div className="text-[10px] text-gray-400 uppercase font-semibold mb-1">Catatan Staf / Booth:</div>
+                        <p className="text-xs text-gray-600 italic bg-amber-50/60 p-3 rounded-xl border border-amber-100">
+                          "{selectedCustomer.notes}"
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Sesi Foto History */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <Camera className="w-3.5 h-3.5 text-[#DE5795]" />
+                        Riwayat Sesi Foto Terakhir
+                      </h4>
+                      <span className="text-xs text-gray-400">
+                        {selectedCustomer.sessionHistory?.length || 0} sesi tercatat
+                      </span>
+                    </div>
+
+                    {selectedCustomer.sessionHistory && selectedCustomer.sessionHistory.length > 0 ? (
+                      <div className="space-y-2.5">
+                        {selectedCustomer.sessionHistory.map((sess, idx) => (
+                          <div
+                            key={idx}
+                            className="p-4 rounded-2xl border border-gray-200/80 bg-white hover:border-pink-200 transition-all space-y-2"
+                          >
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="font-extrabold text-gray-900">{sess.sessionCode}</span>
+                              <span className="font-bold text-[#DE5795]">{formatRupiah(sess.packagePrice)}</span>
+                            </div>
+                            <div className="text-xs text-gray-500 flex items-center gap-1.5">
+                              <Store className="w-3.5 h-3.5 text-gray-400" />
+                              <span>{sess.boothName}</span>
+                            </div>
+                            <div className="flex items-center justify-between pt-1 border-t border-gray-100 text-[11px] text-gray-400">
+                              <span>Template: {sess.templateName}</span>
+                              <span>
+                                {sess.photosCount} Foto • {sess.printCopies} Strip Cetak
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-6 bg-gray-50 rounded-2xl text-center text-xs text-gray-400">
+                        Belum ada riwayat sesi detail untuk pelanggan ini.
                       </div>
                     )}
                   </div>
                 </div>
-              </div>
 
-              {/* Footer */}
-              <div className="px-8 pt-5.5 pb-7 border-t border-gray-100 bg-white flex items-center justify-between gap-3">
-                <button
-                  onClick={() => setIsCustomerDrawerOpen(false)}
-                  className="px-4 py-2.5 text-xs font-semibold text-gray-600 hover:text-gray-900"
-                >
-                  Tutup
-                </button>
+                {/* Drawer Footer */}
+                <div className="px-8 pt-5 pb-6 border-t border-gray-100 flex items-center justify-between gap-3 bg-gray-50/50 shrink-0">
+                  <button
+                    onClick={() => setIsCustomerDrawerOpen(false)}
+                    className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-100 text-gray-700 text-xs font-semibold transition-all"
+                  >
+                    Tutup
+                  </button>
 
-                <button
-                  onClick={() => {
-                    setQuickWACustomer(selectedCustomer);
-                    setIsCustomerDrawerOpen(false);
-                    setIsQuickWADrawerOpen(true);
-                  }}
-                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>Kirim Voucher WhatsApp</span>
-                </button>
+                  <button
+                    id="drawer-wa-btn"
+                    onClick={() => {
+                      setIsCustomerDrawerOpen(false);
+                      handleOpenQuickWA(selectedCustomer);
+                    }}
+                    className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs flex items-center gap-2 transition-all"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>Kirim Pesan WhatsApp</span>
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
 
-      {/* ======================================================== */}
-      {/* DRAWER 2: Buat / Tambah Voucher Promo Baru               */}
-      {/* ======================================================== */}
-      {isAddVoucherOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
-          <div
-            className="absolute inset-0 bg-gray-900/40 backdrop-blur-xs transition-opacity animate-in fade-in"
-            onClick={() => setIsAddVoucherOpen(false)}
-          />
+      {/* FLOATING SLIDE-OVER DRAWER: REGISTRASI TAMU BARU */}
+      {mounted &&
+        isAddCustomerOpen &&
+        createPortal(
+          <div className="fixed inset-0 z-[999] overflow-hidden animate-fade-in">
+            {/* Backdrop */}
+            <div
+              onClick={() => setIsAddCustomerOpen(false)}
+              className="fixed inset-0 bg-gray-900/50 backdrop-blur-xs transition-opacity"
+            />
 
-          <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none">
-            <div className="w-screen max-w-md pointer-events-auto rounded-3xl bg-white shadow-2xl border border-gray-100 flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-300">
-              {/* Header */}
-              <div className="px-8 pt-7 pb-7.5 border-b border-gray-100 flex items-center justify-between bg-gradient-to-b from-pink-50/50 to-white">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-pink-100 text-[#9D174D] flex items-center justify-center font-bold">
-                    <Ticket className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-gray-900">Buat Kupon Promo Baru</h3>
-                    <p className="text-xs text-gray-400">Terintegrasi otomatis ke mesin kiosk & POS</p>
-                  </div>
+            <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none z-[1000]">
+              <div className="pointer-events-auto w-screen max-w-lg bg-white shadow-2xl rounded-3xl flex flex-col border border-gray-100 overflow-hidden animate-slide-in h-full">
+              {/* Drawer Header */}
+              <div className="px-8 pt-7 pb-6 border-b border-gray-100 flex items-center justify-between shrink-0 bg-gradient-to-r from-pink-50/30 to-white">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">Registrasi Tamu Baru</h2>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Tambahkan profil tamu atau pelanggan tetap ke sistem CRM.
+                  </p>
                 </div>
-
                 <button
-                  onClick={() => setIsAddVoucherOpen(false)}
-                  className="p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                  onClick={() => setIsAddCustomerOpen(false)}
+                  className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Form Content */}
-              <div className="flex-1 overflow-y-auto px-8 py-6 space-y-4 text-xs">
+              {/* Drawer Form Body */}
+              <form onSubmit={handleAddCustomerSubmit} className="flex flex-col flex-1 min-h-0">
+                <div className="flex-1 overflow-y-auto px-8 py-6 space-y-4">
                 <div>
-                  <label className="font-bold text-gray-700 block mb-1">Kode Voucher (Kapital)*</label>
+                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                    Nama Lengkap Tamu *
+                  </label>
                   <input
                     type="text"
-                    placeholder="Contoh: HEMAT20K, BDAYMEMBER"
-                    value={newVoucher.code}
-                    onChange={(e) => setNewVoucher({ ...newVoucher, code: e.target.value.toUpperCase() })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 uppercase font-mono font-bold focus:border-[#DE5795] focus:outline-hidden"
+                    required
+                    placeholder="Contoh: Amanda & Kevin"
+                    value={newCustomerForm.name}
+                    onChange={(e) => setNewCustomerForm({ ...newCustomerForm, name: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#DE5795] transition-all"
                   />
                 </div>
 
-                <div>
-                  <label className="font-bold text-gray-700 block mb-1">Judul / Nama Promo*</label>
-                  <input
-                    type="text"
-                    placeholder="Contoh: Diskon Pelajar & Mahasiswa 20%"
-                    value={newVoucher.title}
-                    onChange={(e) => setNewVoucher({ ...newVoucher, title: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:border-[#DE5795] focus:outline-hidden"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-bold text-gray-700 block mb-1">Jenis Potongan Diskon*</label>
-                  <select
-                    value={newVoucher.discountType}
-                    onChange={(e) =>
-                      setNewVoucher({
-                        ...newVoucher,
-                        discountType: e.target.value as any,
-                      })
-                    }
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white focus:border-[#DE5795] focus:outline-hidden"
-                  >
-                    <option value="PERCENTAGE">Persentase Diskon (%)</option>
-                    <option value="FIXED_AMOUNT">Potongan Nominal Tunai (Rp)</option>
-                    <option value="FREE_PRINT">Gratis Strip Cetak Tambahan (Free Print)</option>
-                  </select>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="font-bold text-gray-700 block mb-1">Nilai Diskon*</label>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                      No WhatsApp *
+                    </label>
                     <input
-                      type="number"
-                      placeholder="20 atau 15000"
-                      value={newVoucher.discountValue}
-                      onChange={(e) => setNewVoucher({ ...newVoucher, discountValue: Number(e.target.value) })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:border-[#DE5795] focus:outline-hidden font-bold"
+                      type="tel"
+                      required
+                      placeholder="0812-xxxx-xxxx"
+                      value={newCustomerForm.phone}
+                      onChange={(e) => setNewCustomerForm({ ...newCustomerForm, phone: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#DE5795] transition-all"
                     />
                   </div>
 
                   <div>
-                    <label className="font-bold text-gray-700 block mb-1">Total Kuota Penggunaan*</label>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                      Email
+                    </label>
                     <input
-                      type="number"
-                      placeholder="200"
-                      value={newVoucher.totalQuota}
-                      onChange={(e) => setNewVoucher({ ...newVoucher, totalQuota: Number(e.target.value) })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:border-[#DE5795] focus:outline-hidden font-bold"
+                      type="email"
+                      placeholder="nama@gmail.com"
+                      value={newCustomerForm.email}
+                      onChange={(e) => setNewCustomerForm({ ...newCustomerForm, email: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#DE5795] transition-all"
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="font-bold text-gray-700 block mb-1">Min. Belanja (Rp)</label>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                      Kota Domisili
+                    </label>
                     <input
-                      type="number"
-                      placeholder="50000"
-                      value={newVoucher.minSpend}
-                      onChange={(e) => setNewVoucher({ ...newVoucher, minSpend: Number(e.target.value) })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:border-[#DE5795] focus:outline-hidden"
+                      type="text"
+                      placeholder="Jakarta Selatan"
+                      value={newCustomerForm.city}
+                      onChange={(e) => setNewCustomerForm({ ...newCustomerForm, city: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#DE5795] transition-all"
                     />
                   </div>
 
                   <div>
-                    <label className="font-bold text-gray-700 block mb-1">Berlaku Sampai*</label>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                      Tanggal Lahir
+                    </label>
                     <input
                       type="date"
-                      value={newVoucher.validUntil}
-                      onChange={(e) => setNewVoucher({ ...newVoucher, validUntil: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:border-[#DE5795] focus:outline-hidden"
+                      value={newCustomerForm.birthDate}
+                      onChange={(e) => setNewCustomerForm({ ...newCustomerForm, birthDate: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#DE5795] transition-all text-gray-700"
                     />
                   </div>
                 </div>
 
-                <div>
-                  <label className="font-bold text-gray-700 block mb-1">Berlaku di Booth Mall</label>
-                  <select
-                    value={newVoucher.applicableBooths}
-                    onChange={(e) => setNewVoucher({ ...newVoucher, applicableBooths: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white focus:border-[#DE5795] focus:outline-hidden"
-                  >
-                    <option value="ALL">Semua Booth Mall (Seluruh Indonesia)</option>
-                    <option value="Grand Indonesia (Booth Alpha)">Hanya Grand Indonesia (Booth Alpha)</option>
-                    <option value="Central Park (Booth Beta)">Hanya Central Park (Booth Beta)</option>
-                    <option value="Paris Van Java Bandung (Booth Gamma)">Hanya PVJ Bandung (Booth Gamma)</option>
-                  </select>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                      Segmentasi Awal
+                    </label>
+                    <select
+                      value={newCustomerForm.segment}
+                      onChange={(e) =>
+                        setNewCustomerForm({
+                          ...newCustomerForm,
+                          segment: e.target.value as CustomerSegment,
+                        })
+                      }
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#DE5795] transition-all text-gray-700"
+                    >
+                      <option value="NEW">Pengunjung Baru (New)</option>
+                      <option value="REGULAR">Regular Member</option>
+                      <option value="VIP">VIP & Loyal</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                      Lokasi Booth Pertama
+                    </label>
+                    <select
+                      value={newCustomerForm.favoriteBooth}
+                      onChange={(e) =>
+                        setNewCustomerForm({ ...newCustomerForm, favoriteBooth: e.target.value })
+                      }
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#DE5795] transition-all text-gray-700"
+                    >
+                      <option value="Grand Indonesia (Booth Alpha)">Grand Indonesia (Alpha)</option>
+                      <option value="Central Park Mall (Booth Beta)">Central Park (Beta)</option>
+                      <option value="Paris Van Java Bandung (Booth Gamma)">PVJ Bandung (Gamma)</option>
+                      <option value="Senayan City (Booth Epsilon)">Senayan City (Epsilon)</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div>
-                  <label className="font-bold text-gray-700 block mb-1">Deskripsi Singkat</label>
+                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+                    Catatan CRM Tamu
+                  </label>
                   <textarea
-                    rows={2}
-                    placeholder="Penjelasan promo yang tampil pada layar kios..."
-                    value={newVoucher.description}
-                    onChange={(e) => setNewVoucher({ ...newVoucher, description: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:border-[#DE5795] focus:outline-hidden"
+                    rows={3}
+                    placeholder="Contoh: Suka foto bersama sahabat komunitas cosplay, request cetak strip dobel..."
+                    value={newCustomerForm.notes}
+                    onChange={(e) => setNewCustomerForm({ ...newCustomerForm, notes: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#DE5795] transition-all placeholder:text-gray-400"
                   />
                 </div>
-              </div>
+                </div>
 
-              {/* Footer */}
-              <div className="px-8 pt-5.5 pb-7 border-t border-gray-100 bg-white flex items-center justify-between gap-3">
-                <button
-                  onClick={() => setIsAddVoucherOpen(false)}
-                  className="px-4 py-2.5 text-xs font-semibold text-gray-600 hover:text-gray-900"
-                >
-                  Batal
-                </button>
-
-                <button
-                  onClick={() => {
-                    if (!newVoucher.code || !newVoucher.title) {
-                      alert('Harap isi kode voucher dan nama promo!');
-                      return;
-                    }
-                    setIsAddVoucherOpen(false);
-                    showToast(`Voucher ${newVoucher.code} berhasil dibuat dan aktif di seluruh kiosk!`);
-                  }}
-                  className="px-5 py-2.5 rounded-xl bg-[#DE5795] hover:bg-[#c94982] text-white text-xs font-bold shadow-xs"
-                >
-                  Simpan & Rilis Voucher
-                </button>
-              </div>
+                <div className="px-8 py-4 bg-gray-50/50 border-t border-gray-100 flex items-center justify-end gap-3 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setIsAddCustomerOpen(false)}
+                    className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-100 text-gray-700 text-xs font-semibold transition-all"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2.5 rounded-xl bg-[#DE5795] hover:bg-[#c94982] text-white text-xs font-semibold shadow-xs transition-all"
+                  >
+                    Simpan Tamu
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {/* ======================================================== */}
-      {/* DRAWER 3: Tambah / Registrasi Pelanggan Baru             */}
-      {/* ======================================================== */}
-      {isAddCustomerOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
-          <div
-            className="absolute inset-0 bg-gray-900/40 backdrop-blur-xs transition-opacity animate-in fade-in"
-            onClick={() => setIsAddCustomerOpen(false)}
-          />
+      {/* QUICK WHATSAPP MODAL */}
+      {mounted &&
+        isQuickWADrawerOpen &&
+        quickWACustomer &&
+        createPortal(
+          <div className="fixed inset-0 z-[999] overflow-hidden animate-fade-in flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <div
+              onClick={() => setIsQuickWADrawerOpen(false)}
+              className="fixed inset-0 bg-gray-900/50 backdrop-blur-xs transition-opacity"
+            />
 
-          <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none">
-            <div className="w-screen max-w-md pointer-events-auto rounded-3xl bg-white shadow-2xl border border-gray-100 flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-300">
-              {/* Header */}
-              <div className="px-8 pt-7 pb-7.5 border-b border-gray-100 flex items-center justify-between bg-gradient-to-b from-gray-50/60 to-white">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-pink-50 text-[#DE5795] flex items-center justify-center font-bold">
-                    <Plus className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-gray-900">Registrasi Pelanggan Baru</h3>
-                    <p className="text-xs text-gray-400">Daftarkan nomor WhatsApp untuk poin loyalty</p>
-                  </div>
+            <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-gray-100 p-6 sm:p-7 z-[1000] space-y-5 animate-slide-in">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                  <MessageCircle className="w-5 h-5" />
                 </div>
-
-                <button
-                  onClick={() => setIsAddCustomerOpen(false)}
-                  className="p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Form Content */}
-              <div className="flex-1 overflow-y-auto px-8 py-6 space-y-4 text-xs">
                 <div>
-                  <label className="font-bold text-gray-700 block mb-1">Nama Lengkap*</label>
-                  <input
-                    type="text"
-                    placeholder="Contoh: Sarah Anindita"
-                    value={newCustomer.name}
-                    onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:border-[#DE5795] focus:outline-hidden"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-bold text-gray-700 block mb-1">Nomor WhatsApp Aktif*</label>
-                  <input
-                    type="text"
-                    placeholder="0812-xxxx-xxxx"
-                    value={newCustomer.phone}
-                    onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:border-[#DE5795] focus:outline-hidden font-bold"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-bold text-gray-700 block mb-1">Alamat Email</label>
-                  <input
-                    type="email"
-                    placeholder="sarah.anindita@example.com"
-                    value={newCustomer.email}
-                    onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:border-[#DE5795] focus:outline-hidden"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-bold text-gray-700 block mb-1">Tanggal Lahir (Untuk Reward Ultah)</label>
-                  <input
-                    type="date"
-                    value={newCustomer.birthDate}
-                    onChange={(e) => setNewCustomer({ ...newCustomer, birthDate: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:border-[#DE5795] focus:outline-hidden"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-bold text-gray-700 block mb-1">Tier Awal Member</label>
-                  <select
-                    value={newCustomer.tier}
-                    onChange={(e) => setNewCustomer({ ...newCustomer, tier: e.target.value as any })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white focus:border-[#DE5795] focus:outline-hidden"
-                  >
-                    <option value="BRONZE">Bronze Member (Default Tamu Baru)</option>
-                    <option value="SILVER">Silver Explorer</option>
-                    <option value="GOLD">Gold Enthusiast</option>
-                    <option value="VIP">VIP Diamond</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="font-bold text-gray-700 block mb-1">Booth Lokasi Pertama</label>
-                  <select
-                    value={newCustomer.favoriteBooth}
-                    onChange={(e) => setNewCustomer({ ...newCustomer, favoriteBooth: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white focus:border-[#DE5795] focus:outline-hidden"
-                  >
-                    <option value="Grand Indonesia (Booth Alpha)">Grand Indonesia (Booth Alpha)</option>
-                    <option value="Central Park (Booth Beta)">Central Park (Booth Beta)</option>
-                    <option value="Paris Van Java Bandung (Booth Gamma)">Paris Van Java Bandung</option>
-                  </select>
+                  <h3 className="font-bold text-gray-900">Chat WhatsApp Tamu</h3>
+                  <p className="text-xs text-gray-500">
+                    Kirim pesan personal kepada {quickWACustomer.name} ({quickWACustomer.phone})
+                  </p>
                 </div>
               </div>
+              <button
+                onClick={() => setIsQuickWADrawerOpen(false)}
+                className="p-1.5 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-              {/* Footer */}
-              <div className="px-8 pt-5.5 pb-7 border-t border-gray-100 bg-white flex items-center justify-between gap-3">
-                <button
-                  onClick={() => setIsAddCustomerOpen(false)}
-                  className="px-4 py-2.5 text-xs font-semibold text-gray-600 hover:text-gray-900"
-                >
-                  Batal
-                </button>
+            <div>
+              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                Pesan WhatsApp
+              </label>
+              <textarea
+                rows={5}
+                value={waCustomMessage}
+                onChange={(e) => setWaCustomMessage(e.target.value)}
+                className="w-full p-3.5 rounded-2xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all font-sans leading-relaxed"
+              />
+            </div>
 
-                <button
-                  onClick={() => {
-                    if (!newCustomer.name || !newCustomer.phone) {
-                      alert('Nama dan Nomor WhatsApp wajib diisi!');
-                      return;
-                    }
-                    setIsAddCustomerOpen(false);
-                    showToast(`Pelanggan ${newCustomer.name} berhasil didaftarkan!`);
-                  }}
-                  className="px-5 py-2.5 rounded-xl bg-[#DE5795] hover:bg-[#c94982] text-white text-xs font-bold shadow-xs"
-                >
-                  Daftarkan Member
-                </button>
-              </div>
+            <div className="flex items-center justify-between pt-2">
+              <button
+                type="button"
+                onClick={() => setIsQuickWADrawerOpen(false)}
+                className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-100 transition-all"
+              >
+                Batal
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSendWA}
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs flex items-center gap-2 transition-all"
+              >
+                <Send className="w-4 h-4" />
+                <span>Buka WhatsApp Web / App</span>
+              </button>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* ======================================================== */}
-      {/* DRAWER 4: Quick WhatsApp Voucher Blast Modal            */}
-      {/* ======================================================== */}
-      {isQuickWADrawerOpen && quickWACustomer && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
-          <div
-            className="absolute inset-0 bg-gray-900/40 backdrop-blur-xs transition-opacity animate-in fade-in"
-            onClick={() => setIsQuickWADrawerOpen(false)}
-          />
-
-          <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none">
-            <div className="w-screen max-w-md pointer-events-auto rounded-3xl bg-white shadow-2xl border border-gray-100 flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-300">
-              {/* Header */}
-              <div className="px-8 pt-7 pb-7.5 border-b border-gray-100 flex items-center justify-between bg-gradient-to-b from-emerald-50/50 to-white">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
-                    <Send className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-gray-900">Kirim Voucher via WhatsApp</h3>
-                    <p className="text-xs text-gray-400">Pesan langsung ke {quickWACustomer.name}</p>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => setIsQuickWADrawerOpen(false)}
-                  className="p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Message Preview Content */}
-              <div className="flex-1 overflow-y-auto px-8 py-6 space-y-4 text-xs">
-                <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200">
-                  <span className="text-[10px] text-gray-400 font-bold uppercase block">Penerima Pesan:</span>
-                  <span className="font-bold text-gray-900 block mt-0.5">{quickWACustomer.name}</span>
-                  <span className="text-gray-500">{quickWACustomer.phone}</span>
-                </div>
-
-                <div>
-                  <label className="font-bold text-gray-700 block mb-1">Pilih Hadiah Voucher yang Dikirim:</label>
-                  <select className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white font-medium focus:border-emerald-600 focus:outline-hidden">
-                    <option value="BDAYTREATFREE">BDAYTREATFREE - Gratis 1 Strip Cetak Tambahan</option>
-                    <option value="WEEKENDSERU20">WEEKENDSERU20 - Diskon Spesial 20%</option>
-                    <option value="HEMAT15KGI">HEMAT15KGI - Potongan Rp 15.000 Grand Indonesia</option>
-                  </select>
-                </div>
-
-                {/* WhatsApp Chat Balloon Simulator */}
-                <div className="space-y-1.5 pt-2">
-                  <label className="font-bold text-gray-700 block">Preview Tampilan Pesan WhatsApp:</label>
-                  <div className="p-4 rounded-2xl bg-[#EFEAE2] border border-gray-200 space-y-2">
-                    <div className="bg-white p-3.5 rounded-2xl rounded-tl-none shadow-2xs space-y-2 text-gray-800 leading-relaxed text-[11px]">
-                      <p>Halo kak <strong>{quickWACustomer.name}</strong>! ✨</p>
-                      <p>
-                        Terima kasih sudah setia berfoto bersama PhotoBooth OS! Spesial untukmu sebagai <strong>{quickWACustomer.tier} Member</strong>, kami punya hadiah voucher eksklusif:
-                      </p>
-                      <div className="p-2 rounded-lg bg-pink-50 border border-dashed border-[#DE5795] text-center font-mono font-bold text-[#9D174D]">
-                        KODE: WEEKENDSERU20
-                      </div>
-                      <p className="text-[10px] text-gray-500">
-                        Cukup ketik kode ini di layar kiosk sebelum cetak foto ya! Berlaku s/d 31 Okt 2026.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Footer */}
-              <div className="px-8 pt-5.5 pb-7 border-t border-gray-100 bg-white flex items-center justify-between gap-3">
-                <button
-                  onClick={() => setIsQuickWADrawerOpen(false)}
-                  className="px-4 py-2.5 text-xs font-semibold text-gray-600 hover:text-gray-900"
-                >
-                  Batal
-                </button>
-
-                <button
-                  onClick={() => {
-                    setIsQuickWADrawerOpen(false);
-                    showToast(`Pesan WhatsApp voucher berhasil dikirimkan ke ${quickWACustomer.name} (${quickWACustomer.phone})!`);
-                  }}
-                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-2 shadow-xs"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>Kirim WhatsApp Sekarang</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

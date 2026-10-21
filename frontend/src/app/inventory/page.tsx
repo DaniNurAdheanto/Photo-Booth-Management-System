@@ -233,7 +233,7 @@ export default function InventoryPage() {
   };
 
   return (
-    <div className="flex-1 flex flex-col min-w-0 bg-[#F9FAFB] font-sora min-h-screen">
+    <div className="space-y-6 font-sora animate-fade-in text-gray-900 pb-16">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-5 right-5 z-50 flex items-center gap-2.5 px-4 py-3 bg-gray-900 text-white text-xs rounded-2xl shadow-2xl border border-gray-700 animate-fade-in">
@@ -242,120 +242,125 @@ export default function InventoryPage() {
         </div>
       )}
 
-      {/* Main Container */}
-      <div className="px-6 py-6 lg:px-8 space-y-6 max-w-7xl">
-        {/* 1. Header Section (Untitled UI Standard) */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-200/80 pb-5">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
-                Manajemen Stok Kertas & Inventaris
-              </h1>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                IoT Telemetry Live
-              </span>
+      {/* 1. Header Section (Untitled UI Standard) */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-200 pb-5">
+        <div>
+          <div className="flex items-center gap-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+            <span>PhotoBooth OS</span>
+            <span>•</span>
+            <span className="text-[#DE5795]">Operasional Kiosk</span>
+            <span>•</span>
+            <span>Stok & Inventaris</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
+              Manajemen Stok Kertas & Inventaris
+            </h1>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              IoT Telemetry Live
+            </span>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            Monitoring persediaan kertas dye-sublimation, ribbon printer, frame karton, serta status perangkat IoT booth.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2.5 shrink-0">
+          <button
+            onClick={() => setIsMutationDrawerOpen(true)}
+            className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-200/90 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-2xs"
+          >
+            <ArrowRightLeft className="w-3.5 h-3.5 text-gray-500" />
+            <span>Catat Mutasi / Pengisian</span>
+          </button>
+          <button
+            onClick={() => setIsAddItemDrawerOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-pink-600 to-[#DE5795] rounded-xl hover:opacity-95 transition-all shadow-xs"
+          >
+            <Plus className="w-4 h-4" />
+            <span>+ Tambah Stok / Item Baru</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 2. Top Metrics Strip (Untitled UI 4 Cards) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Card 1: Total Nilai Aset */}
+        <div className="p-5 bg-white border border-gray-200/90 rounded-2xl shadow-2xs space-y-2 hover:shadow-md transition-all">
+          <div className="flex items-center justify-between text-xs text-gray-500">
+            <span className="font-semibold uppercase tracking-wider text-[11px]">Total Nilai Aset</span>
+            <div className="w-9 h-9 rounded-xl bg-pink-50 text-[#DE5795] flex items-center justify-center">
+              <Boxes className="w-4 h-4" />
             </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Monitoring persediaan kertas dye-sublimation, ribbon printer, frame karton, serta status perangkat IoT booth.
+          </div>
+          <div>
+            <div className="text-2xl font-black text-gray-900 tracking-tight font-mono">
+              Rp {metrics.totalAssetVal.toLocaleString('id-ID')}
+            </div>
+            <p className="text-[11px] text-gray-500 mt-1 flex items-center gap-1.5">
+              <span className="font-semibold text-gray-700">{items.length} SKU</span> terdaftar di sistem
             </p>
           </div>
+        </div>
 
-          <div className="flex items-center gap-2.5 shrink-0">
-            <button
-              onClick={() => setIsMutationDrawerOpen(true)}
-              className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-200/90 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-2xs"
-            >
-              <ArrowRightLeft className="w-3.5 h-3.5 text-gray-500" />
-              <span>Catat Mutasi / Pengisian</span>
-            </button>
-            <button
-              onClick={() => setIsAddItemDrawerOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-pink-600 to-[#DE5795] rounded-xl hover:opacity-95 transition-all shadow-xs"
-            >
-              <Plus className="w-4 h-4" />
-              <span>+ Tambah Stok / Item Baru</span>
-            </button>
+        {/* Card 2: Kertas Siaga Cetak */}
+        <div className="p-5 bg-white border border-gray-200/90 rounded-2xl shadow-2xs space-y-2 hover:shadow-md transition-all">
+          <div className="flex items-center justify-between text-xs text-gray-500">
+            <span className="font-semibold uppercase tracking-wider text-[11px]">Kertas & Tinta Siaga</span>
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <Printer className="w-4 h-4" />
+            </div>
+          </div>
+          <div>
+            <div className="text-2xl font-black text-gray-900 tracking-tight">
+              {metrics.totalSheetsReady.toLocaleString('id-ID')} <span className="text-xs font-normal text-gray-500">Lembar</span>
+            </div>
+            <p className="text-[11px] text-emerald-600 mt-1 font-semibold flex items-center gap-1">
+              <span>Est. ~14 hari operasional normal</span>
+            </p>
           </div>
         </div>
 
-        {/* 2. Top Metrics Strip (Untitled UI 4 Cards) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Card 1: Total Nilai Aset */}
-          <div className="p-4.5 bg-white border border-gray-200/90 rounded-2xl shadow-2xs space-y-2">
-            <div className="flex items-center justify-between text-xs text-gray-500">
-              <span className="font-medium">Total Nilai Aset & Bahan</span>
-              <div className="w-8 h-8 rounded-xl bg-pink-50 text-[#DE5795] flex items-center justify-center">
-                <Boxes className="w-4 h-4" />
-              </div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-gray-900 tracking-tight">
-                Rp {metrics.totalAssetVal.toLocaleString('id-ID')}
-              </div>
-              <p className="text-[11px] text-gray-500 mt-1 flex items-center gap-1.5">
-                <span className="font-semibold text-gray-700">{items.length} SKU</span> terdaftar di sistem
-              </p>
+        {/* Card 3: Peringatan Kritis */}
+        <div className="p-5 bg-white border border-gray-200/90 rounded-2xl shadow-2xs space-y-2 hover:shadow-md transition-all">
+          <div className="flex items-center justify-between text-xs text-gray-500">
+            <span className="font-semibold uppercase tracking-wider text-[11px]">Peringatan Stok Kritis</span>
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${metrics.criticalCount > 0 ? 'bg-rose-50 text-rose-600' : 'bg-gray-50 text-gray-400'}`}>
+              <AlertTriangle className="w-4 h-4" />
             </div>
           </div>
-
-          {/* Card 2: Kertas Siaga Cetak */}
-          <div className="p-4.5 bg-white border border-gray-200/90 rounded-2xl shadow-2xs space-y-2">
-            <div className="flex items-center justify-between text-xs text-gray-500">
-              <span className="font-medium">Kertas & Tinta Siaga</span>
-              <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                <Printer className="w-4 h-4" />
-              </div>
+          <div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-black text-rose-600 tracking-tight">
+                {metrics.criticalCount}
+              </span>
+              <span className="text-xs text-gray-500 font-medium">Item Perlu Restock</span>
             </div>
-            <div>
-              <div className="text-2xl font-bold text-gray-900 tracking-tight">
-                {metrics.totalSheetsReady.toLocaleString('id-ID')} <span className="text-xs font-normal text-gray-500">Lembar</span>
-              </div>
-              <p className="text-[11px] text-emerald-600 mt-1 font-semibold flex items-center gap-1">
-                <span>Est. ~14 hari operasional normal</span>
-              </p>
-            </div>
-          </div>
-
-          {/* Card 3: Peringatan Kritis */}
-          <div className="p-4.5 bg-white border border-gray-200/90 rounded-2xl shadow-2xs space-y-2">
-            <div className="flex items-center justify-between text-xs text-gray-500">
-              <span className="font-medium">Peringatan Stok Kritis</span>
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${metrics.criticalCount > 0 ? 'bg-rose-50 text-rose-600' : 'bg-gray-50 text-gray-400'}`}>
-                <AlertTriangle className="w-4 h-4" />
-              </div>
-            </div>
-            <div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-rose-600 tracking-tight">
-                  {metrics.criticalCount}
-                </span>
-                <span className="text-xs text-gray-500 font-medium">Item Perlu Restock</span>
-              </div>
-              <p className="text-[11px] text-rose-600 mt-1 font-medium">
-                {metrics.criticalCount > 0 ? 'DNP RX1HS Booth Alpha < 50 lembar' : 'Semua persediaan aman'}
-              </p>
-            </div>
-          </div>
-
-          {/* Card 4: Kondisi Hardware IoT */}
-          <div className="p-4.5 bg-white border border-gray-200/90 rounded-2xl shadow-2xs space-y-2">
-            <div className="flex items-center justify-between text-xs text-gray-500">
-              <span className="font-medium">Kondisi Hardware IoT</span>
-              <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                <Activity className="w-4 h-4" />
-              </div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-gray-900 tracking-tight">
-                98.4% <span className="text-xs font-normal text-emerald-600 font-semibold">Prima</span>
-              </div>
-              <p className="text-[11px] text-gray-500 mt-1">
-                3 Printer, 3 Kamera, 3 Mini PC Online
-              </p>
-            </div>
+            <p className="text-[11px] text-rose-600 mt-1 font-medium">
+              {metrics.criticalCount > 0 ? 'DNP RX1HS Booth Alpha < 50 lembar' : 'Semua persediaan aman'}
+            </p>
           </div>
         </div>
+
+        {/* Card 4: Kondisi Hardware IoT */}
+        <div className="p-5 bg-white border border-gray-200/90 rounded-2xl shadow-2xs space-y-2 hover:shadow-md transition-all">
+          <div className="flex items-center justify-between text-xs text-gray-500">
+            <span className="font-semibold uppercase tracking-wider text-[11px]">Kondisi Hardware IoT</span>
+            <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+              <Activity className="w-4 h-4" />
+            </div>
+          </div>
+          <div>
+            <div className="text-2xl font-black text-gray-900 tracking-tight">
+              98.4% <span className="text-xs font-normal text-emerald-600 font-semibold">Prima</span>
+            </div>
+            <p className="text-[11px] text-gray-500 mt-1">
+              3 Printer, 3 Kamera, 3 Mini PC Online
+            </p>
+          </div>
+        </div>
+      </div>
 
         {/* 3. Critical Stock Alert Banner (Jika Ada Item Kritis) */}
         {metrics.criticalCount > 0 && (
@@ -471,7 +476,7 @@ export default function InventoryPage() {
         </div>
 
         {/* 5. Horizontal Warehouse Location Tabs */}
-        <div className="space-y-1">
+        <div className="p-4 rounded-2xl bg-white border border-gray-200/90 shadow-2xs space-y-2.5">
           <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
             Pilih Lokasi Gudang / Kios Booth:
           </p>
@@ -517,7 +522,7 @@ export default function InventoryPage() {
         </div>
 
         {/* 6. Filter & Search Bar + Tab Switcher */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-white p-3 border border-gray-200/90 rounded-2xl shadow-2xs">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-white p-4 border border-gray-200/90 rounded-2xl shadow-2xs">
           {/* Search Box */}
           <div className="relative flex-1 min-w-[240px]">
             <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -856,7 +861,6 @@ export default function InventoryPage() {
             </div>
           </div>
         )}
-      </div>
 
       {/* ========================================================================= */}
       {/* DRAWER 1: Catat Mutasi & Pengisian Booth (Floating Slide-Over)            */}

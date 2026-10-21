@@ -413,7 +413,7 @@ export default function PaymentsPage() {
   };
 
   return (
-    <div className="flex-1 flex flex-col min-w-0 bg-[#F9FAFB] font-sora min-h-screen text-gray-900 pb-16">
+    <div className="space-y-6 font-sora animate-fade-in text-gray-900 pb-16">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-5 right-5 z-50 flex items-center gap-2.5 px-4 py-3 bg-gray-900 text-white text-xs rounded-2xl shadow-2xl border border-gray-700 animate-fade-in">
@@ -422,164 +422,180 @@ export default function PaymentsPage() {
         </div>
       )}
 
-      {/* Main Container */}
-      <div className="px-6 py-6 lg:px-8 space-y-6 max-w-7xl">
-        {/* 1. Page Header (Untitled UI Standard) */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-200/80 pb-5">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
-                Laporan Finansial Kasir & Bagi Hasil Mall
-              </h1>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-pink-50 text-[#9D174D] border border-pink-200 shadow-2xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#DE5795] animate-pulse" />
-                Financial POS & Settlement Live
-              </span>
+      {/* 1. Page Header (Untitled UI Standard) */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-200 pb-5">
+        <div>
+          <div className="flex items-center gap-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+            <span>PhotoBooth OS</span>
+            <span>•</span>
+            <span className="text-[#DE5795]">Finansial & Kasir</span>
+            <span>•</span>
+            <span>Bagi Hasil Mall</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
+              Laporan Finansial Kasir & Bagi Hasil Mall
+            </h1>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-pink-50 text-[#9D174D] border border-pink-200 shadow-2xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#DE5795] animate-pulse" />
+              Financial POS & Settlement Live
+            </span>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            Rekonsiliasi omzet harian, bagi hasil sewa mall kiosk (revenue sharing), biaya MDR QRIS, serta audit kasir fisik.
+          </p>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+          <button
+            onClick={handleExportCSV}
+            className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-200/90 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-2xs"
+            title="Ekspor Laporan ke Excel / CSV"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Ekspor CSV</span>
+          </button>
+          <button
+            onClick={() => setIsConfigMallOpen(true)}
+            className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-200/90 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-2xs"
+          >
+            <Building2 className="w-3.5 h-3.5 text-blue-600" />
+            <span>+ Atur Skema Mall</span>
+          </button>
+          <button
+            onClick={() => setIsManualModalOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-pink-600 to-[#DE5795] rounded-xl hover:opacity-95 transition-all shadow-xs"
+          >
+            <Plus className="w-4 h-4" />
+            <span>+ Catat Kasir Manual</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 2. Top Metric Cards Strip (Untitled UI 4 Cards) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Card 1: Gross Revenue */}
+        <div className="p-5 bg-white border border-gray-200/90 rounded-2xl shadow-2xs space-y-2 hover:shadow-md transition-all">
+          <div className="flex items-center justify-between text-xs text-gray-500">
+            <span className="font-semibold uppercase tracking-wider text-[11px]">Total Omzet Kotor</span>
+            <div className="w-9 h-9 rounded-xl bg-pink-50 text-[#DE5795] flex items-center justify-center">
+              <TrendingUp className="w-4 h-4" />
             </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Rekonsiliasi omzet harian, bagi hasil sewa mall kiosk (revenue sharing), biaya MDR QRIS, serta audit kasir fisik.
+          </div>
+          <div>
+            <div className="text-2xl font-black text-gray-900 tracking-tight font-mono">
+              Rp {mallAggregates.totalGross.toLocaleString('id-ID')}
+            </div>
+            <p className="text-[11px] text-gray-500 mt-1 flex items-center gap-1.5">
+              <span className="font-semibold text-gray-700">{mallAggregates.totalSessions.toLocaleString('id-ID')} sesi cetak</span> di 4 mall
             </p>
           </div>
+        </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
-            <button
-              onClick={handleExportCSV}
-              className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-200/90 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-2xs"
-              title="Ekspor Laporan ke Excel / CSV"
-            >
-              <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Ekspor CSV</span>
-            </button>
-            <button
-              onClick={() => setIsConfigMallOpen(true)}
-              className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-200/90 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-2xs"
-            >
-              <Building2 className="w-3.5 h-3.5 text-blue-600" />
-              <span>+ Atur Skema Mall</span>
-            </button>
-            <button
-              onClick={() => setIsManualModalOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-pink-600 to-[#DE5795] rounded-xl hover:opacity-95 transition-all shadow-xs"
-            >
-              <Plus className="w-4 h-4" />
-              <span>+ Catat Kasir Manual</span>
-            </button>
+        {/* Card 2: Bagi Hasil Hak Mall */}
+        <div className="p-5 bg-white border border-gray-200/90 rounded-2xl shadow-2xs space-y-2 hover:shadow-md transition-all">
+          <div className="flex items-center justify-between text-xs text-gray-500">
+            <span className="font-semibold uppercase tracking-wider text-[11px]">Bagi Hasil Mall (Due)</span>
+            <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+              <Building2 className="w-4 h-4" />
+            </div>
+          </div>
+          <div>
+            <div className="text-2xl font-black text-blue-700 tracking-tight font-mono">
+              Rp {mallAggregates.totalMallDue.toLocaleString('id-ID')}
+            </div>
+            <p className="text-[11px] text-blue-600 mt-1 font-semibold flex items-center gap-1">
+              <span>{mallAggregates.pendingSettlementCount} Tagihan Perlu Ditransfer</span>
+            </p>
           </div>
         </div>
 
-        {/* 2. Top Metric Cards Strip (Untitled UI 4 Cards) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Card 1: Gross Revenue */}
-          <div className="p-4.5 bg-white border border-gray-200/90 rounded-2xl shadow-2xs space-y-2">
-            <div className="flex items-center justify-between text-xs text-gray-500">
-              <span className="font-medium">Total Omzet Kotor (Gross)</span>
-              <div className="w-8 h-8 rounded-xl bg-pink-50 text-[#DE5795] flex items-center justify-center">
-                <TrendingUp className="w-4 h-4" />
-              </div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-gray-900 tracking-tight font-mono">
-                Rp {mallAggregates.totalGross.toLocaleString('id-ID')}
-              </div>
-              <p className="text-[11px] text-gray-500 mt-1 flex items-center gap-1.5">
-                <span className="font-semibold text-gray-700">{mallAggregates.totalSessions.toLocaleString('id-ID')} sesi cetak</span> di 4 mall
-              </p>
+        {/* Card 3: Biaya Bahan (HPP) & MDR QRIS */}
+        <div className="p-5 bg-white border border-gray-200/90 rounded-2xl shadow-2xs space-y-2 hover:shadow-md transition-all">
+          <div className="flex items-center justify-between text-xs text-gray-500">
+            <span className="font-semibold uppercase tracking-wider text-[11px]">Biaya HPP & MDR</span>
+            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+              <PieChart className="w-4 h-4" />
             </div>
           </div>
-
-          {/* Card 2: Bagi Hasil Hak Mall */}
-          <div className="p-4.5 bg-white border border-gray-200/90 rounded-2xl shadow-2xs space-y-2">
-            <div className="flex items-center justify-between text-xs text-gray-500">
-              <span className="font-medium">Bagi Hasil & Sewa Mall (Due)</span>
-              <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                <Building2 className="w-4 h-4" />
-              </div>
+          <div>
+            <div className="text-2xl font-black text-amber-700 tracking-tight font-mono">
+              Rp {mallAggregates.totalHpp.toLocaleString('id-ID')}
             </div>
-            <div>
-              <div className="text-2xl font-bold text-blue-700 tracking-tight font-mono">
-                Rp {mallAggregates.totalMallDue.toLocaleString('id-ID')}
-              </div>
-              <p className="text-[11px] text-blue-600 mt-1 font-semibold flex items-center gap-1">
-                <span>{mallAggregates.pendingSettlementCount} Tagihan Perlu Ditransfer</span>
-              </p>
-            </div>
-          </div>
-
-          {/* Card 3: Biaya Bahan (HPP) & MDR QRIS */}
-          <div className="p-4.5 bg-white border border-gray-200/90 rounded-2xl shadow-2xs space-y-2">
-            <div className="flex items-center justify-between text-xs text-gray-500">
-              <span className="font-medium">Biaya HPP Kertas & MDR</span>
-              <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                <PieChart className="w-4 h-4" />
-              </div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-amber-700 tracking-tight font-mono">
-                Rp {mallAggregates.totalHpp.toLocaleString('id-ID')}
-              </div>
-              <p className="text-[11px] text-gray-500 mt-1">
-                Kertas dye-sub, ribbon & MDR QRIS 0.7%
-              </p>
-            </div>
-          </div>
-
-          {/* Card 4: Net Profit Vendor */}
-          <div className="p-4.5 bg-white border border-gray-200/90 rounded-2xl shadow-2xs space-y-2">
-            <div className="flex items-center justify-between text-xs text-gray-500">
-              <span className="font-medium">Laba Bersih Vendor (Net)</span>
-              <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                <Wallet className="w-4 h-4" />
-              </div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-emerald-700 tracking-tight font-mono">
-                Rp {mallAggregates.totalNetProfit.toLocaleString('id-ID')}
-              </div>
-              <p className="text-[11px] text-emerald-600 mt-1 font-semibold flex items-center gap-1">
-                <ArrowUpRight className="w-3.5 h-3.5" />
-                <span>Margin Bersih {mallAggregates.netMarginPercentage}%</span>
-              </p>
-            </div>
+            <p className="text-[11px] text-gray-500 mt-1">
+              Kertas dye-sub, ribbon & MDR QRIS 0.7%
+            </p>
           </div>
         </div>
 
-        {/* 3. Navigation Tabs (Untitled UI Segmented Tabs) */}
-        <div className="flex items-center gap-2 border-b border-gray-200 pb-1">
-          <button
-            onClick={() => setActiveTab('revenue-share')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
-              activeTab === 'revenue-share'
-                ? 'bg-gray-900 text-white shadow-2xs'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-            }`}
-          >
-            <Building2 className="w-3.5 h-3.5" />
-            <span>Bagi Hasil & Sewa Mall ({mallPartnerships.length})</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('transactions')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
-              activeTab === 'transactions'
-                ? 'bg-gray-900 text-white shadow-2xs'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-            }`}
-          >
-            <Receipt className="w-3.5 h-3.5" />
-            <span>Sesi Kasir & Transaksi ({transactions.length})</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('cash-reconciliation')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
-              activeTab === 'cash-reconciliation'
-                ? 'bg-gray-900 text-white shadow-2xs'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-            }`}
-          >
-            <Banknote className="w-3.5 h-3.5" />
-            <span>Audit Selisih Kasir & Kas Fisik ({cashReconciliations.length})</span>
-          </button>
+        {/* Card 4: Net Profit Vendor */}
+        <div className="p-5 bg-white border border-gray-200/90 rounded-2xl shadow-2xs space-y-2 hover:shadow-md transition-all">
+          <div className="flex items-center justify-between text-xs text-gray-500">
+            <span className="font-semibold uppercase tracking-wider text-[11px]">Laba Bersih Vendor</span>
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <Wallet className="w-4 h-4" />
+            </div>
+          </div>
+          <div>
+            <div className="text-2xl font-black text-emerald-700 tracking-tight font-mono">
+              Rp {mallAggregates.totalNetProfit.toLocaleString('id-ID')}
+            </div>
+            <p className="text-[11px] text-emerald-600 mt-1 font-semibold flex items-center gap-1">
+              <ArrowUpRight className="w-3.5 h-3.5" />
+              <span>Margin Bersih {mallAggregates.netMarginPercentage}%</span>
+            </p>
+          </div>
         </div>
+      </div>
+
+      {/* 3. Navigation Tabs (Untitled UI Underline Tabs) */}
+      <div className="flex items-center border-b border-gray-200 gap-6 overflow-x-auto">
+        <button
+          onClick={() => setActiveTab('revenue-share')}
+          className={`pb-3.5 text-xs font-bold transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
+            activeTab === 'revenue-share'
+              ? 'border-[#DE5795] text-[#9D174D]'
+              : 'border-transparent text-gray-500 hover:text-gray-800'
+          }`}
+        >
+          <Building2 className="w-4 h-4" />
+          <span>Bagi Hasil & Sewa Mall</span>
+          <span className="px-2 py-0.5 rounded-full text-[10px] bg-pink-100 text-[#9D174D] font-bold">
+            {mallPartnerships.length} Mall
+          </span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('transactions')}
+          className={`pb-3.5 text-xs font-bold transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
+            activeTab === 'transactions'
+              ? 'border-[#DE5795] text-[#9D174D]'
+              : 'border-transparent text-gray-500 hover:text-gray-800'
+          }`}
+        >
+          <Receipt className="w-4 h-4" />
+          <span>Sesi Kasir & Transaksi</span>
+          <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-700 font-bold">
+            {transactions.length} Sesi
+          </span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('cash-reconciliation')}
+          className={`pb-3.5 text-xs font-bold transition-all border-b-2 flex items-center gap-2 whitespace-nowrap ${
+            activeTab === 'cash-reconciliation'
+              ? 'border-[#DE5795] text-[#9D174D]'
+              : 'border-transparent text-gray-500 hover:text-gray-800'
+          }`}
+        >
+          <Banknote className="w-4 h-4" />
+          <span>Audit Selisih Kasir & Kas Fisik</span>
+          <span className="px-2 py-0.5 rounded-full text-[10px] bg-blue-100 text-blue-700 font-bold">
+            {cashReconciliations.length} Shift
+          </span>
+        </button>
+      </div>
 
         {/* ================================================================= */}
         {/* TAB 1: BAGI HASIL MALL & REVENUE SHARING (THE HERO FEATURE)       */}
@@ -771,7 +787,7 @@ export default function PaymentsPage() {
         {activeTab === 'transactions' && (
           <div className="space-y-4">
             {/* Filter Bar */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-white p-3 border border-gray-200/90 rounded-2xl shadow-2xs">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-white p-4 border border-gray-200/90 rounded-2xl shadow-2xs">
               <div className="relative flex-1 min-w-[240px]">
                 <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
@@ -961,7 +977,6 @@ export default function PaymentsPage() {
             </div>
           </div>
         )}
-      </div>
 
       {/* ========================================================================= */}
       {/* DRAWER 1: SLIP REKONSILIASI & TAGIHAN MALL (Floating Slide-Over)          */}

@@ -20,7 +20,6 @@ import {
   Images,
   Boxes,
   Users,
-  Ticket,
 } from 'lucide-react';
 
 interface NavGroup {
@@ -55,10 +54,9 @@ export function Sidebar() {
       ],
     },
     {
-      category: 'PELANGGAN & MARKETING',
+      category: 'PELANGGAN & CRM',
       items: [
-        { label: 'CRM Pelanggan & Member', href: '/customers', icon: Users, count: '1.4k', badgeVariant: 'pink' },
-        { label: 'Voucher & Promo Diskon', href: '/vouchers', icon: Ticket, count: '4 Aktif', badgeVariant: 'emerald' },
+        { label: 'Data & Kontak Pelanggan', href: '/customers', icon: Users, count: '1.4k', badgeVariant: 'pink' },
       ],
     },
     {
@@ -74,10 +72,16 @@ export function Sidebar() {
         { label: 'Finansial & Bagi Hasil Mall', href: '/payments', icon: CreditCard, count: 'Mall', badgeVariant: 'pink' },
       ],
     },
+    {
+      category: 'PENGATURAN & SISTEM',
+      items: [
+        { label: 'Tarif & Harga Sesi Kios', href: '/settings/pricing', icon: SlidersHorizontal, count: '4 Paket', badgeVariant: 'gray' },
+      ],
+    },
   ];
 
   return (
-    <aside className="w-[264px] min-w-[264px] max-w-[264px] border-r border-gray-200/90 bg-white flex flex-col justify-between shrink-0 font-sora z-30 select-none">
+    <aside className="w-[264px] min-w-[264px] max-w-[264px] h-full border-r border-gray-200/90 bg-white flex flex-col justify-between shrink-0 font-sora select-none">
       {/* Top Header & Searchable Nav Section */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
         {/* 1. Location / Branch Switcher Card (Ref: PWT Location & Zendenta Clinic) */}

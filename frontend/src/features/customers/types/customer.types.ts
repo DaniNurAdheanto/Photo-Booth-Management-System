@@ -1,4 +1,4 @@
-export type LoyaltyTier = 'BRONZE' | 'SILVER' | 'GOLD' | 'VIP';
+export type CustomerSegment = 'VIP' | 'REGULAR' | 'NEW' | 'INACTIVE';
 
 export interface CustomerSessionHistory {
   sessionId: string;
@@ -18,59 +18,24 @@ export interface Customer {
   phone: string;
   email: string;
   birthDate?: string;
+  city?: string;
   avatarUrl?: string;
-  tier: LoyaltyTier;
-  pointsBalance: number;
+  segment: CustomerSegment;
   totalSpent: number;
   totalSessions: number;
+  averageSpent: number;
   favoriteBooth: string;
   favoriteTemplate: string;
   registeredAt: string;
   lastVisitAt: string;
   tags: string[];
+  notes?: string;
   sessionHistory?: CustomerSessionHistory[];
 }
 
-export type VoucherDiscountType = 'PERCENTAGE' | 'FIXED_AMOUNT' | 'FREE_PRINT';
-export type VoucherStatus = 'ACTIVE' | 'EXPIRED' | 'DEPLETED' | 'SCHEDULED';
-
-export interface PromoVoucher {
-  id: string;
-  code: string;
-  title: string;
-  description: string;
-  discountType: VoucherDiscountType;
-  discountValue: number; // e.g., 20 (percent) or 15000 (fixed Rp)
-  minSpend: number;
-  maxDiscount?: number;
-  totalQuota: number;
-  usedCount: number;
-  validFrom: string;
-  validUntil: string;
-  status: VoucherStatus;
-  applicableBooths: string[]; // 'ALL' or booth names
-  terms: string[];
-}
-
-export interface LoyaltyTierRule {
-  tier: LoyaltyTier;
-  name: string;
-  minSpendThreshold: number;
-  pointsMultiplier: string; // e.g. "1x", "1.5x", "2x"
-  cashbackPercent: number;
-  freeExtraPrintPerSession: number;
-  exclusiveFrames: boolean;
-  colorHex: string;
-  badgeBg: string;
-}
-
-export interface BroadcastCampaign {
-  id: string;
-  title: string;
-  targetAudience: string;
-  voucherAttached?: string;
-  recipientsCount: number;
-  sentDate: string;
-  status: 'SENT' | 'SCHEDULED' | 'DRAFT';
-  conversionRate: string;
+export interface CustomerFilterParams {
+  searchQuery: string;
+  segment: string;
+  favoriteBooth: string;
+  sortBy: 'NEWEST' | 'SPENT_DESC' | 'SESSIONS_DESC' | 'NAME_ASC';
 }
