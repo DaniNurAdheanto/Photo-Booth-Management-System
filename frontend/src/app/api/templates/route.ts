@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getRepositories } from '@/lib/db';
 import { fetchFromApi } from '@/lib/api-client';
+import { getMemoryTemplates, addMemoryTemplate } from '@/features/templates/data/default-templates';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -16,7 +17,7 @@ export async function GET(req: NextRequest) {
 
     // 1. Try Go backend API first
     const apiRes = await fetchFromApi<any[]>(`/templates?${query.toString()}`);
-    if (apiRes && apiRes.success && apiRes.data) {
+    if (apiRes && apiRes.success && Array.isArray(apiRes.data) && apiRes.data.length > 0) {
       return NextResponse.json({ success: true, data: apiRes.data });
     }
   } catch (err) {
@@ -34,13 +35,16 @@ export async function GET(req: NextRequest) {
       where: Object.keys(where).length ? where : undefined,
       order: { createdAt: 'DESC' },
     });
-    return NextResponse.json({ success: true, data: records });
+    if (records && records.length > 0) {
+      return NextResponse.json({ success: true, data: records });
+    }
   } catch (error: any) {
-    return NextResponse.json(
-      { success: false, message: error.message || 'Failed to fetch templates' },
-      { status: 500 }
-    );
+    console.warn('TypeORM fetch failed, falling back to memory templates:', error);
   }
+
+  // 3. Fallback to featured memory templates (Minimalist Monochrome, Y2K Cyberpunk, Korean Pastel, Vintage 90s)
+  const fallbackRecords = getMemoryTemplates(boothId, category, includeArchived);
+  return NextResponse.json({ success: true, data: fallbackRecords });
 }
 
 export async function POST(req: NextRequest) {
@@ -61,42 +65,89 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Fallback to direct TypeORM
-    const { templates } = await getRepositories();
-    const newTemplate = templates.create({
-      id: `tmpl-${Math.random().toString(36).substring(2, 9)}`,
-      name: body.name,
-      layout: body.layout || '2x6_strip',
-      category: body.category || 'GENERAL',
-      slotsCount: body.slots_count || body.slotsCount || 4,
-      width: body.width || 600,
-      height: body.height || 1800,
-      backgroundColor: body.background_color || body.backgroundColor || '#DE5795',
-      backgroundGradient: body.background_gradient || body.backgroundGradient || '',
-      backgroundImageUrl: body.background_image_url || body.backgroundImageUrl || '',
-      overlayPngUrl: body.overlay_png_url || body.overlayPngUrl || '',
-      orientation: body.orientation || 'PORTRAIT',
-      printSize: body.print_size || body.printSize || '2x6 in',
-      aspectRatio: body.aspect_ratio || body.aspectRatio || '1:3',
-      padding: body.padding !== undefined ? body.padding : 30,
-      gap: body.gap !== undefined ? body.gap : 20,
-      borderRadius: body.border_radius !== undefined ? body.border_radius : 8,
-      slotsConfig: typeof body.slots_config === 'string' ? body.slots_config : JSON.stringify(body.slots_config || []),
-      textElements: typeof body.text_elements === 'string' ? body.text_elements : JSON.stringify(body.text_elements || []),
-      logoUrl: body.logo_url || body.logoUrl || '',
-      showDate: body.show_date !== undefined ? body.show_date : true,
-      eventName: body.event_name || body.eventName || '',
-      assignedBoothId: body.assigned_booth_id || body.assignedBoothId || 'ALL',
-      description: body.description || '',
-      isActive: body.is_active !== undefined ? body.is_active : true,
-      isArchived: false,
-      version: 1,
-    });
+    try {
+      const { templates } = await getRepositories();
+      const newTemplate = templates.create({
+        id: `tmpl-${Math.random().toString(36).substring(2, 9)}`,
+        name: body.name,
+        layout: body.layout || '2x6_strip',
+        category: body.category || 'GENERAL',
+        slotsCount: body.slots_count || body.slotsCount || 4,
+        width: body.width || 600,
+        height: body.height || 1800,
+        backgroundColor: body.background_color || body.backgroundColor || '#DE5795',
+        backgroundGradient: body.background_gradient || body.backgroundGradient || '',
+        backgroundImageUrl: body.background_image_url || body.backgroundImageUrl || '',
+        overlayPngUrl: body.overlay_png_url || body.overlayPngUrl || '',
+        orientation: body.orientation || 'PORTRAIT',
+        printSize: body.print_size || body.printSize || '2x6 in',
+        aspectRatio: body.aspect_ratio || body.aspectRatio || '1:3',
+        padding: body.padding !== undefined ? body.padding : 30,
+        gap: body.gap !== undefined ? body.gap : 20,
+        borderRadius: body.border_radius !== undefined ? body.border_radius : 8,
+        slotsConfig: typeof body.slots_config === 'string' ? body.slots_config : JSON.stringify(body.slots_config || []),
+        textElements: typeof body.text_elements === 'string' ? body.text_elements : JSON.stringify(body.text_elements || []),
+        logoUrl: body.logo_url || body.logoUrl || '',
+        showDate: body.show_date !== undefined ? body.show_date : true,
+        eventName: body.event_name || body.eventName || '',
+        assignedBoothId: body.assigned_booth_id || body.assignedBoothId || 'ALL',
+        description: body.description || '',
+        isActive: body.is_active !== undefined ? body.is_active : true,
+        isArchived: false,
+        version: 1,
+      });
 
-    const saved = await templates.save(newTemplate);
-    return NextResponse.json(
-      { success: true, message: 'Template created successfully', data: saved },
-      { status: 201 }
-    );
+      const saved = await templates.save(newTemplate);
+      addMemoryTemplate(saved as any);
+      return NextResponse.json(
+        { success: true, message: 'Template created successfully', data: saved },
+        { status: 201 }
+      );
+    } catch (dbErr) {
+      // 3. Fallback to memory store
+      const memoryItem = {
+        id: `tmpl-${Math.random().toString(36).substring(2, 9)}`,
+        name: body.name,
+        layout: body.layout || '2x6_strip',
+        category: body.category || 'GENERAL',
+        slots_count: body.slots_count || body.slotsCount || 4,
+        slotsCount: body.slots_count || body.slotsCount || 4,
+        width: body.width || 600,
+        height: body.height || 1800,
+        background_color: body.background_color || body.backgroundColor || '#DE5795',
+        backgroundColor: body.background_color || body.backgroundColor || '#DE5795',
+        background_gradient: body.background_gradient || body.backgroundGradient || '',
+        backgroundGradient: body.background_gradient || body.backgroundGradient || '',
+        background_image_url: body.background_image_url || body.backgroundImageUrl || '',
+        backgroundImageUrl: body.background_image_url || body.backgroundImageUrl || '',
+        overlay_png_url: body.overlay_png_url || body.overlayPngUrl || '',
+        overlayPngUrl: body.overlay_png_url || body.overlayPngUrl || '',
+        orientation: body.orientation || 'PORTRAIT',
+        print_size: body.print_size || body.printSize || '2x6 in',
+        printSize: body.print_size || body.printSize || '2x6 in',
+        aspect_ratio: body.aspect_ratio || body.aspectRatio || '1:3',
+        aspectRatio: body.aspect_ratio || body.aspectRatio || '1:3',
+        padding: body.padding !== undefined ? body.padding : 30,
+        gap: body.gap !== undefined ? body.gap : 20,
+        border_radius: body.border_radius !== undefined ? body.border_radius : 8,
+        borderRadius: body.border_radius !== undefined ? body.border_radius : 8,
+        slots_config: typeof body.slots_config === 'string' ? body.slots_config : JSON.stringify(body.slots_config || []),
+        text_elements: typeof body.text_elements === 'string' ? body.text_elements : JSON.stringify(body.text_elements || []),
+        logo_url: body.logo_url || body.logoUrl || '',
+        show_date: body.show_date !== undefined ? body.show_date : true,
+        event_name: body.event_name || body.eventName || '',
+        assigned_booth_id: body.assigned_booth_id || body.assignedBoothId || 'ALL',
+        description: body.description || '',
+        is_active: body.is_active !== undefined ? body.is_active : true,
+        isArchived: false,
+        version: 1,
+      };
+      addMemoryTemplate(memoryItem as any);
+      return NextResponse.json(
+        { success: true, message: 'Template created successfully', data: memoryItem },
+        { status: 201 }
+      );
+    }
   } catch (error: any) {
     return NextResponse.json(
       { success: false, message: error.message || 'Failed to create template' },

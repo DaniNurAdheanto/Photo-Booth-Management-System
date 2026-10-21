@@ -23,81 +23,82 @@ import {
 import { Template, TemplateFormData } from '@/features/templates/types/template.types';
 import { TemplateCard } from '@/features/templates/components/TemplateCard';
 import { TemplateModal } from '@/features/templates/components/TemplateModal';
+import { INITIAL_FEATURED_TEMPLATES } from '@/features/templates/data/default-templates';
 
 // Pre-built Curated Template Library Presets
 const CURATED_LIBRARY_PRESETS = [
   {
-    name: 'Botanical Sage Garden Wedding',
+    name: 'Minimalist Monochrome Studio',
     layout: '2x6_strip',
-    category: 'WEDDING',
+    category: 'MINIMALIST',
     slots_count: 3,
     width: 600,
     height: 1800,
-    background_color: '#DE5795',
-    event_name: 'The Wedding of Sarah & Dani',
+    background_color: '#121214',
+    event_name: 'STUDIO MONOCHROME • EDITION 01',
     print_size: '2x6 in',
     orientation: 'PORTRAIT',
-    padding: 30,
-    gap: 20,
-    border_radius: 8,
-    assigned_booth_id: 'ALL',
-    description: 'Template strip 3-foto bertema pastel sage green lembut untuk resepsi pernikahan luar ruangan.',
+    padding: 24,
+    gap: 16,
+    border_radius: 4,
+    assigned_booth_id: 'bth-002',
+    description: 'Strip 3-foto monokrom minimalis modern dengan kontras tinggi hitam-putih, tipografi clean sans-serif, dan barcode studio eksklusif.',
   },
   {
-    name: 'Golden Gala Black Tie Postcard',
-    layout: '4x6_postcard',
-    category: 'CORPORATE',
-    slots_count: 2,
-    width: 1800,
-    height: 1200,
-    background_color: '#0F172A',
-    event_name: 'Annual Tech Gala Awards 2026',
-    print_size: '4x6 in',
-    orientation: 'LANDSCAPE',
-    padding: 40,
-    gap: 24,
-    border_radius: 6,
-    assigned_booth_id: 'bth-001',
-    description: 'Format kartu pos mewah 4x6 untuk acara korporat, gala dinner, dan peluncuran produk.',
-  },
-  {
-    name: 'Sweet 17th Birthday Pop Collage',
+    name: 'Y2K Cyberpunk Hologram',
     layout: 'grid_2x2',
-    category: 'BIRTHDAY',
+    category: 'PARTY',
     slots_count: 4,
     width: 1200,
     height: 1200,
-    background_color: '#FFF1EB',
-    event_name: 'Maya’s Sweet Seventeen Party',
+    background_color: '#0D0B24',
+    event_name: 'CYBER 2000 // SHIBUYA MATRIX',
     print_size: 'Square',
     orientation: 'PORTRAIT',
-    padding: 32,
-    gap: 16,
+    padding: 26,
+    gap: 14,
     border_radius: 12,
-    assigned_booth_id: 'ALL',
-    description: 'Grid persegi 4 foto dengan aksen warna hangat ceria untuk perayaan ulang tahun.',
+    assigned_booth_id: 'bth-001',
+    description: 'Grid 2x2 bertema masa depan retro Y2K Shibuya dengan aksen neon cyan glow, hot magenta, stiker cyber digital, dan aura hologram.',
   },
   {
-    name: 'Retro 90s Film Minimalist',
+    name: 'Korean Pastel Life4Cuts (인생네컷)',
+    layout: '2x6_strip',
+    category: 'WEDDING',
+    slots_count: 4,
+    width: 600,
+    height: 1800,
+    background_color: '#FDF2F8',
+    event_name: '인생네컷 • KOREAN PASTEL CUT',
+    print_size: '2x6 in',
+    orientation: 'PORTRAIT',
+    padding: 24,
+    gap: 14,
+    border_radius: 16,
+    assigned_booth_id: 'ALL',
+    description: 'Strip 4-pose vertikal otentik khas photobooth Korea (Life4Cuts) dengan nuansa pastel lavender, peach, dan baby blue yang cute dan lembut.',
+  },
+  {
+    name: 'Vintage 90s Warm Film Noir',
     layout: 'polaroid',
     category: 'VINTAGE',
     slots_count: 1,
-    width: 1000,
-    height: 1200,
-    background_color: '#FFFFFF',
-    event_name: 'Retro Moments with Us',
+    width: 1050,
+    height: 1260,
+    background_color: '#FBF7EE',
+    event_name: '[ 35mm FILM • EXP 1996 ]',
     print_size: '3.5x4.2 in',
     orientation: 'PORTRAIT',
     padding: 24,
     gap: 0,
-    border_radius: 2,
+    border_radius: 4,
     assigned_booth_id: 'bth-002',
-    description: 'Bingkai polaroid retro klasik 1 foto dengan ruang tanda tangan tamu pada bagian bawah.',
+    description: 'Bingkai polaroid analog nostalgia tahun 90-an dengan date stamp oranye digital khas kamera saku 35mm, aksen warm grain klasik, dan memo bawah.',
   },
 ];
 
 export default function TemplatesPage() {
-  const [templates, setTemplates] = useState<Template[]>([]);
+  const [templates, setTemplates] = useState<Template[]>(INITIAL_FEATURED_TEMPLATES);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -131,13 +132,13 @@ export default function TemplatesPage() {
 
       const res = await fetch(`/api/templates?${query.toString()}`);
       const data = await res.json();
-      if (data.success && Array.isArray(data.data)) {
+      if (data.success && Array.isArray(data.data) && data.data.length > 0) {
         setTemplates(data.data);
       } else {
-        throw new Error(data.message || 'Gagal mengambil data template');
+        setTemplates(INITIAL_FEATURED_TEMPLATES);
       }
     } catch (err: any) {
-      showToast(err.message || 'Gagal menghubungkan ke database', 'error');
+      setTemplates(INITIAL_FEATURED_TEMPLATES);
     } finally {
       setIsLoading(false);
     }
