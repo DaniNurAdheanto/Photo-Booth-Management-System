@@ -372,7 +372,7 @@ export default function BoothsPage() {
   const criticalPaperCount = booths.filter((b) => b.paperCount <= 200).length;
 
   return (
-    <div className="space-y-7 pb-12 font-sora">
+    <div className="space-y-6 font-sora animate-fade-in text-gray-900 pb-16">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-5 right-5 z-60 bg-gray-900 text-white text-xs px-4 py-3 rounded-2xl shadow-2xl border border-white/10 flex items-center gap-2.5 animate-bounce">

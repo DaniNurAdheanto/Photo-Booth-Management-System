@@ -300,7 +300,7 @@ export default function TemplatesPage() {
   const layoutCount = new Set(templates.map((t) => t.layout)).size;
 
   return (
-    <div className="space-y-6 font-sora">
+    <div className="space-y-6 font-sora animate-fade-in text-gray-900 pb-16">
         {/* Toast Notification */}
         {toast && (
           <div className="fixed top-6 right-6 z-50 animate-fade-in">
