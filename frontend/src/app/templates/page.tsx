@@ -569,19 +569,19 @@ export default function TemplatesPage() {
           <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 p-3 sm:p-4 pointer-events-none">
             <div className="w-screen max-w-2xl bg-white shadow-2xl border border-gray-200/90 rounded-3xl flex flex-col animate-slide-left overflow-hidden ring-1 ring-black/10 pointer-events-auto">
               {/* Drawer Header */}
-              <div className="px-6 py-5 border-b border-gray-200/80 flex items-center justify-between bg-white shrink-0 sticky top-0 z-20 shadow-2xs">
-                <div className="flex items-center gap-3.5 min-w-0">
+              <div className="px-7 pt-6 pb-5.5 border-b border-gray-200/80 flex items-center justify-between bg-white/95 backdrop-blur-md shrink-0 sticky top-0 z-20 shadow-2xs">
+                <div className="flex items-center gap-4 min-w-0">
                   <div className="w-11 h-11 rounded-2xl bg-[#DE5795]/15 border border-[#DE5795]/30 flex items-center justify-center text-[#9D174D] shadow-xs shrink-0">
                     <BookOpen className="w-5 h-5 text-[#DE5795]" />
                   </div>
-                  <div className="min-w-0">
+                  <div className="min-w-0 pr-2">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h3 className="text-base font-bold text-gray-900 font-sora leading-tight">Template Library</h3>
                       <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#DE5795]/15 text-[#9D174D] border border-[#DE5795]/30">
                         Preset Hub
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-0.5 truncate">
+                    <p className="text-xs text-gray-500 mt-1 truncate">
                       Pilih preset profesional siap pakai untuk langsung ditambahkan ke sistem booth
                     </p>
                   </div>
@@ -589,7 +589,7 @@ export default function TemplatesPage() {
                 <button
                   type="button"
                   onClick={() => setIsLibraryOpen(false)}
-                  className="w-9 h-9 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 border border-transparent hover:border-gray-200 transition-all flex items-center justify-center shrink-0 ml-3"
+                  className="w-9 h-9 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 border border-gray-200/80 transition-all flex items-center justify-center shrink-0 ml-4 shadow-2xs"
                   title="Tutup (Esc)"
                 >
                   <X className="w-5 h-5" />
@@ -597,7 +597,7 @@ export default function TemplatesPage() {
               </div>
 
               {/* Drawer Body */}
-              <div className="p-6 overflow-y-auto flex-1 space-y-4">
+              <div className="px-7 py-6 overflow-y-auto flex-1 space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {CURATED_LIBRARY_PRESETS.map((preset, idx) => (
                     <div
