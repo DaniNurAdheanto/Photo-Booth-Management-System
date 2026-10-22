@@ -73,6 +73,10 @@ export function TemplatePreview({
   const isCyberpunk = lowerName.includes('cyber') || lowerName.includes('y2k') || lowerName.includes('matrix');
   const isKoreanPastel = lowerName.includes('korean') || lowerName.includes('pastel') || lowerName.includes('life4cuts') || lowerName.includes('인생네컷');
   const isVintage90s = lowerName.includes('vintage') || lowerName.includes('90s') || lowerName.includes('film') || lowerName.includes('noir');
+  const isCoquette = lowerName.includes('coquette') || lowerName.includes('balletcore') || lowerName.includes('ribbon');
+  const isCinematicFilm = lowerName.includes('cinematic') || lowerName.includes('sprocket') || lowerName.includes('portra');
+  const isEditorial = lowerName.includes('editorial') || lowerName.includes('vogue') || lowerName.includes('magazine') || lowerName.includes('archive issue');
+  const isScrapbook = lowerName.includes('scrapbook') || lowerName.includes('chrome') || lowerName.includes('acid');
 
   // Background style
   const bgStyle: React.CSSProperties = {
@@ -90,14 +94,18 @@ export function TemplatePreview({
   const isDarkBg =
     isMonochrome ||
     isCyberpunk ||
+    isCinematicFilm ||
     backgroundColor === '#121214' ||
     backgroundColor === '#18181B' ||
     backgroundColor === '#0D0B24' ||
     backgroundColor === '#0A091E' ||
+    backgroundColor === '#0A0A0A' ||
     backgroundColor === '#0F172A' ||
     (backgroundGradient &&
       (backgroundGradient.includes('#18181B') ||
         backgroundGradient.includes('#0D0B24') ||
+        backgroundGradient.includes('#141414') ||
+        backgroundGradient.includes('#0A0A0A') ||
         backgroundGradient.includes('#0A091E') ||
         backgroundGradient.includes('#0F172A')));
 
@@ -110,27 +118,51 @@ export function TemplatePreview({
     ? 'contrast(125%) saturate(135%) hue-rotate(10deg)'
     : isKoreanPastel
     ? 'contrast(98%) brightness(105%) saturate(108%)'
+    : isCoquette
+    ? 'contrast(96%) brightness(106%) saturate(114%)'
+    : isCinematicFilm
+    ? 'contrast(116%) saturate(112%) brightness(98%) sepia(8%)'
+    : isEditorial
+    ? 'contrast(120%) brightness(98%) saturate(92%)'
+    : isScrapbook
+    ? 'contrast(112%) saturate(128%)'
     : undefined;
 
   // Header & Title text color
   const headerTextColor = isDarkBg
     ? isCyberpunk
       ? '#00F0FF'
+      : isCinematicFilm
+      ? '#F59E0B'
       : '#FFFFFF'
     : isKoreanPastel
     ? '#7C3AED'
+    : isCoquette
+    ? '#BE185D'
     : isVintage90s
     ? '#78350F'
+    : isEditorial
+    ? '#1C1917'
+    : isScrapbook
+    ? '#0F172A'
     : '#831843';
 
   const subTextColor = isDarkBg
     ? isCyberpunk
       ? '#F43F5E'
+      : isCinematicFilm
+      ? '#9CA3AF'
       : '#A1A1AA'
     : isKoreanPastel
     ? '#DB2777'
+    : isCoquette
+    ? '#DB2777'
     : isVintage90s
     ? '#B45309'
+    : isEditorial
+    ? '#78716C'
+    : isScrapbook
+    ? '#E11D48'
     : '#9D174D';
 
   const dividerBorderColor = isDarkBg ? 'border-white/15' : 'border-black/10';
@@ -138,7 +170,15 @@ export function TemplatePreview({
   return (
     <div
       className={`relative mx-auto rounded-xl shadow-md border ${
-        isCyberpunk ? 'border-cyan-500/40' : isDarkBg ? 'border-zinc-700/80' : 'border-gray-200/90'
+        isCyberpunk
+          ? 'border-cyan-500/40'
+          : isCinematicFilm
+          ? 'border-neutral-800'
+          : isCoquette
+          ? 'border-pink-200'
+          : isDarkBg
+          ? 'border-zinc-700/80'
+          : 'border-gray-200/90'
       } transition-all overflow-hidden flex flex-col justify-between font-sora select-none ${className}`}
       style={bgStyle}
     >
@@ -150,6 +190,22 @@ export function TemplatePreview({
           onError={() => setImgError(true)}
           className="absolute inset-0 w-full h-full object-cover z-30 pointer-events-none"
         />
+      )}
+
+      {/* 35mm Cinematic Film Sprocket Holes on Left & Right */}
+      {isCinematicFilm && (
+        <>
+          <div className="absolute top-2 bottom-2 left-0.5 z-20 flex flex-col justify-around pointer-events-none">
+            {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="w-1.5 h-2 bg-neutral-900 border border-neutral-700/70 rounded-[1.5px]" />
+            ))}
+          </div>
+          <div className="absolute top-2 bottom-2 right-0.5 z-20 flex flex-col justify-around pointer-events-none">
+            {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="w-1.5 h-2 bg-neutral-900 border border-neutral-700/70 rounded-[1.5px]" />
+            ))}
+          </div>
+        </>
       )}
 
       {/* Cyberpunk ambient top tag */}
@@ -169,12 +225,45 @@ export function TemplatePreview({
         </div>
       )}
 
+      {/* Coquette Ribbon Top Decor */}
+      {isCoquette && (
+        <div className="absolute top-0.5 left-0 right-0 z-20 flex justify-center text-[10px] drop-shadow-xs pointer-events-none">
+          🎀
+        </div>
+      )}
+
+      {/* Scrapbook Corner Star */}
+      {isScrapbook && (
+        <div className="absolute top-1 right-2 z-20 text-[9px] text-slate-400 drop-shadow-xs pointer-events-none font-bold">
+          ✦
+        </div>
+      )}
+
       {/* Main Content Area */}
-      <div className={`relative z-10 flex flex-col justify-between h-full w-full p-2.5 ${isCyberpunk ? 'pt-3.5' : isKoreanPastel ? 'pt-2.5' : ''}`}>
+      <div
+        className={`relative z-10 flex flex-col justify-between h-full w-full p-2.5 ${
+          isCinematicFilm
+            ? 'px-3 py-2'
+            : isCyberpunk
+            ? 'pt-3.5'
+            : isKoreanPastel || isCoquette
+            ? 'pt-3'
+            : ''
+        }`}
+      >
         {/* Top Header / Logo Space (if logo provided) */}
         {logoUrl && (
           <div className="flex items-center justify-center mb-1">
             <img src={logoUrl} alt="Event Logo" className="h-5 object-contain" />
+          </div>
+        )}
+
+        {/* Editorial Masthead */}
+        {isEditorial && (
+          <div className="text-center pb-1 border-b border-black/10">
+            <p className="font-serif font-black tracking-widest text-[10px] text-neutral-900 uppercase">
+              V O G U E
+            </p>
           </div>
         )}
 
@@ -192,8 +281,12 @@ export function TemplatePreview({
                   className={`flex-1 min-h-[38px] bg-white/95 shadow-xs flex flex-col items-center justify-center text-gray-500 overflow-hidden relative group ${
                     isCyberpunk
                       ? 'border border-cyan-400/80 shadow-[0_0_6px_rgba(0,240,255,0.35)]'
+                      : isCinematicFilm
+                      ? 'border border-neutral-800'
                       : isMonochrome
                       ? 'border border-zinc-700/60'
+                      : isCoquette
+                      ? 'border-2 border-pink-300/80 shadow-xs'
                       : isKoreanPastel
                       ? 'border-2 border-white/90 shadow-xs'
                       : 'border border-white/60'
@@ -214,7 +307,14 @@ export function TemplatePreview({
                     </div>
                   )}
 
-                  {/* 90s Vintage orange digital quartz date stamp on first photo */}
+                  {/* Cinematic Film frame number badge */}
+                  {isCinematicFilm && (
+                    <div className="absolute bottom-0.5 left-1 px-1 py-0.2 rounded bg-black/80 text-amber-400 font-mono text-[5.5px] font-bold">
+                      ▶ 0{slotIdx + 1}A
+                    </div>
+                  )}
+
+                  {/* 90s Vintage orange digital quartz date stamp on last photo */}
                   {isVintage90s && slotIdx === actualSlots.length - 1 && (
                     <div className="absolute bottom-1 right-1 px-1 py-0.5 rounded bg-black/60 text-orange-400 font-mono text-[6.5px] font-bold tracking-wider">
                       &apos;96 10 24
@@ -245,6 +345,14 @@ export function TemplatePreview({
                 <div className="flex flex-col items-center gap-0.5 mt-0.5">
                   <p className="text-[6.5px] font-mono tracking-widest text-zinc-400 uppercase">||| || ||| | ||||</p>
                 </div>
+              ) : isCinematicFilm ? (
+                <p className="text-[6.5px] font-mono text-amber-500 font-bold uppercase tracking-wider">
+                  SAFETY FILM • ISO 400
+                </p>
+              ) : isCoquette ? (
+                <p className="text-[7px] font-serif italic text-pink-600">
+                  Je t&apos;aime • Balletcore Dreams
+                </p>
               ) : (
                 <p className="text-[7px] font-medium" style={{ color: subTextColor }}>
                   {isKoreanPastel ? '인생네컷 ♡ Memories' : 'Moments to Remember'}
@@ -270,6 +378,8 @@ export function TemplatePreview({
                   className={`aspect-square bg-white/95 shadow-xs flex flex-col items-center justify-center overflow-hidden relative ${
                     isCyberpunk
                       ? 'border border-cyan-400/80 shadow-[0_0_6px_rgba(0,240,255,0.35)]'
+                      : isScrapbook
+                      ? 'border border-slate-300 shadow-sm'
                       : isMonochrome
                       ? 'border border-zinc-700/60'
                       : 'border border-white/60'
@@ -285,6 +395,18 @@ export function TemplatePreview({
                     />
                   ) : (
                     <Camera className="h-4 w-4 text-gray-400" />
+                  )}
+
+                  {/* Scrapbook corner washi tape on first slot */}
+                  {isScrapbook && slotIdx === 0 && (
+                    <div className="absolute -top-1 -left-1 w-4 h-2 bg-white/70 rotate-[-15deg] shadow-xs border border-white/40 pointer-events-none" />
+                  )}
+
+                  {/* Scrapbook cherry sticker on last slot */}
+                  {isScrapbook && slotIdx === 3 && (
+                    <div className="absolute -bottom-0.5 -right-0.5 text-[8.5px] pointer-events-none drop-shadow-xs">
+                      🍒
+                    </div>
                   )}
                 </div>
               ))}
@@ -306,6 +428,8 @@ export function TemplatePreview({
                     {txt.text}
                   </p>
                 ))
+              ) : isScrapbook ? (
+                <p className="text-[6.5px] text-slate-500 font-medium">✦ 2000s Scrapbook Memories ✦</p>
               ) : null}
 
               {showDate && (
@@ -327,6 +451,8 @@ export function TemplatePreview({
                   className={`aspect-4/3 bg-white/95 shadow-xs flex flex-col items-center justify-center overflow-hidden relative ${
                     isCyberpunk
                       ? 'border border-cyan-400/80 shadow-[0_0_6px_rgba(0,240,255,0.35)]'
+                      : isEditorial
+                      ? 'border border-stone-300'
                       : 'border border-white/60'
                   }`}
                   style={{ borderRadius: `${borderRadius}px` }}
@@ -346,9 +472,16 @@ export function TemplatePreview({
             </div>
 
             <div className={`flex items-center justify-between px-1 pt-1 border-t ${dividerBorderColor} text-[7.5px]`}>
-              <span className="font-bold truncate" style={{ color: headerTextColor }}>
-                {eventName || templateName}
-              </span>
+              <div className="flex flex-col text-left">
+                <span className="font-bold truncate" style={{ color: headerTextColor }}>
+                  {eventName || templateName}
+                </span>
+                {isEditorial && (
+                  <span className="text-[6px] font-mono tracking-wider text-stone-400">
+                    |||| || ||| | VOL. 26
+                  </span>
+                )}
+              </div>
               {showDate && (
                 <span className={`font-mono ${isDarkBg ? 'text-zinc-400' : 'text-gray-500'}`}>
                   {new Date().getFullYear()}
