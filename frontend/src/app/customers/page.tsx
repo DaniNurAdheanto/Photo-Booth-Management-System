@@ -51,7 +51,7 @@ const formatRupiah = (val: number) => {
 };
 
 export default function CustomersPage() {
-  const [customersList, setCustomersList] = useState<Customer[]>(mockCustomers);
+  const [customersList, setCustomersList] = useState<Customer[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSegmentFilter, setSelectedSegmentFilter] = useState<string>('ALL');
   const [selectedBoothFilter, setSelectedBoothFilter] = useState<string>('ALL');
@@ -70,9 +70,28 @@ export default function CustomersPage() {
   // Pagination state (Compact view)
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchCustomers = async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetch('/api/customers');
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+          setCustomersList(json.data);
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to load customers from backend:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     setMounted(true);
+    fetchCustomers();
   }, []);
 
   // Add Customer Form state
@@ -223,6 +242,21 @@ export default function CustomersPage() {
 
     setCustomersList([created, ...customersList]);
     setIsAddCustomerOpen(false);
+
+    // Persist to PostgreSQL backend
+    fetch('/api/customers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: created.name,
+        email: created.email,
+        phone: created.phone,
+        city: created.city,
+        favoriteBooth: created.favoriteBooth,
+        favoriteTemplate: created.favoriteTemplate,
+        totalSpent: created.totalSpent,
+      }),
+    }).catch((err) => console.warn('Failed to persist customer to backend:', err));
     setNewCustomerForm({
       name: '',
       phone: '',

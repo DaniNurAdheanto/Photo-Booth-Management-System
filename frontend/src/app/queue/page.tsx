@@ -40,153 +40,9 @@ import {
 import { useLanguage } from '@/context/language-context';
 import { QueueTicket, QueueStatus, EmailLogEntry, EmailReminderType } from '@/features/queue/types/queue.types';
 
-// Initial Mock Queue Data
-const INITIAL_QUEUE_TICKETS: QueueTicket[] = [
-  {
-    id: 'q-101',
-    ticketNumber: 'A-012',
-    customerName: 'Sarah Kurniawan',
-    customerEmail: 'sarah.kurnia@gmail.com',
-    customerPhone: '0812-9844-2130',
-    boothId: 'bth-001',
-    boothName: 'Booth Alpha (Grand Indonesia Lt. 3A)',
-    pax: 4,
-    packageType: 'Strip 2x6 Glamour Pink',
-    status: 'CALLING',
-    joinedAt: '13:10',
-    calledAt: '13:28',
-    estimatedMinutes: 2,
-    emailRemindersSent: 2,
-    lastReminderAt: '13:28',
-    notes: 'Ulang tahun, minta frame edisi kue',
-  },
-  {
-    id: 'q-102',
-    ticketNumber: 'A-013',
-    customerName: 'Budi Santoso & Maya',
-    customerEmail: 'budi.santoso88@yahoo.com',
-    customerPhone: '0818-0231-9944',
-    boothId: 'bth-001',
-    boothName: 'Booth Alpha (Grand Indonesia Lt. 3A)',
-    pax: 2,
-    packageType: 'Postcard 4x6 Couple Edition',
-    status: 'WAITING',
-    joinedAt: '13:18',
-    estimatedMinutes: 6,
-    emailRemindersSent: 1,
-    lastReminderAt: '13:19',
-    notes: 'Pakai aksesoris kacamata & bando',
-  },
-  {
-    id: 'q-103',
-    ticketNumber: 'B-008',
-    customerName: 'Clarissa Valerie & Friends',
-    customerEmail: 'clarissa.valerie@outlook.com',
-    customerPhone: '0857-1122-3344',
-    boothId: 'bth-002',
-    boothName: 'Booth Beta (Grand Indonesia Lt. 3A)',
-    pax: 6,
-    packageType: 'Strip 2x6 Gen-Z Aesthetic + GIF',
-    status: 'WAITING',
-    joinedAt: '13:22',
-    estimatedMinutes: 12,
-    emailRemindersSent: 0,
-    notes: 'Grup sahabat kampus',
-  },
-  {
-    id: 'q-104',
-    ticketNumber: 'A-011',
-    customerName: 'Dimas Anggara',
-    customerEmail: 'dimas.anggara@gmail.com',
-    customerPhone: '0813-4455-6677',
-    boothId: 'bth-001',
-    boothName: 'Booth Alpha (Grand Indonesia Lt. 3A)',
-    pax: 3,
-    packageType: 'Strip 2x6 Standard Duo',
-    status: 'IN_BOOTH',
-    joinedAt: '13:02',
-    calledAt: '13:20',
-    inBoothAt: '13:22',
-    estimatedMinutes: 0,
-    emailRemindersSent: 2,
-    lastReminderAt: '13:20',
-    notes: 'Sesi sedang pemotretan foto ke-3 dari 4',
-  },
-  {
-    id: 'q-105',
-    ticketNumber: 'B-007',
-    customerName: 'Jessica Tan',
-    customerEmail: 'jessica.tan99@gmail.com',
-    customerPhone: '0811-2233-4455',
-    boothId: 'bth-002',
-    boothName: 'Booth Beta (Grand Indonesia Lt. 3A)',
-    pax: 2,
-    packageType: 'Strip 2x6 Pastel Cute',
-    status: 'COMPLETED',
-    joinedAt: '12:45',
-    calledAt: '13:00',
-    inBoothAt: '13:02',
-    estimatedMinutes: 0,
-    emailRemindersSent: 2,
-    lastReminderAt: '13:00',
-    notes: 'Selesai cetak & cloud delivery sukses',
-  },
-  {
-    id: 'q-106',
-    ticketNumber: 'C-004',
-    customerName: 'Rian Hidayat',
-    customerEmail: 'rian.hidayat@gmail.com',
-    customerPhone: '0819-3322-1100',
-    boothId: 'bth-003',
-    boothName: 'Booth Gamma (Central Park Mall)',
-    pax: 1,
-    packageType: 'Postcard 4x6 Solo Portrait',
-    status: 'WAITING',
-    joinedAt: '13:30',
-    estimatedMinutes: 18,
-    emailRemindersSent: 0,
-    notes: 'Foto paspor/formal creative',
-  },
-];
-
-const INITIAL_EMAIL_LOGS: EmailLogEntry[] = [
-  {
-    id: 'log-1',
-    ticketId: 'q-101',
-    ticketNumber: 'A-012',
-    recipientEmail: 'sarah.kurnia@gmail.com',
-    recipientName: 'Sarah Kurniawan',
-    subject: '🔔 Giliran Anda Sekarang! - PhotoBooth Central (Tiket #A-012)',
-    type: 'CALLING_NOW',
-    sentAt: '13:28:15',
-    status: 'OPENED',
-    boothName: 'Booth Alpha',
-  },
-  {
-    id: 'log-2',
-    ticketId: 'q-102',
-    ticketNumber: 'A-013',
-    recipientEmail: 'budi.santoso88@yahoo.com',
-    recipientName: 'Budi Santoso',
-    subject: '⏳ Antrean Anda Tinggal 1 Lagi (±6 Menit) - PhotoBooth Central (#A-013)',
-    type: 'UPCOMING_SOON',
-    sentAt: '13:19:04',
-    status: 'DELIVERED',
-    boothName: 'Booth Alpha',
-  },
-  {
-    id: 'log-3',
-    ticketId: 'q-104',
-    ticketNumber: 'A-011',
-    recipientEmail: 'dimas.anggara@gmail.com',
-    recipientName: 'Dimas Anggara',
-    subject: '🔔 Giliran Anda Sekarang! - PhotoBooth Central (Tiket #A-011)',
-    type: 'CALLING_NOW',
-    sentAt: '13:20:10',
-    status: 'OPENED',
-    boothName: 'Booth Alpha',
-  },
-];
+// Initial Queue Data (Clean State)
+const INITIAL_QUEUE_TICKETS: QueueTicket[] = [];
+const INITIAL_EMAIL_LOGS: EmailLogEntry[] = [];
 
 export default function QueueManagementPage() {
   const { t, language } = useLanguage();
@@ -223,8 +79,28 @@ export default function QueueManagementPage() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchQueues = async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetch('/api/queues');
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+          setTickets(json.data);
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to load queues from backend:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     setMounted(true);
+    fetchQueues();
   }, []);
 
   // Filtered Tickets
@@ -262,6 +138,13 @@ export default function QueueManagementPage() {
       return t;
     });
     setTickets(updated);
+
+    // Sync to PostgreSQL backend
+    fetch(`/api/queues/${ticket.id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'CALLED' }),
+    }).catch((err) => console.warn('Failed to sync queue status:', err));
 
     // Auto Dispatch Email Notification
     const newLog: EmailLogEntry = {
@@ -331,6 +214,14 @@ export default function QueueManagementPage() {
           : t
       )
     );
+
+    // Sync to PostgreSQL backend
+    fetch(`/api/queues/${ticketId}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'IN_BOOTH' }),
+    }).catch((err) => console.warn('Failed to sync queue status:', err));
+
     showToast(language === 'en' ? 'Guest has entered the booth! Photo session starting.' : 'Tamu telah masuk booth! Sesi foto dimulai.');
   };
 
@@ -340,6 +231,14 @@ export default function QueueManagementPage() {
         t.id === ticketId ? { ...t, status: 'COMPLETED' as QueueStatus } : t
       )
     );
+
+    // Sync to PostgreSQL backend
+    fetch(`/api/queues/${ticketId}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'COMPLETED' }),
+    }).catch((err) => console.warn('Failed to sync queue status:', err));
+
     showToast(language === 'en' ? 'Session completed. Paper printed & uploaded to cloud.' : 'Sesi selesai. Foto dicetak & diunggah ke cloud.');
   };
 
@@ -349,6 +248,14 @@ export default function QueueManagementPage() {
         t.id === ticketId ? { ...t, status: 'NO_SHOW' as QueueStatus } : t
       )
     );
+
+    // Sync to PostgreSQL backend
+    fetch(`/api/queues/${ticketId}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'CANCELLED' }),
+    }).catch((err) => console.warn('Failed to sync queue status:', err));
+
     showToast(language === 'en' ? 'Ticket skipped (guest did not show up).' : 'Tiket dilewati (tamu tidak hadir saat dipanggil).');
   };
 
@@ -431,6 +338,28 @@ export default function QueueManagementPage() {
     };
 
     setTickets([...tickets, newTicket]);
+
+    // Persist to PostgreSQL backend
+    fetch('/api/queues', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customerName: newCustName,
+        customerEmail: newCustEmail,
+        customerPhone: newCustPhone,
+        boothId: newBoothId,
+        packageType: newPackage,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.data && data.data.id) {
+          setTickets((prev) =>
+            prev.map((t) => (t.id === newTicket.id ? { ...t, id: data.data.id, ticketNumber: data.data.queue_number || t.ticketNumber } : t))
+          );
+        }
+      })
+      .catch((err) => console.warn('Failed to persist queue to backend:', err));
 
     // Send instant registration email confirmation or direct entry notification
     const newLog: EmailLogEntry = {

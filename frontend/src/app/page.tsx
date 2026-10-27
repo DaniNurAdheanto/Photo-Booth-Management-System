@@ -77,29 +77,9 @@ const initialBooths = [
   },
 ];
 
-const liveSession: PhotoSession = {
-  id: 'sess-001',
-  booth_id: 'bth-002',
-  boothId: 'bth-002',
-  session_code: 'PB-CP-9021',
-  sessionCode: 'PB-CP-9021',
-  customer_name: 'Sarah & Dani',
-  customerName: 'Sarah & Dani',
-  customer_email: 'sarah@example.com',
-  customerEmail: 'sarah@example.com',
-  status: 'CAPTURING',
-  total_photos: 4,
-  totalPhotos: 4,
-  print_copies: 2,
-  printCopies: 2,
-  countdown_seconds: 3,
-  retake_count: 0,
-  filter_preset: 'ORIGINAL',
-  captured_photos: '[]',
-  createdAt: '2026-10-21T08:30:00Z',
-};
+const liveSession: PhotoSession | null = null;
 
-// Initial Operational Tasks (Referenced from Image 1 "Upcoming Task")
+// Operational Tasks
 interface DashboardTask {
   id: string;
   title: string;
@@ -111,134 +91,12 @@ interface DashboardTask {
   boothName: string;
 }
 
-const initialTasks: DashboardTask[] = [
-  {
-    id: 'tsk-01',
-    title: 'Refill Roll Kertas DNP & Kalibrasi Sensor',
-    assignedTo: 'Panji Dwi',
-    avatarColor: 'bg-emerald-500',
-    status: 'OVERDUE',
-    dueDate: 'Hari ini, 15:00',
-    completed: false,
-    boothName: 'Booth Gamma (PVJ)',
-  },
-  {
-    id: 'tsk-02',
-    title: 'Setup Template Khusus The Wedding Sarah & Dani',
-    assignedTo: 'Dani Adheanto',
-    avatarColor: 'bg-[#DE5795]',
-    status: 'DOING',
-    dueDate: 'Hari ini, 17:30',
-    completed: true,
-    boothName: 'Booth Alpha (GI)',
-  },
-  {
-    id: 'tsk-03',
-    title: 'Pengecekan Baterai & Kabel Tethering Kamera Sony',
-    assignedTo: 'Luca Modric',
-    avatarColor: 'bg-blue-600',
-    status: 'DOING',
-    dueDate: 'Besok, 10:00',
-    completed: false,
-    boothName: 'Booth Beta (CP)',
-  },
-  {
-    id: 'tsk-04',
-    title: 'Audit Transaksi Kasir & Rekonsiliasi QRIS Midtrans',
-    assignedTo: 'Ahmad Zaini',
-    avatarColor: 'bg-amber-500',
-    status: 'TODO',
-    dueDate: '23 Okt 2026',
-    completed: false,
-    boothName: 'Semua Kiosk',
-  },
-  {
-    id: 'tsk-05',
-    title: 'Pembersihan Lensa & Ring Light Booth Alpha',
-    assignedTo: 'Aditya Irawan',
-    avatarColor: 'bg-purple-600',
-    status: 'DONE',
-    dueDate: 'Kemarin',
-    completed: true,
-    boothName: 'Booth Alpha (GI)',
-  },
-];
+const initialTasks: DashboardTask[] = [];
 
-// Upcoming Schedule Timeline (Referenced from Image 1 & 2)
-const upcomingSchedule = [
-  {
-    dayNumber: '21',
-    dayName: 'Rab',
-    events: [
-      {
-        id: 'sch-01',
-        title: 'The Wedding of Sarah & Dani',
-        time: '18:00 - 22:00 WIB',
-        venue: 'Grand Ballroom Hotel Mulia',
-        booth: 'Booth Alpha',
-        accentColor: 'border-l-[#DE5795]',
-        tag: 'Wedding',
-        printsQuota: '284 / 400 Lembar',
-      },
-      {
-        id: 'sch-02',
-        title: 'Google Tech Summit Jakarta 2026',
-        time: '09:00 - 17:00 WIB',
-        venue: 'The Ritz-Carlton Pacific Place',
-        booth: 'Booth Beta',
-        accentColor: 'border-l-blue-500',
-        tag: 'Corporate',
-        printsQuota: '490 / 500 Lembar',
-      },
-    ],
-  },
-  {
-    dayNumber: '24',
-    dayName: 'Sab',
-    events: [
-      {
-        id: 'sch-03',
-        title: 'Kayla’s Sweet 17th Birthday Celebration',
-        time: '14:00 - 18:00 WIB',
-        venue: 'Plataran Dharmawangsa',
-        booth: 'Booth Gamma',
-        accentColor: 'border-l-amber-500',
-        tag: 'Birthday',
-        printsQuota: 'Kuota 300 Lembar',
-      },
-    ],
-  },
-];
+// Upcoming Schedule Timeline
+const upcomingSchedule: any[] = [];
 
-const recentTransactions = [
-  {
-    id: 'TX-9021',
-    time: '2 menit lalu',
-    customer: 'Sarah & Dani',
-    amount: 50000,
-    method: 'QRIS BCA',
-    copies: 2,
-    avatar: 'SD',
-  },
-  {
-    id: 'TX-9020',
-    time: '8 menit lalu',
-    customer: 'Budi Pratama',
-    amount: 75000,
-    method: 'GoPay QRIS',
-    copies: 3,
-    avatar: 'BP',
-  },
-  {
-    id: 'TX-9019',
-    time: '15 menit lalu',
-    customer: 'Jessica Tan',
-    amount: 50000,
-    method: 'Debit EDC',
-    copies: 2,
-    avatar: 'JT',
-  },
-];
+const recentTransactions: any[] = [];
 
 export default function DashboardPage() {
   const [tasks, setTasks] = useState<DashboardTask[]>(initialTasks);
@@ -671,7 +529,16 @@ export default function DashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {tasks.map((task, index) => (
+                  {tasks.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="px-6 py-8 text-center text-xs text-gray-500">
+                        <CheckCircle2 className="w-7 h-7 text-gray-300 mx-auto mb-1.5" />
+                        <p className="font-semibold text-gray-700">Tidak ada tugas operasional tertunda</p>
+                        <p className="text-[11px] text-gray-400">Semua checklist booth dalam kondisi prima.</p>
+                      </td>
+                    </tr>
+                  ) : (
+                    tasks.map((task, index) => (
                     <tr
                       key={task.id}
                       className={`hover:bg-gray-50/80 transition-colors ${
@@ -752,7 +619,8 @@ export default function DashboardPage() {
                         {task.dueDate}
                       </td>
                     </tr>
-                  ))}
+                  ))
+                )}
                 </tbody>
               </table>
             </div>
@@ -856,51 +724,47 @@ export default function DashboardPage() {
             </div>
 
             {/* Timeline Day Groupings */}
-            <div className="p-6 space-y-5">
-              {upcomingSchedule.map((group, gIdx) => (
-                <div key={gIdx} className="flex gap-4">
-                  {/* Left Date Block */}
-                  <div className="w-12 shrink-0 text-center">
-                    <span className="text-[11px] font-bold text-gray-400 uppercase block">
-                      {group.dayName}
-                    </span>
-                    <span className="text-2xl font-black text-gray-900 tracking-tight block">
-                      {group.dayNumber}
-                    </span>
-                  </div>
-
-                  {/* Event Slots with colored left accent */}
-                  <div className="flex-1 space-y-2.5">
-                    {group.events.map((evt) => (
-                      <div
-                        key={evt.id}
-                        className={`p-3 rounded-xl bg-gray-50 border border-gray-200/80 border-l-4 ${evt.accentColor} space-y-1`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="font-mono text-[11px] font-bold text-gray-900">
-                            {evt.time}
-                          </span>
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white border border-gray-200 text-gray-600">
-                            {evt.tag}
-                          </span>
-                        </div>
-                        <h4 className="text-xs font-bold text-gray-900 leading-snug">
-                          {evt.title}
-                        </h4>
-                        <div className="flex items-center justify-between text-[11px] text-gray-500 pt-1">
-                          <span className="flex items-center gap-1 truncate">
-                            <MapPin className="w-3 h-3 text-gray-400 shrink-0" />
-                            {evt.venue.split(' ')[0]} • {evt.booth}
-                          </span>
-                          <span className="font-mono text-[#9D174D] font-semibold shrink-0">
-                            {evt.printsQuota}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+            <div className="p-6">
+              {upcomingSchedule.length === 0 ? (
+                <div className="text-center py-6 text-xs text-gray-500 space-y-1.5">
+                  <CalendarDays className="w-8 h-8 text-gray-300 mx-auto mb-1" />
+                  <p className="font-semibold text-gray-700">Belum ada jadwal event mendatang</p>
+                  <p className="text-[11px] text-gray-400">Semua kios beroperasi normal untuk pengunjung walk-in.</p>
                 </div>
-              ))}
+              ) : (
+                upcomingSchedule.map((group, gIdx) => (
+                  <div key={gIdx} className="flex gap-4">
+                    <div className="w-12 shrink-0 text-center">
+                      <span className="text-[11px] font-bold text-gray-400 uppercase block">
+                        {group.dayName}
+                      </span>
+                      <span className="text-2xl font-black text-gray-900 tracking-tight block">
+                        {group.dayNumber}
+                      </span>
+                    </div>
+                    <div className="flex-1 space-y-2.5">
+                      {group.events.map((evt: any) => (
+                        <div
+                          key={evt.id}
+                          className={`p-3 rounded-xl bg-gray-50 border border-gray-200/80 border-l-4 ${evt.accentColor} space-y-1`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-mono text-[11px] font-bold text-gray-900">
+                              {evt.time}
+                            </span>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white border border-gray-200 text-gray-600">
+                              {evt.tag}
+                            </span>
+                          </div>
+                          <h4 className="text-xs font-bold text-gray-900 leading-snug">
+                            {evt.title}
+                          </h4>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
@@ -921,34 +785,42 @@ export default function DashboardPage() {
             </div>
 
             <div className="divide-y divide-gray-100">
-              {recentTransactions.map((tx) => (
-                <div
-                  key={tx.id}
-                  className="px-6 py-3.5 flex items-center justify-between hover:bg-gray-50/80 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-pink-50 border border-pink-200 text-[#DE5795] font-bold text-xs flex items-center justify-center shrink-0">
-                      {tx.avatar}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-bold text-gray-900">{tx.customer}</span>
-                        <span className="text-[10px] font-mono text-gray-400">({tx.id})</span>
-                      </div>
-                      <span className="text-[11px] text-gray-500">
-                        {tx.method} • {tx.copies} lembar
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="text-right">
-                    <span className="font-mono text-xs font-bold text-[#9D174D] block">
-                      Rp {tx.amount.toLocaleString('id-ID')}
-                    </span>
-                    <span className="text-[10px] text-gray-400">{tx.time}</span>
-                  </div>
+              {recentTransactions.length === 0 ? (
+                <div className="text-center py-8 text-xs text-gray-500 space-y-1.5">
+                  <CreditCard className="w-8 h-8 text-gray-300 mx-auto mb-1" />
+                  <p className="font-semibold text-gray-700">Belum ada transaksi kasir hari ini</p>
+                  <p className="text-[11px] text-gray-400">Transaksi baru akan otomatis muncul di sini setelah customer membayar.</p>
                 </div>
-              ))}
+              ) : (
+                recentTransactions.map((tx) => (
+                  <div
+                    key={tx.id}
+                    className="px-6 py-3.5 flex items-center justify-between hover:bg-gray-50/80 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-pink-50 border border-pink-200 text-[#DE5795] font-bold text-xs flex items-center justify-center shrink-0">
+                        {tx.avatar}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-bold text-gray-900">{tx.customer}</span>
+                          <span className="text-[10px] font-mono text-gray-400">({tx.id})</span>
+                        </div>
+                        <span className="text-[11px] text-gray-500">
+                          {tx.method} • {tx.copies} lembar
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <span className="font-mono text-xs font-bold text-[#9D174D] block">
+                        Rp {tx.amount.toLocaleString('id-ID')}
+                      </span>
+                      <span className="text-[10px] text-gray-400">{tx.time}</span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

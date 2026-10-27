@@ -13,6 +13,8 @@ type RouterDependencies struct {
 	BoothHandler    *handlers.BoothHandler
 	SessionHandler  *handlers.SessionHandler
 	TemplateHandler *handlers.TemplateHandler
+	CustomerHandler *handlers.CustomerHandler
+	QueueHandler    *handlers.QueueHandler
 }
 
 func SetupRouter(deps *RouterDependencies) *gin.Engine {
@@ -66,6 +68,30 @@ func SetupRouter(deps *RouterDependencies) *gin.Engine {
 			templates.PATCH("/:id/toggle", deps.TemplateHandler.ToggleActive)
 			templates.PATCH("/:id/archive", deps.TemplateHandler.ToggleArchive)
 			templates.POST("/:id/duplicate", deps.TemplateHandler.DuplicateTemplate)
+		}
+
+		// Customer CRM routes (Walk-in directory)
+		if deps.CustomerHandler != nil {
+			customers := v1.Group("/customers")
+			{
+				customers.GET("", deps.CustomerHandler.ListCustomers)
+				customers.GET("/:id", deps.CustomerHandler.GetCustomer)
+				customers.POST("", deps.CustomerHandler.CreateCustomer)
+				customers.DELETE("/:id", deps.CustomerHandler.DeleteCustomer)
+			}
+		}
+
+		// Queue Management routes
+		if deps.QueueHandler != nil {
+			queues := v1.Group("/queues")
+			{
+				queues.GET("", deps.QueueHandler.ListQueues)
+				queues.GET("/:id", deps.QueueHandler.GetQueue)
+				queues.POST("", deps.QueueHandler.CreateQueue)
+				queues.PATCH("/:id/status", deps.QueueHandler.UpdateStatus)
+				queues.POST("/call-next", deps.QueueHandler.CallNext)
+				queues.POST("/:id/cancel", deps.QueueHandler.CancelQueue)
+			}
 		}
 	}
 

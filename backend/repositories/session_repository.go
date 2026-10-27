@@ -36,11 +36,11 @@ func scanSession(row interface {
 	Scan(dest ...interface{}) error
 }) (*models.PhotoSession, error) {
 	var s models.PhotoSession
-	var cName, cEmail, tID, fComp, qrCode, notes, idemp sql.NullString
+	var cName, cEmail, cPhone, qNumber, tID, fComp, qrCode, notes, idemp sql.NullString
 	var startedAt, endedAt sql.NullTime
 
 	err := row.Scan(
-		&s.ID, &s.BoothID, &s.SessionCode, &cName, &cEmail, &s.Status,
+		&s.ID, &s.BoothID, &s.SessionCode, &cName, &cEmail, &cPhone, &qNumber, &s.Status,
 		&s.TotalPhotos, &s.PrintCopies, &tID, &s.CountdownSeconds, &s.RetakeCount,
 		&s.FilterPreset, &idemp, &s.CapturedPhotos, &fComp, &qrCode, &notes,
 		&startedAt, &endedAt, &s.CreatedAt, &s.UpdatedAt,
@@ -51,6 +51,8 @@ func scanSession(row interface {
 
 	s.CustomerName = cName.String
 	s.CustomerEmail = cEmail.String
+	s.CustomerPhone = cPhone.String
+	s.QueueNumber = qNumber.String
 	s.TemplateID = tID.String
 	s.FinalCompositeURL = fComp.String
 	s.QRCodeURL = qrCode.String
@@ -78,7 +80,7 @@ func (r *sessionRepository) FindAll(ctx context.Context, boothID string, status 
 
 	query := `
 		SELECT 
-			id, booth_id, session_code, customer_name, customer_email, status,
+			id, booth_id, session_code, customer_name, customer_email, customer_phone, queue_number, status,
 			total_photos, print_copies, template_id, countdown_seconds, retake_count,
 			filter_preset, idempotency_key, captured_photos, final_composite_url, qr_code_url, notes,
 			started_at, ended_at, created_at, updated_at
@@ -114,7 +116,7 @@ func (r *sessionRepository) FindByID(ctx context.Context, id string) (*models.Ph
 
 	query := `
 		SELECT 
-			id, booth_id, session_code, customer_name, customer_email, status,
+			id, booth_id, session_code, customer_name, customer_email, customer_phone, queue_number, status,
 			total_photos, print_copies, template_id, countdown_seconds, retake_count,
 			filter_preset, idempotency_key, captured_photos, final_composite_url, qr_code_url, notes,
 			started_at, ended_at, created_at, updated_at
@@ -139,7 +141,7 @@ func (r *sessionRepository) FindActiveByBoothID(ctx context.Context, boothID str
 
 	query := `
 		SELECT 
-			id, booth_id, session_code, customer_name, customer_email, status,
+			id, booth_id, session_code, customer_name, customer_email, customer_phone, queue_number, status,
 			total_photos, print_copies, template_id, countdown_seconds, retake_count,
 			filter_preset, idempotency_key, captured_photos, final_composite_url, qr_code_url, notes,
 			started_at, ended_at, created_at, updated_at
@@ -173,16 +175,17 @@ func (r *sessionRepository) Create(ctx context.Context, session *models.PhotoSes
 
 	query := `
 		INSERT INTO photo_sessions (
-			id, booth_id, session_code, customer_name, customer_email, status,
+			id, booth_id, session_code, customer_name, customer_email, customer_phone, queue_number, status,
 			total_photos, print_copies, template_id, countdown_seconds, retake_count,
 			filter_preset, idempotency_key, captured_photos, final_composite_url, qr_code_url, notes,
 			started_at, ended_at, created_at, updated_at
 		) VALUES (
-			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21
+			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23
 		)
 	`
 	_, err := r.db.ExecContext(ctx, query,
 		session.ID, session.BoothID, session.SessionCode, session.CustomerName, session.CustomerEmail,
+		session.CustomerPhone, session.QueueNumber,
 		session.Status, session.TotalPhotos, session.PrintCopies, session.TemplateID, session.CountdownSeconds,
 		session.RetakeCount, session.FilterPreset, session.IdempotencyKey, session.CapturedPhotos,
 		session.FinalCompositeURL, session.QRCodeURL, session.Notes, session.StartedAt, session.EndedAt,
@@ -201,14 +204,14 @@ func (r *sessionRepository) Update(ctx context.Context, session *models.PhotoSes
 			status = $1, total_photos = $2, print_copies = $3, template_id = $4,
 			countdown_seconds = $5, retake_count = $6, filter_preset = $7,
 			captured_photos = $8, final_composite_url = $9, qr_code_url = $10,
-			notes = $11, ended_at = $12, updated_at = NOW()
-		WHERE id = $13
+			notes = $11, ended_at = $12, customer_phone = $13, queue_number = $14, updated_at = NOW()
+		WHERE id = $15
 	`
 	_, err := r.db.ExecContext(ctx, query,
 		session.Status, session.TotalPhotos, session.PrintCopies, session.TemplateID,
 		session.CountdownSeconds, session.RetakeCount, session.FilterPreset,
 		session.CapturedPhotos, session.FinalCompositeURL, session.QRCodeURL,
-		session.Notes, session.EndedAt, session.ID,
+		session.Notes, session.EndedAt, session.CustomerPhone, session.QueueNumber, session.ID,
 	)
 	return err
 }

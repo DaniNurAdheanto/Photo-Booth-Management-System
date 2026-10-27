@@ -27,6 +27,8 @@ type PhotoSession struct {
 	SessionCode       string        `json:"session_code" db:"session_code"`
 	CustomerName      string        `json:"customer_name,omitempty" db:"customer_name"`
 	CustomerEmail     string        `json:"customer_email,omitempty" db:"customer_email"`
+	CustomerPhone     string        `json:"customer_phone,omitempty" db:"customer_phone"`
+	QueueNumber       string        `json:"queue_number,omitempty" db:"queue_number"`
 	Status            SessionStatus `json:"status" db:"status"`
 	TotalPhotos       int           `json:"total_photos" db:"total_photos"`
 	PrintCopies       int           `json:"print_copies" db:"print_copies"`
@@ -47,6 +49,8 @@ type StartSessionInput struct {
 	BoothID          string `json:"booth_id" binding:"required"`
 	CustomerName     string `json:"customer_name"`
 	CustomerEmail    string `json:"customer_email"`
+	CustomerPhone    string `json:"customer_phone"`
+	QueueNumber      string `json:"queue_number"`
 	TemplateID       string `json:"template_id"`
 	TotalPhotos      int    `json:"total_photos"`
 	PrintCopies      int    `json:"print_copies"`
